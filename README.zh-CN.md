@@ -122,6 +122,6 @@ A12 设备的雷达切换根因、已完成优化、真机验收标准和后续�
 
 ## 作者与许可证
 
-RAYN Weather 由 **QHWORK** 创建并维护，欢迎通过 Issue 和 Pull Request 参与贡献。
+RAYN Weather 由 **QHWORK** 创建并维护，欢迎通过 Issue 和 Pull Request 参与贡献。项目来源、签名密钥指纹与验证方法见 [`PROVENANCE.md`](PROVENANCE.md)。
 
 项目源代码与原创资源采用 [MIT License](LICENSE) 开放。天气数据、雷达瓦片、Apple 平台框架与相关商标不属于 MIT 授权范围，分别受其提供方条款约束。详见 [`NOTICE.md`](NOTICE.md)。

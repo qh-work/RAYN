@@ -127,7 +127,7 @@ The production application must continue to use real provider responses. Fixture
 
 ## Creator
 
-RAYN Weather was created and is maintained by **QHWORK**. See [`AUTHORS.md`](AUTHORS.md) for the public attribution policy.
+RAYN Weather was created and is maintained by **QHWORK**. See [`AUTHORS.md`](AUTHORS.md) for the public attribution policy and [`PROVENANCE.md`](PROVENANCE.md) for the signed origin record and verification instructions.
 
 ## License and disclaimer
 
