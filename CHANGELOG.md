@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-17
+
+### Added
+
+- Added automatic system-language support for English, French, German, Spanish, Italian, Japanese, Korean, Simplified Chinese, and Traditional Chinese.
+- Added localization bundle, script-selection, and format-placeholder regression tests.
+
+### Changed
+
+- Localized weather states, summaries, dates, location search, settings, radar, astronomy, marine conditions, and accessibility labels through Xcode String Catalogs.
+- Changed unsupported interface languages to fall back consistently to English.
+- Removed the secondary `RAYN` and `Weather Studio` branding from the in-app header and Settings screen.
+- Improved tvOS focus recovery after weather-scene handoffs while preserving the normal five-second control auto-hide behavior.
+
 ## [1.0.1] - 2026-08-17
 
 ### Added
@@ -31,6 +45,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/qh-work/RAYN/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/qh-work/RAYN/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qh-work/RAYN/releases/tag/v1.0.0

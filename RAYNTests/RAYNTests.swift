@@ -42,15 +42,16 @@ final class RAYNTests: XCTestCase {
     let names = ["beijing", "shanghai", "new-york", "shenzhen", "london", "vancouver"]
     let locations = names.compactMap(AppConfiguration.captureLocation(named:))
     XCTAssertEqual(locations.count, names.count)
-    XCTAssertEqual(locations.first?.name, "北京市")
+    XCTAssertEqual(locations.first?.name, String(localized: "Beijing"))
     XCTAssertEqual(locations[2].timezoneIdentifier, "America/New_York")
     XCTAssertNil(AppConfiguration.captureLocation(named: "private-location"))
     #endif
   }
 
   func testWeatherCodeMapping() {
-    XCTAssertEqual(WeatherCodeMapper.description(for: 0, isDay: true), "晴")
-    XCTAssertEqual(WeatherCodeMapper.description(for: 95, isDay: true), "雷暴")
+    XCTAssertEqual(WeatherCodeMapper.description(for: 0, isDay: true), String(localized: "Clear"))
+    XCTAssertEqual(
+      WeatherCodeMapper.description(for: 95, isDay: true), String(localized: "Thunderstorm"))
     XCTAssertEqual(WeatherCodeMapper.symbol(for: 73, isDay: true), "cloud.snow.fill")
   }
 
@@ -100,19 +101,28 @@ final class RAYNTests: XCTestCase {
     var snapshot = WeatherSnapshot.testFixture
     snapshot.current.high = 32
     snapshot.current.low = 21
+    var drySnapshot = snapshot
+    drySnapshot.hourly = drySnapshot.hourly.map {
+      var point = $0
+      point.precipitationProbability = 0
+      return point
+    }
     snapshot.hourly[3].precipitationProbability = 86
     snapshot.summary = WeatherSummaryBuilder.make(from: snapshot)
-    XCTAssertTrue(snapshot.summary.headline.contains("降水概率升高"))
-    XCTAssertTrue(snapshot.summary.insights.contains { $0.contains("温差") })
+    let drySummary = WeatherSummaryBuilder.make(from: drySnapshot)
+    XCTAssertNotEqual(snapshot.summary.headline, drySummary.headline)
+    XCTAssertGreaterThan(snapshot.summary.insights.count, drySummary.insights.count)
   }
 
   func testAQILevelsAndAdvice() {
     var air = WeatherSnapshot.testFixture.airQuality!
     air.europeanAQI = 18
-    XCTAssertEqual(air.level, "优")
-    XCTAssertTrue(air.advice.contains("适宜"))
+    XCTAssertEqual(air.level, String(localized: "Excellent"))
+    XCTAssertEqual(
+      air.advice,
+      String(localized: "Air quality is suitable for outdoor activities. Sensitive groups can adjust as needed."))
     air.europeanAQI = 92
-    XCTAssertEqual(air.level, "重度污染")
+    XCTAssertEqual(air.level, String(localized: "Very Poor"))
   }
 
   func testOptionalFieldsSurviveRoundTrip() throws {
@@ -245,7 +255,7 @@ final class RAYNTests: XCTestCase {
     let result = await coordinator.refresh(location: .beijing, fallback: fallback)
     XCTAssertNil(result.snapshot)
     XCTAssertTrue(result.forecastAttempted)
-    XCTAssertEqual(Set(result.failedSources), Set(["天气", "空气质量", "雷达", "海洋"]))
+    XCTAssertEqual(Set(result.failedSources), Set(["forecast", "airQuality", "radar", "marine"]))
   }
 
   func testWeatherKitProviderExplicitlyFallsBack() async {
@@ -298,7 +308,9 @@ final class RAYNTests: XCTestCase {
   func testRadarNoCoverageModelIsSafe() {
     XCTAssertFalse(RadarSnapshot.unavailable.isAvailable)
     XCTAssertTrue(RadarSnapshot.unavailable.frames.isEmpty)
-    XCTAssertTrue(RadarSnapshot.unavailable.message?.contains("暂无") == true)
+    XCTAssertEqual(
+      RadarSnapshot.unavailable.message,
+      String(localized: "No radar imagery is available for this area."))
   }
 
   func testHeavySceneHandoffAndRadarWarmupAreSerialized() {
@@ -327,8 +339,8 @@ final class RAYNTests: XCTestCase {
     current.precipitationProbability = 75
     let advice = ClothingAdviceBuilder.make(from: current)
     XCTAssertEqual(advice.index, .light)
-    XCTAssertTrue(advice.outfit.contains("短袖"))
-    XCTAssertTrue(advice.detail.contains("带伞"))
+    XCTAssertEqual(advice.outfit, String(localized: "T-shirt or lightweight long sleeves"))
+    XCTAssertTrue(advice.detail.contains(String(localized: "Rain is likely. Remember an umbrella.")))
   }
 
   @MainActor
@@ -372,6 +384,61 @@ final class RAYNTests: XCTestCase {
     let summary = WeatherSummaryBuilder.make(from: .testFixture, unit: .fahrenheit)
     XCTAssertTrue(summary.headline.contains("℉"))
     XCTAssertFalse(summary.headline.contains("℃"))
+  }
+
+  func testEverySupportedLocalizationBundleIsPackaged() throws {
+    XCTAssertEqual(
+      Set(L10n.supportedLanguageCodes),
+      Set(["en", "fr", "de", "es", "it", "ja", "ko", "zh-Hans", "zh-Hant"])
+    )
+    for languageCode in L10n.supportedLanguageCodes {
+      XCTAssertNotNil(
+        L10n.bundle(for: languageCode),
+        "Missing packaged localization for \(languageCode)"
+      )
+    }
+  }
+
+  func testRepresentativeTranslationsAreCompleteAndDistinct() throws {
+    let expected = [
+      "en": "Air Quality",
+      "fr": "Qualité de l’air",
+      "de": "Luftqualität",
+      "es": "Calidad del aire",
+      "it": "Qualità dell’aria",
+      "ja": "大気質",
+      "ko": "대기질",
+      "zh-Hans": "空气质量",
+      "zh-Hant": "空氣品質",
+    ]
+
+    for languageCode in L10n.supportedLanguageCodes {
+      let bundle = try XCTUnwrap(L10n.bundle(for: languageCode))
+      XCTAssertEqual(L10n.string("Air Quality", bundle: bundle), expected[languageCode])
+      XCTAssertNotEqual(L10n.string("Settings", bundle: bundle), "")
+      XCTAssertNotEqual(L10n.string("Precipitation Radar", bundle: bundle), "")
+    }
+  }
+
+  func testChineseScriptBundlesRemainDistinct() throws {
+    let simplified = try XCTUnwrap(L10n.bundle(for: "zh-CN"))
+    let traditional = try XCTUnwrap(L10n.bundle(for: "zh-TW"))
+    XCTAssertEqual(L10n.string("Settings", bundle: simplified), "设置")
+    XCTAssertEqual(L10n.string("Settings", bundle: traditional), "設定")
+  }
+
+  func testLocationSearchUsesSupportedSystemLanguageOrEnglishFallback() {
+    let expected = [
+      "en_US": "en", "fr_FR": "fr", "de_DE": "de", "es_ES": "es",
+      "it_IT": "it", "ja_JP": "ja", "ko_KR": "ko", "zh_Hant_TW": "zh",
+      "pt_BR": "en",
+    ]
+    for (identifier, languageCode) in expected {
+      XCTAssertEqual(
+        OpenMeteoLocationSearchProvider.requestLanguageCode(for: Locale(identifier: identifier)),
+        languageCode
+      )
+    }
   }
 }
 

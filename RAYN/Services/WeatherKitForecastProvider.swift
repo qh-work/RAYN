@@ -28,7 +28,7 @@ struct AppleWeatherKitProvider: ForecastProvider {
             if let error = error as? WeatherProviderError {
                 throw error
             }
-            throw WeatherProviderError.unavailable("WeatherKit 请求失败：\(error.localizedDescription)")
+            throw WeatherProviderError.unavailable(String(localized: "WeatherKit request failed: \(error.localizedDescription)"))
         }
     }
 
@@ -202,7 +202,7 @@ import Foundation
 /// shared source previews and non-Apple test environments.
 struct AppleWeatherKitProvider: ForecastProvider {
     func fetchForecast(for location: SavedLocation) async throws -> WeatherSnapshot {
-        throw WeatherProviderError.unavailable("WeatherKit 当前不可用，请启用 WeatherKit capability。")
+        throw WeatherProviderError.unavailable(String(localized: "WeatherKit is unavailable. Enable the WeatherKit capability."))
     }
 }
 #endif

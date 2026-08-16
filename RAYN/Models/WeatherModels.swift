@@ -12,12 +12,12 @@ enum BroadcastScene: String, CaseIterable, Codable, Identifiable {
 
     var title: String {
         switch self {
-        case .current: return "此刻"
-        case .hourly: return "24小时"
-        case .daily: return "未来10天"
-        case .radar: return "降水雷达"
-        case .airQuality: return "空气质量"
-        case .astronomy: return "日照月相"
+        case .current: return String(localized: "Now")
+        case .hourly: return String(localized: "24 Hours")
+        case .daily: return String(localized: "10-Day Forecast")
+        case .radar: return String(localized: "Precipitation Radar")
+        case .airQuality: return String(localized: "Air Quality")
+        case .astronomy: return String(localized: "Sun & Moon")
         }
     }
 
@@ -37,21 +37,25 @@ enum TemperatureUnit: String, Codable, CaseIterable {
     case celsius
     case fahrenheit
 
-    var title: String { self == .celsius ? "摄氏度（℃）" : "华氏度（℉）" }
+    var title: String {
+        self == .celsius ? String(localized: "Celsius (°C)") : String(localized: "Fahrenheit (°F)")
+    }
 }
 
 enum MeasurementSystem: String, Codable, CaseIterable {
     case metric
     case imperial
 
-    var title: String { self == .metric ? "公制" : "英制" }
+    var title: String { self == .metric ? String(localized: "Metric") : String(localized: "Imperial") }
 }
 
 enum ClockFormat: String, Codable, CaseIterable {
     case twentyFourHour
     case twelveHour
 
-    var title: String { self == .twentyFourHour ? "24小时制" : "12小时制" }
+    var title: String {
+        self == .twentyFourHour ? String(localized: "24-Hour") : String(localized: "12-Hour")
+    }
 }
 
 enum DynamicIntensity: String, Codable, CaseIterable {
@@ -61,9 +65,9 @@ enum DynamicIntensity: String, Codable, CaseIterable {
 
     var title: String {
         switch self {
-        case .low: return "低"
-        case .medium: return "中"
-        case .high: return "高"
+        case .low: return String(localized: "Low")
+        case .medium: return String(localized: "Medium")
+        case .high: return String(localized: "High")
         }
     }
 
@@ -83,9 +87,9 @@ enum ViewingDistance: String, Codable, CaseIterable {
 
     var title: String {
         switch self {
-        case .near: return "近距离"
-        case .standard: return "标准观看"
-        case .far: return "远距离"
+        case .near: return String(localized: "Near")
+        case .standard: return String(localized: "Standard")
+        case .far: return String(localized: "Far")
         }
     }
 
@@ -152,7 +156,7 @@ struct SavedLocation: Codable, Identifiable, Equatable, Hashable {
 
     static let currentPlaceholder = SavedLocation(
         id: UUID(uuidString: "00000000-0000-0000-0000-000000000002") ?? UUID(),
-        name: "正在定位",
+        name: String(localized: "Locating…"),
         administrativeArea: "",
         country: "",
         latitude: 0,
@@ -245,20 +249,20 @@ struct AirQualitySnapshot: Codable, Equatable {
 
     var level: String {
         switch europeanAQI {
-        case ..<20: return "优"
-        case ..<40: return "良"
-        case ..<60: return "轻度污染"
-        case ..<80: return "中度污染"
-        case ..<100: return "重度污染"
-        default: return "严重污染"
+        case ..<20: return String(localized: "Excellent")
+        case ..<40: return String(localized: "Good")
+        case ..<60: return String(localized: "Moderate Pollution")
+        case ..<80: return String(localized: "Poor")
+        case ..<100: return String(localized: "Very Poor")
+        default: return String(localized: "Extremely Poor")
         }
     }
 
     var advice: String {
         switch europeanAQI {
-        case ..<40: return "空气状况适宜户外活动，敏感人群可按需调整。"
-        case ..<80: return "建议敏感人群减少长时间、高强度户外活动。"
-        default: return "建议减少户外停留时间，必要时做好防护。"
+        case ..<40: return String(localized: "Air quality is suitable for outdoor activities. Sensitive groups can adjust as needed.")
+        case ..<80: return String(localized: "Sensitive groups should reduce prolonged or intense outdoor activity.")
+        default: return String(localized: "Reduce time outdoors and take precautions when necessary.")
         }
     }
 
@@ -324,7 +328,10 @@ struct RadarSnapshot: Codable, Equatable {
     var isAvailable: Bool
     var message: String?
 
-    static let unavailable = RadarSnapshot(frames: [], selectedIndex: 0, isAvailable: false, message: "当前区域暂无可用雷达图像")
+    static let unavailable = RadarSnapshot(
+        frames: [], selectedIndex: 0, isAvailable: false,
+        message: String(localized: "No radar imagery is available for this area.")
+    )
 }
 
 struct MarineSnapshot: Codable, Equatable {
@@ -379,7 +386,12 @@ struct WeatherSummary: Codable, Equatable {
     var insights: [String]
     var hasAlert: Bool
 
-    static let empty = WeatherSummary(headline: "正在生成天气播报", detail: "天气数据准备中。", insights: [], hasAlert: false)
+    static let empty = WeatherSummary(
+        headline: String(localized: "Preparing weather summary"),
+        detail: String(localized: "Weather data is loading."),
+        insights: [],
+        hasAlert: false
+    )
 }
 
 enum ClothingIndex: String, Equatable {
@@ -390,10 +402,10 @@ enum ClothingIndex: String, Equatable {
 
     var title: String {
         switch self {
-        case .cool: return "偏凉"
-        case .comfortable: return "舒适"
-        case .light: return "清爽"
-        case .hot: return "炎热"
+        case .cool: return String(localized: "Cool")
+        case .comfortable: return String(localized: "Comfortable")
+        case .light: return String(localized: "Mild")
+        case .hot: return String(localized: "Hot")
         }
     }
 
@@ -423,29 +435,29 @@ enum ClothingAdviceBuilder {
         switch apparent {
         case ..<8:
             index = .cool
-            outfit = "厚外套或羽绒服"
-            detail = "体感偏冷，早晚注意保暖。"
+            outfit = String(localized: "Heavy coat or down jacket")
+            detail = String(localized: "It feels cold. Keep warm, especially in the morning and evening.")
         case 8..<16:
             index = .cool
-            outfit = "夹克或薄外套"
-            detail = "早晚偏凉，建议准备一件外套。"
+            outfit = String(localized: "Jacket or light coat")
+            detail = String(localized: "Mornings and evenings feel cool. Bring a jacket.")
         case 16..<24:
             index = .comfortable
-            outfit = "长袖或薄外套"
-            detail = "体感舒适，分层穿着更方便。"
+            outfit = String(localized: "Long sleeves or a light jacket")
+            detail = String(localized: "Conditions feel comfortable. Layers make it easier to adjust.")
         case 24..<29:
             index = .light
-            outfit = "短袖或轻薄长袖"
-            detail = "体感温和，选择轻便透气的衣物。"
+            outfit = String(localized: "T-shirt or lightweight long sleeves")
+            detail = String(localized: "Conditions feel mild. Choose light, breathable clothing.")
         default:
             index = .hot
-            outfit = "短袖等清凉夏装"
-            detail = "体感偏热，注意通风、补水与防晒。"
+            outfit = String(localized: "Light summer clothing")
+            detail = String(localized: "It feels hot. Stay ventilated, hydrated, and protected from the sun.")
         }
 
         var extra = detail
         if current.precipitationProbability >= 60 {
-            extra += " 降水概率较高，出门记得带伞。"
+            extra += " " + String(localized: "Rain is likely. Remember an umbrella.")
         }
         return ClothingAdvice(index: index, outfit: outfit, detail: extra)
     }
@@ -470,14 +482,14 @@ enum MoonPhaseCalculator {
         let illumination = (1 - cos(2 * Double.pi * age / synodicMonth)) / 2
         let phase: (title: String, symbolName: String)
         switch age {
-        case 1.85..<7.38: phase = ("蛾眉月", "moon.haze.fill")
-        case 7.38..<9.23: phase = ("上弦月", "moon.phase.first.quarter")
-        case 9.23..<14.77: phase = ("盈凸月", "moon.circle.fill")
-        case 14.77..<16.62: phase = ("满月", "moon.fill")
-        case 16.62..<22.15: phase = ("亏凸月", "moon.circle.fill")
-        case 22.15..<24.00: phase = ("下弦月", "moon.phase.last.quarter")
-        case 24.00..<28.00: phase = ("残月", "moon.haze.fill")
-        default: phase = ("新月", "moon.zzz.fill")
+        case 1.85..<7.38: phase = (String(localized: "Waxing Crescent"), "moon.haze.fill")
+        case 7.38..<9.23: phase = (String(localized: "First Quarter"), "moon.phase.first.quarter")
+        case 9.23..<14.77: phase = (String(localized: "Waxing Gibbous"), "moon.circle.fill")
+        case 14.77..<16.62: phase = (String(localized: "Full Moon"), "moon.fill")
+        case 16.62..<22.15: phase = (String(localized: "Waning Gibbous"), "moon.circle.fill")
+        case 22.15..<24.00: phase = (String(localized: "Last Quarter"), "moon.phase.last.quarter")
+        case 24.00..<28.00: phase = (String(localized: "Waning Crescent"), "moon.haze.fill")
+        default: phase = (String(localized: "New Moon"), "moon.zzz.fill")
         }
         let next = nextMajorPhase(after: age, date: date)
         return MoonPhaseInfo(title: phase.title, symbolName: phase.symbolName, illumination: illumination, age: age, nextPhaseTitle: next.title, nextPhaseDate: next.date)
@@ -485,17 +497,17 @@ enum MoonPhaseCalculator {
 
     private static func nextMajorPhase(after age: Double, date: Date) -> (title: String, date: Date) {
         let phases: [(age: Double, title: String)] = [
-            (0, "新月"),
-            (7.38, "上弦月"),
-            (14.77, "满月"),
-            (22.15, "下弦月")
+            (0, String(localized: "New Moon")),
+            (7.38, String(localized: "First Quarter")),
+            (14.77, String(localized: "Full Moon")),
+            (22.15, String(localized: "Last Quarter"))
         ]
         let next = phases
             .map { phase in
                 let delta = phase.age >= age ? phase.age - age : synodicMonth - age + phase.age
                 return (phase.title, delta)
             }
-            .min(by: { $0.1 < $1.1 }) ?? ("新月", synodicMonth - age)
+            .min(by: { $0.1 < $1.1 }) ?? (String(localized: "New Moon"), synodicMonth - age)
         return (next.0, date.addingTimeInterval(next.1 * 86_400))
     }
 }
@@ -530,53 +542,54 @@ enum WeatherSummaryBuilder {
         let formattedHigh = current.high.formattedTemperature(unit: unit)
         let formattedCurrent = current.temperature.formattedTemperature(unit: unit)
         let formattedFeelsLike = current.feelsLike.formattedTemperature(unit: unit)
-        var headline = "今天以\(condition)为主，最高气温\(formattedHigh)\(unitSymbol)。"
+        var headline = String(localized: "Today will be mostly \(condition), with a high of \(formattedHigh)\(unitSymbol).")
         if maxRain >= 60 {
-            headline += "\(rainHours.first.map { formatHour($0.time, timezone: snapshot.timezoneIdentifier) } ?? "稍后")前后降水概率升高。"
+            let rainTime = rainHours.first.map { formatHour($0.time, timezone: snapshot.timezoneIdentifier) } ?? String(localized: "later")
+            headline += " " + String(localized: "Rain chances rise around \(rainTime).")
         }
 
-        var details = "当前\(formattedCurrent)\(unitSymbol)，体感\(formattedFeelsLike)\(unitSymbol)；"
+        var detailParts = [String(localized: "Currently \(formattedCurrent)\(unitSymbol), feels like \(formattedFeelsLike)\(unitSymbol).")]
         if let airQuality = snapshot.airQuality {
-            details += "空气质量\(airQuality.level)，AQI \(Int(airQuality.europeanAQI.rounded()))。"
+            detailParts.append(String(localized: "Air quality is \(airQuality.level), with an AQI of \(Int(airQuality.europeanAQI.rounded()))."))
         } else {
-            details += "空气质量数据暂不可用。"
+            detailParts.append(String(localized: "Air-quality data is currently unavailable."))
         }
 
         var insights = [String]()
         if current.temperature - current.low >= 6 {
             let displayRange = unit == .celsius ? range : range * 9 / 5
             let formattedRange = displayRange.formattedNumber(decimals: 0)
-            insights.append("昼夜温差约\(formattedRange)\(unitSymbol)，早晚体感更凉。")
+            insights.append(String(localized: "The day–night temperature range is about \(formattedRange)\(unitSymbol), so mornings and evenings will feel cooler."))
         }
         if maxRain >= 60 {
-            insights.append("未来24小时最大降水概率约\(Int(maxRain.rounded()))%，建议随身携带雨具。")
+            insights.append(String(localized: "The highest rain chance in the next 24 hours is about \(Int(maxRain.rounded()))%. Carry an umbrella."))
         }
         if maxGust >= 30 {
-            insights.append("阵风可能达到\(Int(maxGust.rounded())) km/h，沿海区域注意风力变化。")
+            insights.append(String(localized: "Wind gusts may reach \(Int(maxGust.rounded())) km/h. Coastal areas should monitor changing winds."))
         }
         if current.uvIndex >= 6 {
-            insights.append("午后紫外线较强，长时间户外活动建议做好防晒。")
+            insights.append(String(localized: "Afternoon UV levels are high. Use sun protection for extended outdoor activity."))
         }
         let futureAverageHigh = snapshot.daily.map(\.high).average
         if let futureAverageHigh, current.high - futureAverageHigh >= 2 {
             let delta = unit == .celsius ? current.high - futureAverageHigh : (current.high - futureAverageHigh) * 9 / 5
-            insights.append("今天最高气温高于未来10天平均约\(Int(delta.rounded()))\(unitSymbol)。")
+            insights.append(String(localized: "Today's high is about \(Int(delta.rounded()))\(unitSymbol) above the 10-day average."))
         } else if let futureAverageHigh, futureAverageHigh - current.high >= 2 {
             let delta = unit == .celsius ? futureAverageHigh - current.high : (futureAverageHigh - current.high) * 9 / 5
-            insights.append("今天最高气温低于未来10天平均约\(Int(delta.rounded()))\(unitSymbol)。")
+            insights.append(String(localized: "Today's high is about \(Int(delta.rounded()))\(unitSymbol) below the 10-day average."))
         }
         if insights.isEmpty {
-            insights.append("天气变化平稳，适合按照原计划安排活动。")
+            insights.append(String(localized: "Weather conditions are stable, so planned activities can continue."))
         }
 
-        return WeatherSummary(headline: headline, detail: details, insights: insights, hasAlert: !snapshot.alerts.isEmpty)
+        return WeatherSummary(headline: headline, detail: detailParts.joined(separator: " "), insights: insights, hasAlert: !snapshot.alerts.isEmpty)
     }
 
     private static func formatHour(_ date: Date, timezone: String) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = .autoupdatingCurrent
         formatter.timeZone = TimeZone(identifier: timezone)
-        formatter.dateFormat = "HH时"
+        formatter.setLocalizedDateFormatFromTemplate("j")
         return formatter.string(from: date)
     }
 }

@@ -53,16 +53,16 @@ struct PageHeader: View {
     var body: some View {
         HStack(alignment: .bottom, spacing: 18) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(eyebrow.uppercased())
+                Text(L10n.string(eyebrow).uppercased(with: .autoupdatingCurrent))
                     .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
                     .tracking(2.2)
                     .foregroundStyle(.white.opacity(0.68))
-                Text(title)
+                Text(L10n.string(title))
                     .font(.system(size: 48 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
             if let detail {
-                Text(detail)
+                Text(L10n.string(detail))
                     .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
                     .padding(.bottom, 6)
@@ -101,7 +101,7 @@ struct MetricTile: View {
                 .foregroundStyle(accent)
                 .frame(width: 30 * layoutScale)
             VStack(alignment: .leading, spacing: 3 * layoutScale) {
-                Text(title)
+                Text(L10n.string(title))
                     .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
                 Text(value)
@@ -212,9 +212,11 @@ struct TickerText: View {
 
     private func timeString(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = .autoupdatingCurrent
         formatter.timeZone = appState.localTimeZone
-        formatter.dateFormat = appState.settings.clockFormat == .twentyFourHour ? "HH:mm" : "a h:mm"
+        formatter.setLocalizedDateFormatFromTemplate(
+            appState.settings.clockFormat == .twentyFourHour ? "Hm" : "hm"
+        )
         return formatter.string(from: date)
     }
 }
@@ -223,7 +225,7 @@ struct LiveIndicator: View {
     var body: some View {
         HStack(spacing: 8) {
             Circle().fill(.green).frame(width: 9, height: 9)
-            Text("在线")
+            Text("Live")
                 .font(.system(size: 16, weight: .black, design: .rounded))
                 .tracking(1)
         }
@@ -234,16 +236,16 @@ struct LiveIndicator: View {
 extension Double {
     func formattedTemperature(unit: TemperatureUnit, decimals: Int = 0) -> String {
         let converted = unit == .celsius ? self : (self * 9 / 5) + 32
-        return String(format: "%.*f", decimals, converted)
+        return converted.formatted(.number.precision(.fractionLength(decimals)))
     }
 
     func formattedNumber(decimals: Int = 0) -> String {
-        String(format: "%.*f", decimals, self)
+        formatted(.number.precision(.fractionLength(decimals)))
     }
 
     func formattedSpeed(system: MeasurementSystem) -> String {
         let value = system == .metric ? self : self * 0.621371
-        return "\(Int(value.rounded())) \(system == .metric ? "km/h" : "mph")"
+        return "\(value.formattedNumber()) \(system == .metric ? "km/h" : "mph")"
     }
 
     func formattedDistance(system: MeasurementSystem, decimals: Int = 1) -> String {
@@ -252,12 +254,38 @@ extension Double {
     }
 }
 
+enum WeatherDateTemplate {
+    case time
+    case monthDayTime
+    case monthDay
+    case weekday
+    case fullDate
+    case shortWeekday
+    case hour
+
+    var formatTemplate: String {
+        switch self {
+        case .time: return "Hm"
+        case .monthDayTime: return "MdHm"
+        case .monthDay: return "Md"
+        case .weekday: return "EEEE"
+        case .fullDate: return "yyyyMdEEEE"
+        case .shortWeekday: return "EEE"
+        case .hour: return "j"
+        }
+    }
+}
+
 extension Date {
-    func formatted(_ format: String, timezoneIdentifier: String, localeIdentifier: String = "zh_CN") -> String {
+    func formatted(
+        _ template: WeatherDateTemplate,
+        timezoneIdentifier: String,
+        locale: Locale = .autoupdatingCurrent
+    ) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: localeIdentifier)
+        formatter.locale = locale
         formatter.timeZone = TimeZone(identifier: timezoneIdentifier)
-        formatter.dateFormat = format
+        formatter.setLocalizedDateFormatFromTemplate(template.formatTemplate)
         return formatter.string(from: self)
     }
 }

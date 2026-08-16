@@ -39,6 +39,14 @@ xcodebuild -project RAYN.xcodeproj -scheme RAYN \
 
 Changes involving focus, navigation, radar, or rendering should also run the relevant UI tests and be checked on physical hardware when available.
 
+For any user-facing copy change, also run:
+
+```bash
+ruby Scripts/validate-localizations.rb
+```
+
+Keep all supported languages complete in the String Catalogs. Use stable enum or model values for logic; never branch by comparing a localized display string.
+
 ## Commit and pull-request style
 
 Use concise, imperative commit messages. Conventional prefixes such as `feat:`, `fix:`, `perf:`, `test:`, and `docs:` are welcome but not mandatory.

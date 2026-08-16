@@ -9,14 +9,14 @@ struct DataAttribution: Identifiable, Hashable {
   static let openMeteo = DataAttribution(
     id: "open-meteo",
     title: "Open-Meteo",
-    detail: "天气、空气质量、海况与地址搜索 · CC BY 4.0",
+    detail: String(localized: "Weather, air quality, marine conditions, and location search · CC BY 4.0"),
     urlString: "https://open-meteo.com/"
   )
 
   static let rainViewer = DataAttribution(
     id: "rainviewer",
     title: "RainViewer",
-    detail: "降水雷达地图",
+    detail: String(localized: "Precipitation radar maps"),
     urlString: "https://www.rainviewer.com/"
   )
 
@@ -100,8 +100,8 @@ enum WeatherProviderError: LocalizedError {
 
   var errorDescription: String? {
     switch self {
-    case .invalidURL: return "天气服务地址无效。"
-    case .invalidResponse: return "天气服务返回了无法识别的数据。"
+    case .invalidURL: return String(localized: "The weather service URL is invalid.")
+    case .invalidResponse: return String(localized: "The weather service returned unrecognized data.")
     case .unavailable(let message): return message
     }
   }

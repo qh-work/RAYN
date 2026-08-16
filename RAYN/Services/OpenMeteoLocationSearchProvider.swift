@@ -15,7 +15,7 @@ struct OpenMeteoLocationSearchProvider: LocationSearchProvider {
     var queryItems = [
       URLQueryItem(name: "name", value: searchPlan.name),
       URLQueryItem(name: "count", value: "8"),
-      URLQueryItem(name: "language", value: "zh"),
+      URLQueryItem(name: "language", value: Self.requestLanguageCode(for: .autoupdatingCurrent)),
       URLQueryItem(name: "format", value: "json"),
     ]
     if let countryCode = searchPlan.countryCode {
@@ -57,6 +57,12 @@ struct OpenMeteoLocationSearchProvider: LocationSearchProvider {
     default:
       return (trimmed, nil)
     }
+  }
+
+  static func requestLanguageCode(for locale: Locale) -> String {
+    let code = locale.language.languageCode?.identifier.lowercased() ?? "en"
+    if code == "zh" { return "zh" }
+    return ["en", "fr", "de", "es", "it", "ja", "ko"].contains(code) ? code : "en"
   }
 }
 

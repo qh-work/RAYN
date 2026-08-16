@@ -25,6 +25,18 @@ RAYN Weather 是面向 tvOS 27 的原生 Apple TV 天气演播室。界面、动
 - 数据服务异常时不伪造数值；海况或雷达没有覆盖时显示无覆盖状态。
 - 自动轮播默认关闭，可在全屏设置的“演播轮播”中主动开启；主页不显示实现注释或轮播状态文字。
 
+## 多语言支持
+
+RAYN Weather 会自动跟随 Apple TV 的系统语言，目前完整支持：
+
+- 简体中文、繁体中文
+- 英语、法语、德语、西班牙语、意大利语
+- 日语、韩语
+
+系统使用其他语言时会回退到英语。日期、时间、数字、动态天气摘要、天气状态和辅助功能标签都会随语言变化；地点搜索也会在数据源支持时使用对应语言，不会把界面语言和天气数据层耦合在一起。
+
+所有译文统一维护在 `RAYN/Resources` 下的 Xcode String Catalog 中。新增或修改界面文字后运行 `ruby Scripts/validate-localizations.rb`，可检查缺失语言、过期词条和动态数值占位符错误。
+
 ## 代码结构
 
 ```text
@@ -100,6 +112,7 @@ xcodebuild -project RAYN.xcodeproj -scheme RAYN \
 5. 修改大屏布局后，要在 tvOS 27 Simulator 和实体 Apple TV 上检查焦点路径、远距离可读性和减少动态效果选项。
 6. 不以截图或静态 JSON 代替实时数据；需要 UI 预览时使用测试夹具，并确保它不进入正式启动路径。
 7. Xcode 工程不保存个人 Development Team；真机构建时由维护者在本机选择团队或通过构建参数传入。
+8. 用户可见文字必须进入 String Catalog；不能通过比较译文来判断业务状态，也不能只更新某一种语言。
 
 数据服务、许可证和雷达归因边界见 [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md)。
 

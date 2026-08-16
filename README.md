@@ -29,7 +29,20 @@ More live captures and a tvOS 27 walkthrough are available in the [media gallery
 - Air quality, sun, moon phase, and optional marine conditions without fake fallback values.
 - Location-first startup, saved-place fallback, and no default city baked into the production path.
 - Provider-neutral architecture so forecast, air quality, radar, marine, and location-search services can be replaced independently.
+- Automatic system-language support for English, French, German, Spanish, Italian, Japanese, Korean, Simplified Chinese, and Traditional Chinese.
 - No advertising, analytics SDK, account system, or third-party Swift package dependency.
+
+## Languages
+
+RAYN Weather follows the Apple TV system language automatically. The complete interface, weather conditions, accessibility labels, dates, and dynamic summaries are localized for:
+
+- English, French, German, Spanish, and Italian
+- Japanese and Korean
+- Simplified Chinese and Traditional Chinese
+
+Other system languages fall back to English. Location-search requests use the matching supported language when the provider offers it, while saved provider data remains independent from the interface language.
+
+Translations live in Xcode String Catalogs under `RAYN/Resources`. Run `ruby Scripts/validate-localizations.rb` after adding or changing user-facing text; the validator rejects missing locales, stale entries, and unsafe format placeholders.
 
 ## Requirements
 
@@ -101,6 +114,7 @@ For the product story, current limitations, and public-facing introduction, see 
 ## Testing
 
 - Unit tests cover weather-code mapping, themes, model conversion, provider configuration, source attribution, and failure isolation.
+- Localization tests verify that all nine language bundles are packaged and that Simplified and Traditional Chinese stay distinct.
 - UI tests cover hourly-to-daily-to-radar handoff, all 10 daily detail selections, settings navigation, scene traversal, and focus restoration.
 - CI builds with the public Xcode 27 runner and executes deterministic unit tests.
 - MapKit composition and remote focus are checked on physical Apple TV hardware before each release.

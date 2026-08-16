@@ -1,10 +1,10 @@
 import Foundation
 
 enum RefreshSource: String, CaseIterable {
-  case forecast = "天气"
-  case airQuality = "空气质量"
-  case radar = "雷达"
-  case marine = "海洋"
+  case forecast
+  case airQuality
+  case radar
+  case marine
 
   var refreshInterval: TimeInterval {
     switch self {

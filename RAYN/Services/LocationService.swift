@@ -78,9 +78,9 @@ enum LocationServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .authorizationDenied: return "未获得当前位置权限。"
-        case .requestReplaced: return "新的位置请求已替换当前请求。"
-        case .providerFailure(let message): return "无法获取当前位置：\(message)"
+        case .authorizationDenied: return String(localized: "Location access was not granted.")
+        case .requestReplaced: return String(localized: "A newer location request replaced the current request.")
+        case .providerFailure(let message): return String(localized: "Unable to get the current location: \(message)")
         }
     }
 }
@@ -97,6 +97,6 @@ final class LocationService {
 enum LocationServiceError: LocalizedError {
     case authorizationDenied
     case requestReplaced
-    var errorDescription: String? { "当前位置仅支持 tvOS。" }
+    var errorDescription: String? { String(localized: "Current location is available only on tvOS.") }
 }
 #endif

@@ -23,6 +23,26 @@ enum AppConfiguration {
         #endif
     }
 
+    // These public screenshot/test locations are compiled only as display
+    // labels. Keeping each key explicit lets Xcode include them in every
+    // String Catalog even though capture mode itself is DEBUG-only.
+    private enum PublicLocationLabels {
+        static let beijing = String(localized: "Beijing")
+        static let shanghai = String(localized: "Shanghai")
+        static let china = String(localized: "China")
+        static let newYorkCity = String(localized: "New York City")
+        static let newYork = String(localized: "New York")
+        static let unitedStates = String(localized: "United States")
+        static let shenzhen = String(localized: "Shenzhen")
+        static let guangdong = String(localized: "Guangdong")
+        static let london = String(localized: "London")
+        static let england = String(localized: "England")
+        static let unitedKingdom = String(localized: "United Kingdom")
+        static let vancouver = String(localized: "Vancouver")
+        static let britishColumbia = String(localized: "British Columbia")
+        static let canada = String(localized: "Canada")
+    }
+
     #if DEBUG
     /// Public coordinates used only for reproducible screenshots, UI tests,
     /// and maintainer demos. Values still come from the live providers. A
@@ -30,17 +50,17 @@ enum AppConfiguration {
     static func captureLocation(named value: String?) -> SavedLocation? {
         switch value?.lowercased() {
         case "beijing":
-            return SavedLocation(name: "北京市", administrativeArea: "北京市", country: "中国", latitude: 39.9042, longitude: 116.4074, timezoneIdentifier: "Asia/Shanghai")
+            return SavedLocation(name: PublicLocationLabels.beijing, administrativeArea: PublicLocationLabels.beijing, country: PublicLocationLabels.china, latitude: 39.9042, longitude: 116.4074, timezoneIdentifier: "Asia/Shanghai")
         case "shanghai":
-            return SavedLocation(name: "上海市", administrativeArea: "上海市", country: "中国", latitude: 31.2304, longitude: 121.4737, timezoneIdentifier: "Asia/Shanghai")
+            return SavedLocation(name: PublicLocationLabels.shanghai, administrativeArea: PublicLocationLabels.shanghai, country: PublicLocationLabels.china, latitude: 31.2304, longitude: 121.4737, timezoneIdentifier: "Asia/Shanghai")
         case "new-york":
-            return SavedLocation(name: "纽约市", administrativeArea: "纽约州", country: "美国", latitude: 40.7128, longitude: -74.0060, timezoneIdentifier: "America/New_York")
+            return SavedLocation(name: PublicLocationLabels.newYorkCity, administrativeArea: PublicLocationLabels.newYork, country: PublicLocationLabels.unitedStates, latitude: 40.7128, longitude: -74.0060, timezoneIdentifier: "America/New_York")
         case "shenzhen":
-            return SavedLocation(name: "深圳市", administrativeArea: "广东省", country: "中国", latitude: 22.5431, longitude: 114.0579, timezoneIdentifier: "Asia/Shanghai")
+            return SavedLocation(name: PublicLocationLabels.shenzhen, administrativeArea: PublicLocationLabels.guangdong, country: PublicLocationLabels.china, latitude: 22.5431, longitude: 114.0579, timezoneIdentifier: "Asia/Shanghai")
         case "london":
-            return SavedLocation(name: "伦敦", administrativeArea: "英格兰", country: "英国", latitude: 51.5074, longitude: -0.1278, timezoneIdentifier: "Europe/London")
+            return SavedLocation(name: PublicLocationLabels.london, administrativeArea: PublicLocationLabels.england, country: PublicLocationLabels.unitedKingdom, latitude: 51.5074, longitude: -0.1278, timezoneIdentifier: "Europe/London")
         case "vancouver":
-            return SavedLocation(name: "温哥华", administrativeArea: "不列颠哥伦比亚", country: "加拿大", latitude: 49.2827, longitude: -123.1207, timezoneIdentifier: "America/Vancouver")
+            return SavedLocation(name: PublicLocationLabels.vancouver, administrativeArea: PublicLocationLabels.britishColumbia, country: PublicLocationLabels.canada, latitude: 49.2827, longitude: -123.1207, timezoneIdentifier: "America/Vancouver")
         default:
             return nil
         }

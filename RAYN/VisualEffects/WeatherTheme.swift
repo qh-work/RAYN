@@ -17,19 +17,19 @@ enum WeatherTheme: String, Codable, CaseIterable {
 
     var title: String {
         switch self {
-        case .clearDay: return "晴朗白天"
-        case .clearNight: return "晴朗夜晚"
-        case .cloudy: return "多云"
-        case .overcast: return "阴天"
-        case .haze: return "霾 / 低能见度"
-        case .drizzle: return "毛毛雨"
-        case .rain: return "降雨"
-        case .freezingRain: return "冻雨"
-        case .showers: return "阵雨"
-        case .storm: return "雷暴"
-        case .snow: return "降雪"
-        case .hail: return "冰雹"
-        case .fog: return "雾"
+        case .clearDay: return String(localized: "Clear Day")
+        case .clearNight: return String(localized: "Clear Night")
+        case .cloudy: return String(localized: "Cloudy")
+        case .overcast: return String(localized: "Overcast")
+        case .haze: return String(localized: "Haze / Low Visibility")
+        case .drizzle: return String(localized: "Drizzle")
+        case .rain: return String(localized: "Rain")
+        case .freezingRain: return String(localized: "Freezing Rain")
+        case .showers: return String(localized: "Showers")
+        case .storm: return String(localized: "Thunderstorm")
+        case .snow: return String(localized: "Snow")
+        case .hail: return String(localized: "Hail")
+        case .fog: return String(localized: "Fog")
         }
     }
 
@@ -108,27 +108,27 @@ enum WeatherTheme: String, Codable, CaseIterable {
 enum WeatherCodeMapper {
     static func description(for code: Int, isDay: Bool) -> String {
         switch code {
-        case 0: return isDay ? "晴" : "晴朗夜空"
-        case 1: return "少云"
-        case 2: return "多云"
-        case 3: return "阴天"
-        case 45, 48: return "雾"
-        case 51, 53, 55: return "毛毛雨"
-        case 56, 57: return "冻毛毛雨"
-        case 61, 63, 65: return "降雨"
-        case 66, 67: return "冻雨"
-        case 71, 73, 75, 77: return "降雪"
-        case 80, 81, 82: return "阵雨"
-        case 85, 86: return "阵雪"
-        case 95: return "雷暴"
-        case 96, 99: return "雷暴伴冰雹"
-        default: return "天气变化"
+        case 0: return isDay ? String(localized: "Clear") : String(localized: "Clear Night Sky")
+        case 1: return String(localized: "Mostly Clear")
+        case 2: return String(localized: "Cloudy")
+        case 3: return String(localized: "Overcast")
+        case 45, 48: return String(localized: "Fog")
+        case 51, 53, 55: return String(localized: "Drizzle")
+        case 56, 57: return String(localized: "Freezing Drizzle")
+        case 61, 63, 65: return String(localized: "Rain")
+        case 66, 67: return String(localized: "Freezing Rain")
+        case 71, 73, 75, 77: return String(localized: "Snow")
+        case 80, 81, 82: return String(localized: "Showers")
+        case 85, 86: return String(localized: "Snow Showers")
+        case 95: return String(localized: "Thunderstorm")
+        case 96, 99: return String(localized: "Thunderstorm with Hail")
+        default: return String(localized: "Changing Weather")
         }
     }
 
     static func description(for code: Int, isDay: Bool, visibility: Double?) -> String {
         if let visibility, visibility < 5, code < 45 {
-            return "霾 / 低能见度"
+            return String(localized: "Haze / Low Visibility")
         }
         return description(for: code, isDay: isDay)
     }

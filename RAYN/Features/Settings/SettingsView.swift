@@ -28,16 +28,18 @@ struct SettingsView: View {
     private var settingsHeader: some View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("RAYN").font(.system(size: 16, weight: .black, design: .rounded)).tracking(3).foregroundStyle(.cyan)
-                Text("演播室设置").font(.system(size: 44, weight: .bold, design: .rounded)).foregroundStyle(.white)
-                Text("控制数据、轮播、动态效果和收藏城市").font(.system(size: 21, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.62))
+                Text("Settings").font(.system(size: 44, weight: .bold, design: .rounded)).foregroundStyle(.white)
+                Text("Manage data, rotation, visual effects, and saved locations").font(.system(size: 21, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.62))
             }
             Spacer()
             HStack(spacing: 14) {
                 Button {
                     appState.refresh(force: true)
                 } label: {
-                    Label(appState.isRefreshing ? "更新中" : "立即刷新", systemImage: "arrow.clockwise")
+                    Label(
+                        appState.isRefreshing ? String(localized: "Updating…") : String(localized: "Refresh Now"),
+                        systemImage: "arrow.clockwise"
+                    )
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
@@ -47,7 +49,7 @@ struct SettingsView: View {
                 .foregroundStyle(.white)
 
                 Button(action: { dismiss() }) {
-                    Label("完成", systemImage: "checkmark")
+                    Label("Done", systemImage: "checkmark")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
@@ -60,15 +62,15 @@ struct SettingsView: View {
     }
 
     private var locationsSection: some View {
-        settingsCard(title: "城市与位置", symbol: "location.fill") {
+        settingsCard(title: String(localized: "Cities & Location"), symbol: "location.fill") {
             VStack(alignment: .leading, spacing: 18) {
-                Toggle("使用当前位置", isOn: Binding(get: { appState.settings.useCurrentLocation }, set: { value in updateSettings { $0.useCurrentLocation = value } }))
+                Toggle("Use Current Location", isOn: Binding(get: { appState.settings.useCurrentLocation }, set: { value in updateSettings { $0.useCurrentLocation = value } }))
                     .font(.system(size: 22, weight: .semibold, design: .rounded))
-                Text("启动时优先读取当前位置；关闭后使用下方设定地址。定位失败时才回退到已保存地址。")
+                Text("At launch, use the current location first. When disabled, use the location selected below. A saved location is used only if positioning fails.")
                     .font(.system(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
-                Text("已保存地址").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
-                HStack(spacing: 12) {
+                Text("Saved Locations").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 220, maximum: 420), spacing: 12)], alignment: .leading, spacing: 12) {
                     ForEach(appState.savedLocations) { location in
                         Button {
                             appState.chooseLocation(location)
@@ -90,7 +92,7 @@ struct SettingsView: View {
                     }
                 }
                 HStack(spacing: 12) {
-                    TextField("搜索城市，例如：上海、东京", text: $searchText)
+                    TextField("Search cities, for example Paris or Tokyo", text: $searchText)
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .textFieldStyle(.plain)
                         .padding(.horizontal, 16)
@@ -99,7 +101,7 @@ struct SettingsView: View {
                     Button {
                         appState.searchLocations(query: searchText)
                     } label: {
-                        Label("搜索", systemImage: "magnifyingglass")
+                        Label("Search", systemImage: "magnifyingglass")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .padding(.horizontal, 18)
                             .padding(.vertical, 12)
@@ -109,12 +111,12 @@ struct SettingsView: View {
                     .foregroundStyle(.white)
                 }
                 if appState.isSearching {
-                    ProgressView("搜索中…")
+                    ProgressView("Searching…")
                         .font(.system(size: 18, weight: .medium, design: .rounded))
                 }
                 if !appState.searchResults.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("搜索结果").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                        Text("Search Results").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
                         ForEach(appState.searchResults) { location in
                             Button {
                                 appState.chooseLocation(location)
@@ -139,15 +141,15 @@ struct SettingsView: View {
     }
 
     private var broadcastSection: some View {
-        settingsCard(title: "演播轮播", symbol: "play.rectangle.fill") {
+        settingsCard(title: String(localized: "Scene Rotation"), symbol: "play.rectangle.fill") {
             VStack(alignment: .leading, spacing: 20) {
-                Toggle("自动轮播天气场景", isOn: Binding(get: { appState.settings.automaticRotation }, set: { value in updateSettings { $0.automaticRotation = value } }))
+                Toggle("Automatically Rotate Weather Scenes", isOn: Binding(get: { appState.settings.automaticRotation }, set: { value in updateSettings { $0.automaticRotation = value } }))
                     .font(.system(size: 22, weight: .semibold, design: .rounded))
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("每页停留时间").font(.system(size: 20, weight: .semibold, design: .rounded))
+                        Text("Time per Scene").font(.system(size: 20, weight: .semibold, design: .rounded))
                         Spacer()
-                        Text("\(Int(appState.settings.rotationSeconds)) 秒").font(.system(size: 20, weight: .bold, design: .rounded)).foregroundStyle(.cyan)
+                        Text("\(Int(appState.settings.rotationSeconds)) seconds").font(.system(size: 20, weight: .bold, design: .rounded)).foregroundStyle(.cyan)
                     }
                     HStack(spacing: 14) {
                         Button {
@@ -158,7 +160,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(FocusButtonStyle())
                         .background(.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        Text("8–30 秒")
+                        Text("8–30 seconds")
                             .font(.system(size: 18, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.60))
                         Button {
@@ -173,8 +175,8 @@ struct SettingsView: View {
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 }
-                Text("启用场景").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
-                HStack(spacing: 12) {
+                Text("Enabled Scenes").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 210, maximum: 360), spacing: 12)], alignment: .leading, spacing: 12) {
                     ForEach(BroadcastScene.allCases) { scene in
                         let enabled = !appState.settings.hiddenScenes.contains(scene)
                         Button {
@@ -197,47 +199,47 @@ struct SettingsView: View {
     }
 
     private var displaySection: some View {
-        settingsCard(title: "显示与动态", symbol: "sparkles.tv.fill") {
+        settingsCard(title: String(localized: "Display & Motion"), symbol: "sparkles.tv.fill") {
             VStack(alignment: .leading, spacing: 20) {
                 HStack(spacing: 24) {
-                    Picker("温度单位", selection: Binding(get: { appState.settings.temperatureUnit }, set: { value in updateSettings { $0.temperatureUnit = value } })) {
+                    Picker("Temperature Unit", selection: Binding(get: { appState.settings.temperatureUnit }, set: { value in updateSettings { $0.temperatureUnit = value } })) {
                         ForEach(TemperatureUnit.allCases, id: \.self) { Text($0.title).tag($0) }
                     }
                     .pickerStyle(.segmented)
-                    Picker("时钟", selection: Binding(get: { appState.settings.clockFormat }, set: { value in updateSettings { $0.clockFormat = value } })) {
+                    Picker("Clock", selection: Binding(get: { appState.settings.clockFormat }, set: { value in updateSettings { $0.clockFormat = value } })) {
                         ForEach(ClockFormat.allCases, id: \.self) { Text($0.title).tag($0) }
                     }
                     .pickerStyle(.segmented)
                 }
-                Picker("计量单位", selection: Binding(get: { appState.settings.measurementSystem }, set: { value in updateSettings { $0.measurementSystem = value } })) {
+                Picker("Measurement System", selection: Binding(get: { appState.settings.measurementSystem }, set: { value in updateSettings { $0.measurementSystem = value } })) {
                     ForEach(MeasurementSystem.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
-                Picker("观看距离", selection: Binding(get: { appState.settings.viewingDistance }, set: { value in updateSettings { $0.viewingDistance = value } })) {
+                Picker("Viewing Distance", selection: Binding(get: { appState.settings.viewingDistance }, set: { value in updateSettings { $0.viewingDistance = value } })) {
                     ForEach(ViewingDistance.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
-                Picker("动态效果强度", selection: Binding(get: { appState.settings.dynamicIntensity }, set: { value in updateSettings { $0.dynamicIntensity = value } })) {
+                Picker("Motion Intensity", selection: Binding(get: { appState.settings.dynamicIntensity }, set: { value in updateSettings { $0.dynamicIntensity = value } })) {
                     ForEach(DynamicIntensity.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 .pickerStyle(.segmented)
-                Toggle("减少动态效果", isOn: Binding(get: { appState.settings.reduceMotion }, set: { value in updateSettings { $0.reduceMotion = value } }))
+                Toggle("Reduce Motion", isOn: Binding(get: { appState.settings.reduceMotion }, set: { value in updateSettings { $0.reduceMotion = value } }))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
-                Toggle("限制雷电闪烁", isOn: Binding(get: { !appState.settings.lightningEnabled }, set: { value in updateSettings { $0.lightningEnabled = !value } }))
+                Toggle("Limit Lightning Flashes", isOn: Binding(get: { !appState.settings.lightningEnabled }, set: { value in updateSettings { $0.lightningEnabled = !value } }))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
-                Toggle("夜间低亮度模式", isOn: Binding(get: { appState.settings.nightDimMode }, set: { value in updateSettings { $0.nightDimMode = value } }))
+                Toggle("Low-Brightness Night Mode", isOn: Binding(get: { appState.settings.nightDimMode }, set: { value in updateSettings { $0.nightDimMode = value } }))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
-                Toggle("保持屏幕常亮", isOn: Binding(get: { appState.settings.keepScreenAwake }, set: { value in updateSettings { $0.keepScreenAwake = value } }))
+                Toggle("Keep Screen Awake", isOn: Binding(get: { appState.settings.keepScreenAwake }, set: { value in updateSettings { $0.keepScreenAwake = value } }))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
-                Text("保持屏幕常亮只会在你主动开启后生效，退出设置或关闭开关后恢复系统默认。")
+                Text("Keeping the screen awake takes effect only when you enable it. Leaving Settings or turning it off restores the system default.")
                     .font(.system(size: 17, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.52))
             }
         }
     }
 
     private var privacySection: some View {
-        settingsCard(title: "隐私说明", symbol: "lock.shield.fill") {
-            Text("RAYN Weather 不要求账号登录，不包含广告、分析追踪或后台用户画像。开启“使用当前位置”后，应用才会请求位置权限；天气服务请求只发送用于查询天气的经纬度，不保存位置历史。收藏城市和设置仅保存在本机。")
+        settingsCard(title: String(localized: "Privacy"), symbol: "lock.shield.fill") {
+            Text("No account is required. This app contains no ads, analytics tracking, or background profiling. Location permission is requested only after Use Current Location is enabled. Weather requests send only the coordinates needed for the query and do not store location history. Saved locations and settings remain on this Apple TV.")
                 .font(.system(size: 19, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.70))
                 .fixedSize(horizontal: false, vertical: true)
@@ -245,9 +247,9 @@ struct SettingsView: View {
     }
 
     private var attributionSection: some View {
-        settingsCard(title: "关于与归因", symbol: "info.circle.fill") {
+        settingsCard(title: String(localized: "About & Attribution"), symbol: "info.circle.fill") {
             VStack(alignment: .leading, spacing: 10) {
-                Text("天气、空气质量、海况和雷达只在服务实际返回数据时显示；没有覆盖时不会用演示图或假数值替代。")
+                Text("Weather, air quality, marine conditions, and radar appear only when a provider returns real data. Demo imagery or invented values never replace missing coverage.")
                 ForEach(appState.dataAttributions) { attribution in
                     if let destination = URL(string: attribution.urlString) {
                         Link(destination: destination) {
@@ -273,7 +275,7 @@ struct SettingsView: View {
     private func settingsCard<Content: View>(title: String, symbol: String, @ViewBuilder content: () -> Content) -> some View {
         GlassCard(cornerRadius: 26) {
             VStack(alignment: .leading, spacing: 19) {
-                Label(title, systemImage: symbol)
+                Label(L10n.string(title), systemImage: symbol)
                     .font(.system(size: 25, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 content()

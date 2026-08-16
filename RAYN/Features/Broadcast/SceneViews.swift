@@ -12,7 +12,7 @@ struct CurrentWeatherScene: View {
 
         VStack(alignment: .leading, spacing: 26 * layoutScale) {
             PageHeader(
-                eyebrow: "当前天气",
+                eyebrow: String(localized: "Current Weather"),
                 title: snapshot.location.name,
                 detail: snapshot.location.subtitle
             )
@@ -27,7 +27,7 @@ struct CurrentWeatherScene: View {
                                 .foregroundStyle(.white)
                         }
                     }
-                    Text("体感 \(snapshot.current.feelsLike.formattedTemperature(unit: appState.settings.temperatureUnit))°  ·  今日 \(snapshot.current.low.formattedTemperature(unit: appState.settings.temperatureUnit))° / \(snapshot.current.high.formattedTemperature(unit: appState.settings.temperatureUnit))°")
+                    Text("Feels like \(snapshot.current.feelsLike.formattedTemperature(unit: appState.settings.temperatureUnit))°  ·  Today \(snapshot.current.low.formattedTemperature(unit: appState.settings.temperatureUnit))° / \(snapshot.current.high.formattedTemperature(unit: appState.settings.temperatureUnit))°")
                         .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.70))
                 }
@@ -35,18 +35,18 @@ struct CurrentWeatherScene: View {
 
                 GlassCard(cornerRadius: 26) {
                     VStack(alignment: .leading, spacing: 18) {
-                        Text("实时观测")
+                        Text("Live Observations")
                             .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.84))
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 22) {
-                            MetricTile(symbol: "humidity.fill", title: "湿度", value: "\(Int(snapshot.current.relativeHumidity.rounded()))%", accent: .cyan)
-                            MetricTile(symbol: "wind", title: "风速", value: snapshot.current.windSpeed.formattedSpeed(system: appState.settings.measurementSystem), accent: .mint)
-                            MetricTile(symbol: "gauge.with.dots.needle.33percent", title: "气压", value: "\(Int(snapshot.current.pressure.rounded())) hPa", accent: .yellow)
-                            MetricTile(symbol: "eye.fill", title: "能见度", value: snapshot.current.visibility.formattedDistance(system: appState.settings.measurementSystem), accent: .orange)
-                            MetricTile(symbol: "thermometer.medium", title: "露点", value: snapshot.current.dewPoint.formattedTemperature(unit: appState.settings.temperatureUnit) + (appState.settings.temperatureUnit == .celsius ? "℃" : "℉"), accent: .blue)
-                            MetricTile(symbol: "cloud.fill", title: "总云量", value: "\(Int(snapshot.current.cloudCover.rounded()))%", accent: .white)
-                            MetricTile(symbol: "wind.circle.fill", title: "阵风", value: snapshot.current.windGust.formattedSpeed(system: appState.settings.measurementSystem), accent: .orange)
-                            MetricTile(symbol: "drop.fill", title: "降水", value: "\(snapshot.current.precipitation.formattedNumber(decimals: 1)) mm", accent: .cyan)
+                            MetricTile(symbol: "humidity.fill", title: String(localized: "Humidity"), value: "\(Int(snapshot.current.relativeHumidity.rounded()))%", accent: .cyan)
+                            MetricTile(symbol: "wind", title: String(localized: "Wind Speed"), value: snapshot.current.windSpeed.formattedSpeed(system: appState.settings.measurementSystem), accent: .mint)
+                            MetricTile(symbol: "gauge.with.dots.needle.33percent", title: String(localized: "Pressure"), value: "\(Int(snapshot.current.pressure.rounded())) hPa", accent: .yellow)
+                            MetricTile(symbol: "eye.fill", title: String(localized: "Visibility"), value: snapshot.current.visibility.formattedDistance(system: appState.settings.measurementSystem), accent: .orange)
+                            MetricTile(symbol: "thermometer.medium", title: String(localized: "Dew Point"), value: snapshot.current.dewPoint.formattedTemperature(unit: appState.settings.temperatureUnit) + (appState.settings.temperatureUnit == .celsius ? "℃" : "℉"), accent: .blue)
+                            MetricTile(symbol: "cloud.fill", title: String(localized: "Total Cloud Cover"), value: "\(Int(snapshot.current.cloudCover.rounded()))%", accent: .white)
+                            MetricTile(symbol: "wind.circle.fill", title: String(localized: "Wind Gusts"), value: snapshot.current.windGust.formattedSpeed(system: appState.settings.measurementSystem), accent: .orange)
+                            MetricTile(symbol: "drop.fill", title: String(localized: "Precipitation"), value: "\(snapshot.current.precipitation.formattedNumber(decimals: 1)) mm", accent: .cyan)
                         }
                     }
                 }
@@ -54,12 +54,12 @@ struct CurrentWeatherScene: View {
             }
             Spacer(minLength: 0)
             HStack(spacing: 36 * layoutScale) {
-                miniFact(symbol: "sunrise.fill", title: "日出", value: snapshot.current.sunrise?.formatted("HH:mm", timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--", tint: .yellow)
-                miniFact(symbol: "sunset.fill", title: "日落", value: snapshot.current.sunset?.formatted("HH:mm", timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--", tint: .orange)
-                miniFact(symbol: "sun.max.fill", title: "紫外线", value: snapshot.current.uvIndex.formattedNumber(decimals: 1), tint: .yellow)
-                miniFact(symbol: "drop.fill", title: "降水概率", value: "\(Int(snapshot.current.precipitationProbability.rounded()))%", tint: .cyan)
-                miniFact(symbol: "location.north.line.fill", title: "风向", value: "\(Int(snapshot.current.windDirection.rounded()))°", tint: .mint)
-                miniFact(symbol: "cloud.sun.fill", title: "低/中/高云", value: "\(Int(snapshot.current.cloudCoverLow?.rounded() ?? 0))/\(Int(snapshot.current.cloudCoverMid?.rounded() ?? 0))/\(Int(snapshot.current.cloudCoverHigh?.rounded() ?? 0))%", tint: .white)
+                miniFact(symbol: "sunrise.fill", title: String(localized: "Sunrise"), value: snapshot.current.sunrise?.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--", tint: .yellow)
+                miniFact(symbol: "sunset.fill", title: String(localized: "Sunset"), value: snapshot.current.sunset?.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--", tint: .orange)
+                miniFact(symbol: "sun.max.fill", title: String(localized: "UV Index"), value: snapshot.current.uvIndex.formattedNumber(decimals: 1), tint: .yellow)
+                miniFact(symbol: "drop.fill", title: String(localized: "Rain Chance"), value: "\(Int(snapshot.current.precipitationProbability.rounded()))%", tint: .cyan)
+                miniFact(symbol: "location.north.line.fill", title: String(localized: "Wind Direction"), value: "\(Int(snapshot.current.windDirection.rounded()))°", tint: .mint)
+                miniFact(symbol: "cloud.sun.fill", title: String(localized: "Low / Mid / High Cloud"), value: "\(Int(snapshot.current.cloudCoverLow?.rounded() ?? 0))/\(Int(snapshot.current.cloudCoverMid?.rounded() ?? 0))/\(Int(snapshot.current.cloudCoverHigh?.rounded() ?? 0))%", tint: .white)
             }
             ClothingAdviceCard(advice: clothing)
         }
@@ -71,7 +71,7 @@ struct CurrentWeatherScene: View {
         HStack(spacing: 12 * layoutScale) {
             Image(systemName: symbol).font(.system(size: 24 * layoutScale, weight: .semibold)).foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 3 * layoutScale) {
-                Text(title).font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                Text(L10n.string(title)).font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
                 Text(value).font(.system(size: 24 * layoutScale, weight: .semibold, design: .rounded)).foregroundStyle(.white)
             }
         }
@@ -101,7 +101,7 @@ private struct ClothingAdviceCard: View {
                     .background(tint.opacity(0.16), in: Circle())
                 VStack(alignment: .leading, spacing: 5 * layoutScale) {
                     HStack(spacing: 12 * layoutScale) {
-                        Text("穿衣指数")
+                        Text("Clothing Index")
                             .font(.system(size: 21 * layoutScale, weight: .bold, design: .rounded))
                         Text(advice.index.title)
                             .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
@@ -128,12 +128,16 @@ struct HourlyForecastScene: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(eyebrow: "趋势预报", title: "未来24小时", detail: "温度 · 体感 · 降水 · 风速")
+            PageHeader(
+                eyebrow: String(localized: "Forecast"),
+                title: String(localized: "Next 24 Hours"),
+                detail: String(localized: "Temperature · Feels Like · Rain · Wind")
+            )
             GlassCard(cornerRadius: 28) {
                 VStack(alignment: .leading, spacing: 14) {
                     Chart {
                         ForEach(Array(snapshot.hourly.prefix(24).enumerated()), id: \.offset) { index, point in
-                            PointMark(x: .value("时间", point.time), y: .value("温度", point.temperature))
+                            PointMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Temperature"), point.temperature))
                                 .foregroundStyle(.white)
                                 .symbolSize(index.isMultiple(of: 3) ? 96 : 62)
                                 .annotation(position: .top, spacing: 4) {
@@ -143,10 +147,10 @@ struct HourlyForecastScene: View {
                                             .foregroundStyle(.white.opacity(0.78))
                                     }
                                 }
-                            PointMark(x: .value("时间", point.time), y: .value("体感", point.apparentTemperature))
+                            PointMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Feels Like"), point.apparentTemperature))
                                 .foregroundStyle(.orange.opacity(0.86))
                                 .symbolSize(index.isMultiple(of: 3) ? 78 : 48)
-                            BarMark(x: .value("时间", point.time), y: .value("降水概率", point.precipitationProbability / 3.0))
+                            BarMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Rain Chance"), point.precipitationProbability / 3.0))
                                 .foregroundStyle(.blue.opacity(0.42))
                                 .annotation(position: .top, spacing: 2) {
                                     if index.isMultiple(of: 3) {
@@ -157,7 +161,7 @@ struct HourlyForecastScene: View {
                                 }
                         }
                         if let selected = selectedHour {
-                            RuleMark(x: .value("当前选择", selected.time))
+                            RuleMark(x: .value(String(localized: "Current Selection"), selected.time))
                                 .foregroundStyle(.yellow.opacity(0.80))
                                 .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 5]))
                         }
@@ -171,12 +175,12 @@ struct HourlyForecastScene: View {
                     )
 
                     HStack(spacing: 22) {
-                        ChartLegendItem(title: "温度", color: .white, style: .dot)
-                        ChartLegendItem(title: "体感", color: .orange, style: .dot)
-                        ChartLegendItem(title: "降水概率", color: .blue, style: .bar)
-                        ChartLegendItem(title: "风速", color: .mint, style: .bar)
+                        ChartLegendItem(title: String(localized: "Temperature"), color: .white, style: .dot)
+                        ChartLegendItem(title: String(localized: "Feels Like"), color: .orange, style: .dot)
+                        ChartLegendItem(title: String(localized: "Rain Chance"), color: .blue, style: .bar)
+                        ChartLegendItem(title: String(localized: "Wind Speed"), color: .mint, style: .bar)
                         Spacer()
-                        Text("蓝柱=降水概率 · 青柱=风速")
+                        Text("Blue bars = rain chance · Teal bars = wind speed")
                             .font(.system(size: 15, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.46))
                     }
@@ -202,7 +206,7 @@ struct HourlyForecastScene: View {
             }
             .frame(maxWidth: .infinity)
             if let selectedHour {
-                Text("已选 \(selectedHour.time.formatted("M月d日 HH:mm", timezoneIdentifier: snapshot.timezoneIdentifier)) · 体感 \(selectedHour.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))° · 降水 \(Int(selectedHour.precipitationProbability.rounded()))% · 风向 \(Int(selectedHour.windDirection.rounded()))°")
+                Text("Selected \(selectedHour.time.formatted(.monthDayTime, timezoneIdentifier: snapshot.timezoneIdentifier)) · Feels like \(selectedHour.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))° · Rain \(Int(selectedHour.precipitationProbability.rounded()))% · Wind Direction \(Int(selectedHour.windDirection.rounded()))°")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.68))
             }
@@ -227,7 +231,7 @@ private struct HourlyCard: View {
 
     var body: some View {
         VStack(spacing: 9 * layoutScale) {
-            Text(point.time.formatted("HH:mm", timezoneIdentifier: timezone))
+            Text(point.time.formatted(.time, timezoneIdentifier: timezone))
                 .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.70))
             WeatherSymbol(code: point.weatherCode, isDay: point.isDay, size: 29)
@@ -283,7 +287,7 @@ private struct ChartLegendItem: View {
             case .bar:
                 RoundedRectangle(cornerRadius: 2).fill(color.opacity(0.72)).frame(width: 10, height: 12)
             }
-            Text(title)
+            Text(L10n.string(title))
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.68))
         }
@@ -296,7 +300,7 @@ private struct WindSpeedChart: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Label("风速", systemImage: "wind")
+            Label("Wind Speed", systemImage: "wind")
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundStyle(.mint.opacity(0.86))
                 .frame(width: 72, alignment: .leading)
@@ -304,8 +308,8 @@ private struct WindSpeedChart: View {
             Chart {
                 ForEach(Array(points.enumerated()), id: \.offset) { index, point in
                     BarMark(
-                        x: .value("时间", point.time),
-                        y: .value("风速", displayedSpeed(point.windSpeed))
+                        x: .value(String(localized: "Time"), point.time),
+                        y: .value(String(localized: "Wind Speed"), displayedSpeed(point.windSpeed))
                     )
                     .foregroundStyle(.mint.opacity(index.isMultiple(of: 3) ? 0.95 : 0.68))
                     .annotation(position: .top, spacing: 2) {
@@ -376,7 +380,11 @@ struct DailyForecastScene: View {
 
     private var forecastList: some View {
         VStack(alignment: .leading, spacing: 20 * layoutScale) {
-            PageHeader(eyebrow: "延展预报", title: "未来10天", detail: "上下滑动选择日期 · 按确定查看详情")
+            PageHeader(
+                eyebrow: String(localized: "Extended Forecast"),
+                title: String(localized: "10-Day Forecast"),
+                detail: String(localized: "Swipe up or down to choose a date · Press Select for details")
+            )
 
             GlassCard(cornerRadius: 28, shadowRadius: 8, shadowOffset: 4) {
                 ScrollView(.vertical, showsIndicators: false) {
@@ -402,8 +410,8 @@ struct DailyForecastScene: View {
                             }
                             .buttonStyle(DailyForecastRowButtonStyle())
                             .focused($focusedDayID, equals: point.id)
-                            .accessibilityLabel("第 \(index + 1) 天，\(point.date.formatted("M月d日", timezoneIdentifier: snapshot.timezoneIdentifier))")
-                            .accessibilityHint("按下确定查看详细天气")
+                            .accessibilityLabel("Day \(index + 1), \(point.date.formatted(.monthDay, timezoneIdentifier: snapshot.timezoneIdentifier))")
+                            .accessibilityHint("Press Select to view detailed weather")
                             .foregroundStyle(.white)
                             .id(point.id)
 
@@ -433,7 +441,7 @@ struct DailyForecastScene: View {
             }
             .focusSection()
 
-            Text("上下滑动浏览全部日期；确定键放大当天预报，返回键回到列表")
+            Text("Swipe up or down through all dates. Press Select to open a forecast, and Menu to return to the list.")
                 .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.58))
         }
@@ -492,9 +500,9 @@ private struct DailyForecastRow: View {
     var body: some View {
         HStack(spacing: 22 * layoutScale) {
             VStack(alignment: .leading, spacing: 4 * layoutScale) {
-                Text(ordinal == 0 ? "今天" : point.date.formatted("EEEE", timezoneIdentifier: timezone))
+                Text(ordinal == 0 ? String(localized: "Today") : point.date.formatted(.weekday, timezoneIdentifier: timezone))
                     .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
-                Text(point.date.formatted("M月d日", timezoneIdentifier: timezone))
+                Text(point.date.formatted(.monthDay, timezoneIdentifier: timezone))
                     .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
             }
@@ -623,15 +631,15 @@ private struct DailyDetailCard: View {
             VStack(alignment: .leading, spacing: 24 * layoutScale) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5 * layoutScale) {
-                        Text(ordinal == 0 ? "今天详细天气" : "第 \(ordinal + 1) 天详细天气")
+                        Text(ordinal == 0 ? String(localized: "Today’s Detailed Forecast") : String(localized: "Day \(ordinal + 1) Details"))
                             .font(.system(size: 31 * layoutScale, weight: .bold, design: .rounded))
-                        Text(point.date.formatted("yyyy年M月d日 EEEE", timezoneIdentifier: timezone))
+                        Text(point.date.formatted(.fullDate, timezoneIdentifier: timezone))
                             .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.62))
                     }
                     Spacer()
                     Button(action: onClose) {
-                        Label("收起", systemImage: "chevron.down")
+                        Label("Collapse", systemImage: "chevron.down")
                             .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
                             .padding(.horizontal, 16 * layoutScale)
                             .padding(.vertical, 10 * layoutScale)
@@ -646,27 +654,27 @@ private struct DailyDetailCard: View {
                     VStack(alignment: .leading, spacing: 7 * layoutScale) {
                         Text(WeatherCodeMapper.description(for: point.weatherCode, isDay: true, visibility: nil))
                             .font(.system(size: 34 * layoutScale, weight: .semibold, design: .rounded))
-                        Text("最高 \(point.high.formattedTemperature(unit: unit))°  ·  最低 \(point.low.formattedTemperature(unit: unit))°")
+                        Text("High \(point.high.formattedTemperature(unit: unit))°  ·  Low \(point.low.formattedTemperature(unit: unit))°")
                             .font(.system(size: 25 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.72))
                     }
                     Spacer()
-                    detailMetric(symbol: "drop.fill", title: "降水概率", value: "\(Int(point.precipitationProbability.rounded()))%", tint: .cyan)
-                    detailMetric(symbol: "wind", title: "最大风速", value: point.windSpeed.formattedSpeed(system: measurementSystem), tint: .mint)
-                    detailMetric(symbol: "sun.max.fill", title: "紫外线", value: point.uvIndex?.formattedNumber(decimals: 1) ?? "--", tint: .yellow)
+                    detailMetric(symbol: "drop.fill", title: String(localized: "Rain Chance"), value: "\(Int(point.precipitationProbability.rounded()))%", tint: .cyan)
+                    detailMetric(symbol: "wind", title: String(localized: "Max Wind"), value: point.windSpeed.formattedSpeed(system: measurementSystem), tint: .mint)
+                    detailMetric(symbol: "sun.max.fill", title: String(localized: "UV Index"), value: point.uvIndex?.formattedNumber(decimals: 1) ?? "--", tint: .yellow)
                 }
 
                 HStack(spacing: 42 * layoutScale) {
-                    detailFact(symbol: "sunrise.fill", title: "日出", value: point.sunrise?.formatted("HH:mm", timezoneIdentifier: timezone) ?? "--:--", tint: .yellow)
-                    detailFact(symbol: "sunset.fill", title: "日落", value: point.sunset?.formatted("HH:mm", timezoneIdentifier: timezone) ?? "--:--", tint: .orange)
-                    detailFact(symbol: "clock.fill", title: "白昼", value: daylightText, tint: .cyan)
-                    detailFact(symbol: "wind", title: "阵风", value: point.windGust.formattedSpeed(system: measurementSystem), tint: .orange)
-                    detailFact(symbol: "drop", title: "预计降水", value: "\(point.precipitation.formattedNumber(decimals: 1)) mm", tint: .blue)
+                    detailFact(symbol: "sunrise.fill", title: String(localized: "Sunrise"), value: point.sunrise?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--", tint: .yellow)
+                    detailFact(symbol: "sunset.fill", title: String(localized: "Sunset"), value: point.sunset?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--", tint: .orange)
+                    detailFact(symbol: "clock.fill", title: String(localized: "Daylight"), value: daylightText, tint: .cyan)
+                    detailFact(symbol: "wind", title: String(localized: "Wind Gusts"), value: point.windGust.formattedSpeed(system: measurementSystem), tint: .orange)
+                    detailFact(symbol: "drop", title: String(localized: "Expected Rain"), value: "\(point.precipitation.formattedNumber(decimals: 1)) mm", tint: .blue)
                 }
                 HStack(spacing: 16 * layoutScale) {
                     if let onPrevious {
                         Button(action: onPrevious) {
-                            Label("上一天", systemImage: "chevron.left")
+                            Label("Previous Day", systemImage: "chevron.left")
                                 .frame(minWidth: 150 * layoutScale)
                                 .foregroundStyle(focusedControl == .previous ? Color(hex: 0x082A3D) : .white)
                         }
@@ -675,7 +683,7 @@ private struct DailyDetailCard: View {
                     }
                     if let onNext {
                         Button(action: onNext) {
-                            Label("下一天", systemImage: "chevron.right")
+                            Label("Next Day", systemImage: "chevron.right")
                                 .frame(minWidth: 150 * layoutScale)
                                 .foregroundStyle(focusedControl == .next ? Color(hex: 0x082A3D) : .white)
                         }
@@ -683,7 +691,7 @@ private struct DailyDetailCard: View {
                         .focused($focusedControl, equals: .next)
                     }
                     Spacer()
-                    Text("返回键收起详情")
+                    Text("Press Menu to close details")
                         .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.48))
                 }
@@ -706,7 +714,7 @@ private struct DailyDetailCard: View {
     private var daylightText: String {
         guard let duration = point.daylightDuration else { return "--" }
         let minutes = Int(duration / 60)
-        return "\(minutes / 60)小时\(minutes % 60)分"
+        return String(localized: "\(minutes / 60) hr \(minutes % 60) min")
     }
 
     private func detailMetric(symbol: String, title: String, value: String, tint: Color) -> some View {
@@ -714,7 +722,7 @@ private struct DailyDetailCard: View {
             Image(systemName: symbol)
                 .font(.system(size: 22 * layoutScale, weight: .semibold))
                 .foregroundStyle(tint)
-            Text(title)
+            Text(L10n.string(title))
                 .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.55))
             Text(value)
@@ -729,7 +737,7 @@ private struct DailyDetailCard: View {
                 .font(.system(size: 22 * layoutScale, weight: .semibold))
                 .foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 3 * layoutScale) {
-                Text(title)
+                Text(L10n.string(title))
                     .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
                 Text(value)
@@ -761,9 +769,11 @@ struct RadarScene: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             PageHeader(
-                eyebrow: "雷达监测",
-                title: "降水雷达",
-                detail: hasNowcast ? "观测回放 · 临近趋势" : "过去两小时回放"
+                eyebrow: String(localized: "Radar"),
+                title: String(localized: "Precipitation Radar"),
+                detail: hasNowcast
+                    ? String(localized: "Observation Playback · Nowcast")
+                    : String(localized: "Past Two Hours")
             )
             if snapshot.radar.isAvailable && !snapshot.radar.frames.isEmpty {
                 radarPlayback
@@ -826,7 +836,7 @@ struct RadarScene: View {
                 }
                 VStack(alignment: .leading, spacing: 9) {
                     HStack(spacing: 10) {
-                        Text(frameDate?.formatted("HH:mm", timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--")
+                        Text(frameDate?.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--")
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                         if requestedIndex != presentedIndex {
                             ProgressView()
@@ -834,7 +844,11 @@ struct RadarScene: View {
                                 .tint(.white.opacity(0.75))
                         }
                     }
-                    Text(displayedFrame?.isForecast == true ? "临近趋势 · 周边天气系统" : "过去约2小时 · 周边天气系统")
+                    Text(
+                        displayedFrame?.isForecast == true
+                            ? String(localized: "Nowcast · Nearby Weather Systems")
+                            : String(localized: "Past Two Hours · Nearby Weather Systems")
+                    )
                         .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.66))
                 }
@@ -851,11 +865,14 @@ struct RadarScene: View {
             .shadow(color: .black.opacity(0.14), radius: 8, y: 4)
 
             VStack(alignment: .leading, spacing: 18) {
-                Text("动画控制").font(.system(size: 24, weight: .bold, design: .rounded))
+                Text("Animation Controls").font(.system(size: 24, weight: .bold, design: .rounded))
                 Button {
                     isPlaying.toggle()
                 } label: {
-                    Label(isPlaying ? "暂停雷达" : "播放雷达", systemImage: isPlaying ? "pause.fill" : "play.fill")
+                    Label(
+                        isPlaying ? String(localized: "Pause Radar") : String(localized: "Play Radar"),
+                        systemImage: isPlaying ? "pause.fill" : "play.fill"
+                    )
                         .font(.system(size: 23, weight: .bold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
@@ -873,7 +890,7 @@ struct RadarScene: View {
                     }
                     .buttonStyle(FocusButtonStyle())
                     .background(.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    Text("第 \(snapshot.radar.frames.isEmpty ? 0 : presentedIndex + 1) / \(snapshot.radar.frames.count) 帧")
+                    Text("Frame \(snapshot.radar.frames.isEmpty ? 0 : presentedIndex + 1) of \(snapshot.radar.frames.count)")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.72))
                         .frame(maxWidth: .infinity)
@@ -889,13 +906,13 @@ struct RadarScene: View {
                 }
                 .foregroundStyle(.white)
                 HStack {
-                    Text("较早").foregroundStyle(.white.opacity(0.55))
+                    Text("Earlier").foregroundStyle(.white.opacity(0.55))
                     Spacer()
-                    Text("较新").foregroundStyle(.white.opacity(0.55))
+                    Text("Later").foregroundStyle(.white.opacity(0.55))
                 }
                 .font(.system(size: 17, weight: .medium, design: .rounded))
                 RadarLegend()
-                Text("覆盖范围以实际雷达数据为准")
+                Text("Coverage reflects available radar data")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
             }
@@ -911,9 +928,9 @@ struct RadarScene: View {
                     .font(.system(size: 48, weight: .semibold))
                     .foregroundStyle(.cyan)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("当前没有可用的实时雷达回波")
+                    Text("No live radar echoes are available")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                    Text(snapshot.radar.message ?? "此位置暂时没有可用雷达覆盖；不会用演示图替代。")
+                    Text(snapshot.radar.message ?? String(localized: "Radar coverage is temporarily unavailable for this location. Demo imagery will not be substituted."))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.62))
                 }
@@ -993,7 +1010,7 @@ private struct RadarMap: View {
 #endif
             HStack(spacing: 8) {
                 Image(systemName: "map.fill")
-                Text("降水回放")
+                Text("Precipitation Playback")
             }
             .font(.system(size: 15, weight: .bold, design: .rounded))
             .foregroundStyle(.white.opacity(0.82))
@@ -1029,9 +1046,13 @@ private struct RadarSimulatorUnavailableView: View {
                 Image(systemName: "tv.and.hifispeaker.fill")
                     .font(.system(size: 42, weight: .semibold))
                     .foregroundStyle(.cyan)
-                Text("实体 Apple TV 显示实时雷达地图")
+                Text("Live radar maps appear on Apple TV hardware")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
-                Text(frame == nil ? "当前没有可用雷达帧" : "模拟器不渲染实时地图瓦片")
+                Text(
+                    frame == nil
+                        ? String(localized: "No radar frame is currently available")
+                        : String(localized: "The simulator does not render live map tiles")
+                )
                     .font(.system(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
             }
@@ -1052,9 +1073,9 @@ private struct RadarMapPreparingView: View {
                 ProgressView()
                     .controlSize(.large)
                     .tint(.cyan)
-                Text("正在准备实时雷达")
+                Text("Preparing Live Radar")
                     .font(.system(size: 21, weight: .bold, design: .rounded))
-                Text("天气页面已就绪，地图随后载入")
+                Text("Weather is ready. The map will load next.")
                     .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
             }
@@ -1070,9 +1091,9 @@ private struct RadarTileUnavailableView: View {
                 Image(systemName: "map.fill")
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundStyle(.cyan)
-                Text("当前雷达帧没有可用地图瓦片")
+                Text("No map tiles are available for this radar frame")
                     .font(.system(size: 21, weight: .bold, design: .rounded))
-                Text("保留真实时间，不显示替代回波")
+                Text("The real timestamp is preserved without substitute echoes")
                     .font(.system(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
             }
@@ -1548,16 +1569,16 @@ private final class RadarTileOverlay: MKTileOverlay {
 private struct RadarLegend: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("降水强度").font(.system(size: 18, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.68))
+            Text("Precipitation Intensity").font(.system(size: 18, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.68))
             HStack(spacing: 0) {
                 ForEach([Color.blue, Color.cyan, Color.green, Color.yellow, Color.orange, Color.red], id: \.self) { color in
                     Rectangle().fill(color).frame(maxWidth: .infinity).frame(height: 10)
                 }
             }
             HStack {
-                Text("弱").foregroundStyle(.white.opacity(0.55))
+                Text("Light").foregroundStyle(.white.opacity(0.55))
                 Spacer()
-                Text("强").foregroundStyle(.white.opacity(0.55))
+                Text("Heavy").foregroundStyle(.white.opacity(0.55))
             }
             .font(.system(size: 15, weight: .medium, design: .rounded))
         }
@@ -1570,7 +1591,11 @@ struct AirQualityScene: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24 * layoutScale) {
-            PageHeader(eyebrow: "环境", title: "空气质量", detail: "当前与未来趋势")
+            PageHeader(
+                eyebrow: String(localized: "Environment"),
+                title: String(localized: "Air Quality"),
+                detail: String(localized: "Current and Future Trends")
+            )
             if let air = snapshot.airQuality {
                 HStack(alignment: .top, spacing: 24 * layoutScale) {
                     AirQualityHero(air: air, timezone: snapshot.timezoneIdentifier)
@@ -1586,9 +1611,9 @@ struct AirQualityScene: View {
                             .font(.system(size: 52 * layoutScale, weight: .medium))
                             .foregroundStyle(.white.opacity(0.78))
                         VStack(alignment: .leading, spacing: 7 * layoutScale) {
-                            Text("空气质量暂时没有更新")
+                            Text("Air quality has not updated yet")
                                 .font(.system(size: 27 * layoutScale, weight: .semibold, design: .rounded))
-                            Text("实时天气仍可正常查看。")
+                            Text("Live weather remains available.")
                                 .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.58))
                         }
@@ -1626,7 +1651,7 @@ private struct AirQualityHero: View {
             HStack(spacing: 26 * layoutScale) {
                 AQIGauge(value: air.europeanAQI, level: air.level)
                 VStack(alignment: .leading, spacing: 12 * layoutScale) {
-                    Text("当前空气")
+                    Text("Current Air")
                         .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.60))
                     Text(air.level)
@@ -1640,7 +1665,7 @@ private struct AirQualityHero: View {
                         Circle()
                             .fill(aqiColor(air.europeanAQI))
                             .frame(width: 8 * layoutScale, height: 8 * layoutScale)
-                        Text("更新于 \(air.updatedAt.formatted("HH:mm", timezoneIdentifier: timezone))")
+                        Text("Updated \(air.updatedAt.formatted(.time, timezoneIdentifier: timezone))")
                     }
                     .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.48))
@@ -1657,7 +1682,7 @@ private struct AirQualityPollutants: View {
     var body: some View {
         GlassCard(cornerRadius: 30) {
             VStack(alignment: .leading, spacing: 16 * layoutScale) {
-                Text("污染物")
+                Text("Pollutants")
                     .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.88))
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 14 * layoutScale), GridItem(.flexible(), spacing: 14 * layoutScale), GridItem(.flexible(), spacing: 14 * layoutScale)], spacing: 14 * layoutScale) {
@@ -1709,7 +1734,7 @@ private struct AQIHourlyTrend: View {
         GlassCard(cornerRadius: 28) {
             VStack(alignment: .leading, spacing: 12 * layoutScale) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("未来24小时")
+                    Text("Next 24 Hours")
                         .font(.system(size: 23 * layoutScale, weight: .bold, design: .rounded))
                     Spacer()
                     Text("AQI")
@@ -1717,14 +1742,14 @@ private struct AQIHourlyTrend: View {
                         .foregroundStyle(.white.opacity(0.48))
                 }
                 if values.isEmpty {
-                    Text("暂无逐小时数据")
+                    Text("No hourly data is available")
                         .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.55))
                         .frame(maxWidth: .infinity, minHeight: 112 * layoutScale)
                 } else {
                     Chart {
                         ForEach(Array(values.enumerated()), id: \.offset) { index, value in
-                            BarMark(x: .value("小时", index), y: .value("AQI", value))
+                            BarMark(x: .value(String(localized: "Hour"), index), y: .value("AQI", value))
                                 .foregroundStyle(aqiColor(value).gradient)
                                 .cornerRadius(5 * layoutScale)
                                 .annotation(position: .top, spacing: 3 * layoutScale) {
@@ -1776,7 +1801,7 @@ private struct AQIHourlyTrend: View {
     private func hourLabel(_ index: Int) -> String {
         let calendar = Calendar(identifier: .gregorian)
         let date = calendar.date(bySettingHour: index % 24, minute: 0, second: 0, of: Date()) ?? Date()
-        return date.formatted("HH:mm", timezoneIdentifier: timezone)
+        return date.formatted(.time, timezoneIdentifier: timezone)
     }
 }
 
@@ -1791,13 +1816,13 @@ private struct AQIThresholdScale: View {
                 }
             }
             HStack {
-                Text("优")
+                Text("Excellent")
                 Spacer()
-                Text("良")
+                Text("Good")
                 Spacer()
-                Text("轻度")
+                Text("Moderate")
                 Spacer()
-                Text("较差")
+                Text("Poor")
             }
             .font(.system(size: 13 * layoutScale, weight: .medium, design: .rounded))
             .foregroundStyle(.white.opacity(0.46))
@@ -1845,9 +1870,13 @@ struct AstronomyScene: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22 * layoutScale) {
             PageHeader(
-                eyebrow: snapshot.marine == nil ? "天文" : "天文与海况",
-                title: snapshot.marine == nil ? "日照与月相" : "日照、月相与海况",
-                detail: "此刻状态与未来变化"
+                eyebrow: snapshot.marine == nil
+                    ? String(localized: "Astronomy")
+                    : String(localized: "Astronomy & Marine"),
+                title: snapshot.marine == nil
+                    ? String(localized: "Sun & Moon")
+                    : String(localized: "Sun, Moon & Marine"),
+                detail: String(localized: "Current Conditions and Trends")
             )
             GeometryReader { geometry in
                 let spacing = 20 * layoutScale
@@ -1892,13 +1921,13 @@ private struct SolarConditionCard: View {
         GlassCard(cornerRadius: 28) {
             VStack(alignment: .leading, spacing: (compact ? 11 : 17) * layoutScale) {
                 HStack {
-                    Label("太阳", systemImage: "sun.max.fill")
+                    Label("Sun", systemImage: "sun.max.fill")
                         .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.88))
                     Spacer()
                     Text(solarState)
                         .font(.system(size: 16 * layoutScale, weight: .bold, design: .rounded))
-                        .foregroundStyle(solarState == "白昼" ? .yellow : .indigo.opacity(0.95))
+                        .foregroundStyle(isCurrentlyDaylight ? .yellow : .indigo.opacity(0.95))
                 }
 
                 SunlightTimeline(
@@ -1911,13 +1940,13 @@ private struct SolarConditionCard: View {
                 HStack(spacing: 12 * layoutScale) {
                     AstronomyMetric(
                         symbol: "clock.fill",
-                        title: "今日白昼",
+                        title: String(localized: "Today’s Daylight"),
                         value: daylightText,
                         accent: .yellow
                     )
                     AstronomyMetric(
                         symbol: tomorrowChangeSymbol,
-                        title: "明日变化",
+                        title: String(localized: "Tomorrow’s Change"),
                         value: tomorrowDaylightChange,
                         accent: .cyan
                     )
@@ -1932,16 +1961,24 @@ private struct SolarConditionCard: View {
     private var daylightText: String {
         if let duration = snapshot.current.daylightDuration {
             let minutes = Int(duration / 60)
-            return "\(minutes / 60)小时\(minutes % 60)分"
+            return String(localized: "\(minutes / 60) hr \(minutes % 60) min")
         }
         guard let sunrise = snapshot.current.sunrise, let sunset = snapshot.current.sunset else { return "--" }
         let minutes = Int(sunset.timeIntervalSince(sunrise) / 60)
-        return "\(minutes / 60)小时\(minutes % 60)分"
+        return String(localized: "\(minutes / 60) hr \(minutes % 60) min")
     }
 
     private var solarState: String {
-        guard let sunrise = snapshot.current.sunrise, let sunset = snapshot.current.sunset else { return "天文数据缺失" }
-        return Date() >= sunrise && Date() <= sunset ? "白昼" : "夜间"
+        guard snapshot.current.sunrise != nil, snapshot.current.sunset != nil else {
+            return String(localized: "Astronomical data unavailable")
+        }
+        return isCurrentlyDaylight ? String(localized: "Daylight") : String(localized: "Night")
+    }
+
+    private var isCurrentlyDaylight: Bool {
+        guard let sunrise = snapshot.current.sunrise, let sunset = snapshot.current.sunset else { return false }
+        let now = Date()
+        return now >= sunrise && now <= sunset
     }
 
     private var tomorrowDaylightChange: String {
@@ -1949,8 +1986,10 @@ private struct SolarConditionCard: View {
               let today = duration(for: snapshot.daily[0]),
               let tomorrow = duration(for: snapshot.daily[1]) else { return "--" }
         let minutes = Int(((tomorrow - today) / 60).rounded())
-        if abs(minutes) < 1 { return "基本不变" }
-        return minutes > 0 ? "增加 \(minutes) 分" : "减少 \(abs(minutes)) 分"
+        if abs(minutes) < 1 { return String(localized: "No Change") }
+        return minutes > 0
+            ? String(localized: "\(minutes) min longer")
+            : String(localized: "\(abs(minutes)) min shorter")
     }
 
     private var tomorrowChangeSymbol: String {
@@ -1981,7 +2020,7 @@ private struct AstronomyMetric: View {
                 .font(.system(size: 19 * layoutScale, weight: .semibold))
                 .foregroundStyle(accent)
             VStack(alignment: .leading, spacing: 2 * layoutScale) {
-                Text(title)
+                Text(L10n.string(title))
                     .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.50))
                 Text(value)
@@ -2006,24 +2045,24 @@ private struct SunlightForecastStrip: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8 * layoutScale) {
-            Text("未来10天日照变化")
+            Text("10-Day Daylight Trend")
                 .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.58))
             HStack(spacing: 8 * layoutScale) {
                 ForEach(Array(daily.prefix(10).enumerated()), id: \.element.id) { index, point in
                     VStack(alignment: .leading, spacing: 6 * layoutScale) {
-                        Text(index == 0 ? "今天" : point.date.formatted("E", timezoneIdentifier: timezone))
+                        Text(index == 0 ? String(localized: "Today") : point.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
                             .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.76))
-                        Text(point.date.formatted("M/d", timezoneIdentifier: timezone))
+                        Text(point.date.formatted(.monthDay, timezoneIdentifier: timezone))
                             .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.42))
                         SunlightDayBar(point: point, timezone: timezone)
                             .frame(height: 24 * layoutScale)
                         HStack {
-                            Text(point.sunrise?.formatted("HH:mm", timezoneIdentifier: timezone) ?? "--:--")
+                            Text(point.sunrise?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
                             Spacer()
-                            Text(point.sunset?.formatted("HH:mm", timezoneIdentifier: timezone) ?? "--:--")
+                            Text(point.sunset?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
                         }
                         .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
                         .monospacedDigit()
@@ -2080,11 +2119,11 @@ private struct MoonPhaseCard: View {
         GlassCard(cornerRadius: 28) {
             VStack(alignment: .leading, spacing: (compact ? 9 : 14) * layoutScale) {
                 HStack {
-                    Label("月相", systemImage: "moon.stars.fill")
+                    Label("Moon Phase", systemImage: "moon.stars.fill")
                         .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.88))
                     Spacer()
-                    Text("月龄 \(info.age.formattedNumber(decimals: 1)) 天")
+                    Text("Moon age \(info.age.formattedNumber(decimals: 1)) days")
                         .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.50))
                 }
@@ -2098,7 +2137,7 @@ private struct MoonPhaseCard: View {
                     Text(info.title)
                         .font(.system(size: 29 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text("照明度 \(Int((info.illumination * 100).rounded()))%")
+                    Text("Illumination \(Int((info.illumination * 100).rounded()))%")
                         .font(.system(size: 17 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.62))
                 }
@@ -2107,10 +2146,10 @@ private struct MoonPhaseCard: View {
                     Image(systemName: "sparkles")
                         .foregroundStyle(.yellow.opacity(0.85))
                     VStack(alignment: .leading, spacing: 2 * layoutScale) {
-                        Text("下一主要月相")
+                        Text("Next Major Phase")
                             .font(.system(size: 13 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.48))
-                        Text("\(info.nextPhaseTitle) · \(info.nextPhaseDate.formatted("M月d日", timezoneIdentifier: timezone))")
+                        Text("\(info.nextPhaseTitle) · \(info.nextPhaseDate.formatted(.monthDay, timezoneIdentifier: timezone))")
                             .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                     }
@@ -2119,7 +2158,7 @@ private struct MoonPhaseCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14 * layoutScale, style: .continuous))
 
-                Text("未来7天月相")
+                Text("7-Day Moon Phases")
                     .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.54))
 
@@ -2127,7 +2166,7 @@ private struct MoonPhaseCard: View {
                     ForEach(Array(daily.prefix(7).enumerated()), id: \.element.id) { index, point in
                         let dayInfo = MoonPhaseCalculator.info(at: point.date)
                         VStack(spacing: 5 * layoutScale) {
-                            Text(index == 0 ? "今" : point.date.formatted("E", timezoneIdentifier: timezone))
+                            Text(index == 0 ? String(localized: "Today") : point.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
                                 .font(.system(size: 12 * layoutScale, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.58))
                             MoonDiskView(info: dayInfo)
@@ -2171,7 +2210,7 @@ private struct MoonDiskView: View {
             context.stroke(disk, with: .color(.white.opacity(0.22)), lineWidth: max(1, diameter * 0.012))
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(info.title)，照明度 \(Int((info.illumination * 100).rounded()))%")
+        .accessibilityLabel("\(info.title), illumination \(Int((info.illumination * 100).rounded())) percent")
     }
 
     private func illuminatedPath(in rect: CGRect) -> Path {
@@ -2216,13 +2255,13 @@ private struct MarineConditionCard: View {
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(.cyan)
                     VStack(alignment: .leading, spacing: 1 * layoutScale) {
-                        Text("海况 · \(waveState(marine.waveHeight))")
+                        Text("Marine Conditions · \(waveState(marine.waveHeight))")
                             .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.60))
                         Text("\(marine.waveHeight.formattedNumber(decimals: 1)) m")
                             .font(.system(size: 35 * layoutScale, weight: .bold, design: .rounded))
                             .monospacedDigit()
-                        Text("有效浪高 · \(marine.updatedAt.formatted("HH:mm", timezoneIdentifier: timezone)) 更新")
+                        Text("Significant wave height · Updated \(marine.updatedAt.formatted(.time, timezoneIdentifier: timezone))")
                             .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.42))
                     }
@@ -2234,7 +2273,7 @@ private struct MarineConditionCard: View {
                     .frame(width: 1, height: 90 * layoutScale)
 
                 VStack(alignment: .leading, spacing: 4 * layoutScale) {
-                    Text("未来24小时浪高")
+                    Text("24-Hour Wave Height")
                         .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.52))
                     MarineForecastStrip(points: forecastPoints(for: marine), timezone: timezone)
@@ -2250,12 +2289,12 @@ private struct MarineConditionCard: View {
                     columns: Array(repeating: GridItem(.flexible(), spacing: 7 * layoutScale), count: 3),
                     spacing: 7 * layoutScale
                 ) {
-                    MarineCompactMetric(symbol: "timer", title: "周期", value: "\(marine.wavePeriod.formattedNumber(decimals: 1)) s", accent: .yellow)
-                    MarineCompactMetric(symbol: "location.north.line.fill", title: "浪向", value: "\(Int(marine.waveDirection.rounded()))° \(compassDirection(marine.waveDirection))", accent: .mint)
-                    MarineCompactMetric(symbol: "wind", title: "风浪", value: "\(marine.windWaveHeight.formattedNumber(decimals: 1)) m", accent: .orange)
-                    MarineCompactMetric(symbol: "water.waves", title: "涌浪", value: "\(marine.swellWaveHeight.formattedNumber(decimals: 1)) m", accent: .cyan)
-                    MarineCompactMetric(symbol: "thermometer.medium", title: "海温", value: marine.seaSurfaceTemperature.map { "\($0.formattedNumber(decimals: 1))℃" } ?? "--", accent: .pink)
-                    MarineCompactMetric(symbol: "arrow.trianglehead.branch", title: "海流", value: currentText(marine), accent: .blue)
+                    MarineCompactMetric(symbol: "timer", title: String(localized: "Period"), value: "\(marine.wavePeriod.formattedNumber(decimals: 1)) s", accent: .yellow)
+                    MarineCompactMetric(symbol: "location.north.line.fill", title: String(localized: "Direction"), value: "\(Int(marine.waveDirection.rounded()))° \(compassDirection(marine.waveDirection))", accent: .mint)
+                    MarineCompactMetric(symbol: "wind", title: String(localized: "Wind Waves"), value: "\(marine.windWaveHeight.formattedNumber(decimals: 1)) m", accent: .orange)
+                    MarineCompactMetric(symbol: "water.waves", title: String(localized: "Swell"), value: "\(marine.swellWaveHeight.formattedNumber(decimals: 1)) m", accent: .cyan)
+                    MarineCompactMetric(symbol: "thermometer.medium", title: String(localized: "Sea Temp"), value: marine.seaSurfaceTemperature.map { "\($0.formattedNumber(decimals: 1))℃" } ?? "--", accent: .pink)
+                    MarineCompactMetric(symbol: "arrow.trianglehead.branch", title: String(localized: "Current"), value: currentText(marine), accent: .blue)
                 }
                 .frame(width: 590 * layoutScale)
             }
@@ -2271,10 +2310,10 @@ private struct MarineConditionCard: View {
 
     private func waveState(_ height: Double) -> String {
         switch height {
-        case ..<0.5: return "平缓"
-        case ..<1.25: return "轻浪"
-        case ..<2.5: return "中浪"
-        default: return "大浪"
+        case ..<0.5: return String(localized: "Calm")
+        case ..<1.25: return String(localized: "Light")
+        case ..<2.5: return String(localized: "Moderate")
+        default: return String(localized: "High")
         }
     }
 
@@ -2287,9 +2326,17 @@ private struct MarineConditionCard: View {
     }
 
     private func compassDirection(_ degrees: Double) -> String {
-        let labels = ["北", "东北", "东", "东南", "南", "西南", "西", "西北"]
         let normalized = (degrees.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
-        return labels[Int((normalized / 45).rounded()) % labels.count]
+        switch Int((normalized / 45).rounded()) % 8 {
+        case 0: return String(localized: "N")
+        case 1: return String(localized: "NE")
+        case 2: return String(localized: "E")
+        case 3: return String(localized: "SE")
+        case 4: return String(localized: "S")
+        case 5: return String(localized: "SW")
+        case 6: return String(localized: "W")
+        default: return String(localized: "NW")
+        }
     }
 }
 
@@ -2302,7 +2349,7 @@ private struct MarineForecastStrip: View {
         if points.isEmpty {
             HStack {
                 Image(systemName: "clock.badge.questionmark")
-                Text("短时趋势正在更新")
+                Text("Short-Term Trend Is Updating")
             }
             .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
             .foregroundStyle(.white.opacity(0.50))
@@ -2323,7 +2370,7 @@ private struct MarineForecastStrip: View {
                                 .frame(height: max(6 * layoutScale, 34 * layoutScale * point.waveHeight / maximumWaveHeight))
                         }
                         .frame(height: 38 * layoutScale)
-                        Text(point.time.formatted("HH时", timezoneIdentifier: timezone))
+                        Text(point.time.formatted(.hour, timezoneIdentifier: timezone))
                             .font(.system(size: 10 * layoutScale, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white.opacity(0.42))
@@ -2352,7 +2399,7 @@ private struct MarineCompactMetric: View {
                 Image(systemName: symbol)
                     .font(.system(size: 11 * layoutScale, weight: .semibold))
                     .foregroundStyle(accent)
-                Text(title)
+                Text(L10n.string(title))
                     .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.48))
             }
@@ -2380,11 +2427,11 @@ private struct SunlightTimeline: View {
                 let metrics = timelineMetrics(at: context.date, width: geometry.size.width)
                 VStack(alignment: .leading, spacing: 18 * layoutScale) {
                     HStack {
-                        Text("24小时日照时间线")
+                        Text("24-Hour Daylight Timeline")
                             .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.62))
                         Spacer()
-                        Text("现在 \(context.date.formatted("HH:mm", timezoneIdentifier: timezone))")
+                        Text("Now \(context.date.formatted(.time, timezoneIdentifier: timezone))")
                             .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white.opacity(0.78))
@@ -2431,12 +2478,12 @@ private struct SunlightTimeline: View {
                     .foregroundStyle(.white.opacity(0.45))
 
                     HStack {
-                        Label(sunrise.map { $0.formatted("HH:mm", timezoneIdentifier: timezone) } ?? "--:--", systemImage: "sunrise.fill")
+                        Label(sunrise.map { $0.formatted(.time, timezoneIdentifier: timezone) } ?? "--:--", systemImage: "sunrise.fill")
                         Spacer()
-                        Text("日出至日落")
+                        Text("Sunrise to Sunset")
                             .foregroundStyle(.white.opacity(0.50))
                         Spacer()
-                        Label(sunset.map { $0.formatted("HH:mm", timezoneIdentifier: timezone) } ?? "--:--", systemImage: "sunset.fill")
+                        Label(sunset.map { $0.formatted(.time, timezoneIdentifier: timezone) } ?? "--:--", systemImage: "sunset.fill")
                     }
                     .font(.system(size: 17 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.70))

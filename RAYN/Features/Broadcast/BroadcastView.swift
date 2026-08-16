@@ -12,10 +12,13 @@ enum ScenePerformancePolicy {
 
 struct BroadcastView: View {
     @EnvironmentObject private var appState: AppState
+    @Environment(\.resetFocus) private var resetFocus
     @State private var presentedScene: BroadcastScene = .current
     @State private var sceneOpacity = 1.0
     @State private var sceneTransitionTask: Task<Void, Never>?
     @State private var selectedDailyDayID: Date?
+    @State private var hasAssignedInitialFocus = false
+    @Namespace private var broadcastFocusScope
 
     var body: some View {
         GeometryReader { geometry in
@@ -38,6 +41,7 @@ struct BroadcastView: View {
                             .allowsHitTesting(sceneOpacity > 0.99)
                         bottomTicker(snapshot: snapshot, layoutScale: layoutScale)
                     }
+                    .focusScope(broadcastFocusScope)
                     .padding(.horizontal, max(80, 58 * layoutScale))
                     .padding(.top, max(60, 36 * layoutScale))
                     .padding(.bottom, max(60, 30 * layoutScale))
@@ -76,6 +80,18 @@ struct BroadcastView: View {
             presentedScene = appState.currentScene
             appState.start()
         }
+        .task(id: appState.snapshot != nil) {
+            guard appState.snapshot != nil,
+                  !hasAssignedInitialFocus,
+                  appState.currentScene == .current else { return }
+            // The live hierarchy replaces a non-focusable loading view. Ask
+            // for focus after that replacement has completed; a preference
+            // alone is not reevaluated consistently by tvOS in this case.
+            try? await Task.sleep(nanoseconds: 150_000_000)
+            guard !Task.isCancelled else { return }
+            hasAssignedInitialFocus = true
+            resetFocus(in: broadcastFocusScope)
+        }
         .onChange(of: appState.currentScene) { _, nextScene in
             present(nextScene)
         }
@@ -91,13 +107,8 @@ struct BroadcastView: View {
     private func topNavigation(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 12 * layoutScale) {
             HStack(spacing: 22 * layoutScale) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(snapshot.location.name)
-                        .font(.system(size: 30 * layoutScale, weight: .bold, design: .rounded))
-                    Text("RAYN · 天气演播室")
-                        .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.60))
-                }
+                Text(snapshot.location.name)
+                    .font(.system(size: 30 * layoutScale, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 Spacer()
                 Button {
@@ -111,7 +122,7 @@ struct BroadcastView: View {
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
                 .focusAdaptiveGlassForeground()
-                .accessibilityLabel("设置")
+                .accessibilityLabel("Settings")
             }
             // The full header acts as a directional focus guide to the gear.
             // Otherwise the small top-right target is unreachable from most
@@ -131,6 +142,14 @@ struct BroadcastView: View {
                         .buttonStyle(.glass)
                         .tint(scene == appState.currentScene ? .cyan : .white)
                         .focusAdaptiveGlassForeground()
+                        // All scenes except the 10-day list have no primary
+                        // content control. Keep their active tab available as
+                        // tvOS's deterministic recovery target if a scene
+                        // handoff temporarily leaves the focus system empty.
+                        .prefersDefaultFocus(
+                            scene == appState.currentScene && scene != .daily,
+                            in: broadcastFocusScope
+                        )
                     }
                 }
                 // Native glass buttons expand and cast a wider shadow while
@@ -152,7 +171,7 @@ struct BroadcastView: View {
 
     private func navigationTitle(for scene: BroadcastScene, snapshot: WeatherSnapshot) -> String {
         guard scene == .astronomy, snapshot.marine != nil else { return scene.title }
-        return "日月海况"
+        return String(localized: "Sun, Moon & Marine")
     }
 
     @ViewBuilder
@@ -217,11 +236,11 @@ struct BroadcastView: View {
             TickerText(snapshot: snapshot)
             Spacer()
             if appState.isPaused {
-                Label("已暂停", systemImage: "pause.fill")
+                Label("Paused", systemImage: "pause.fill")
                     .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.yellow)
             }
-            Text("更新 \(snapshot.updatedAt.formatted("HH:mm", timezoneIdentifier: snapshot.timezoneIdentifier))")
+            Text("Updated \(snapshot.updatedAt.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier))")
                 .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.54))
         }
@@ -237,14 +256,18 @@ struct BroadcastView: View {
                 .font(.system(size: 72 * layoutScale, weight: .medium))
                 .foregroundStyle(.white.opacity(0.88))
                 .symbolEffect(.pulse, options: .repeating, isActive: appState.dataState == .loading)
-            Text(appState.dataState == .unavailable ? "暂时无法获取实时天气" : "正在获取实时天气")
+            Text(
+                appState.dataState == .unavailable
+                    ? String(localized: "Live weather is temporarily unavailable")
+                    : String(localized: "Loading live weather")
+            )
                 .font(.system(size: 34 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
             Text(placeholderDetail)
                 .font(.system(size: 21 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.62))
             if appState.dataState == .unavailable {
-                Button("重新获取") {
+                Button("Try Again") {
                     appState.refresh(force: true)
                 }
                 .buttonStyle(.glass)
@@ -257,20 +280,20 @@ struct BroadcastView: View {
     private var placeholderDetail: String {
         switch appState.dataState {
         case .locating:
-            return "正在读取 Apple TV 的当前位置"
+            return String(localized: "Reading the Apple TV's current location")
         case .loading:
             return appState.selectedLocation.id == SavedLocation.currentPlaceholder.id
-                ? "正在准备天气服务"
-                : "正在获取 \(appState.selectedLocation.name) 的实时天气"
+                ? String(localized: "Preparing weather services")
+                : String(localized: "Loading live weather for \(appState.selectedLocation.name)")
         case .unavailable:
-            if appState.failedSources.contains("地址") {
-                return "请在设置中搜索并选择一个地址"
+            if appState.failedSources.contains(AppFailureSource.locationSearch) {
+                return String(localized: "Search for and select a location in Settings.")
             }
-            return appState.failedSources.contains("当前位置")
-                ? "无法定位，已尝试使用设定地址"
-                : "请检查 Apple TV 的网络连接"
+            return appState.failedSources.contains(AppFailureSource.currentLocation)
+                ? String(localized: "Location was unavailable, so the saved location was used.")
+                : String(localized: "Check the Apple TV's network connection.")
         case .waiting, .live:
-            return "准备中"
+            return String(localized: "Preparing…")
         }
     }
 }

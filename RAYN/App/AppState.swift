@@ -11,6 +11,11 @@ enum WeatherDataState: Equatable {
     case unavailable
 }
 
+enum AppFailureSource {
+    static let locationSearch = "locationSearch"
+    static let currentLocation = "currentLocation"
+}
+
 @MainActor
 final class AppState: ObservableObject {
     @Published var snapshot: WeatherSnapshot?
@@ -132,7 +137,7 @@ final class AppState: ObservableObject {
             updateCurrentLocation()
         } else if selectedLocation.id == SavedLocation.currentPlaceholder.id {
             dataState = .unavailable
-            failedSources = ["地址"]
+            failedSources = [AppFailureSource.locationSearch]
         } else {
             refresh(force: true)
         }
@@ -151,7 +156,7 @@ final class AppState: ObservableObject {
                 updateCurrentLocation()
             } else {
                 dataState = .unavailable
-                failedSources = ["地址"]
+                failedSources = [AppFailureSource.locationSearch]
             }
             return
         }
@@ -184,7 +189,7 @@ final class AppState: ObservableObject {
                     updateCurrentLocation()
                 } else if selectedLocation.id == SavedLocation.currentPlaceholder.id {
                     dataState = .unavailable
-                    failedSources = ["地址"]
+                    failedSources = [AppFailureSource.locationSearch]
                 } else {
                     refresh()
                 }
@@ -233,6 +238,14 @@ final class AppState: ObservableObject {
         // Air Quality, which looked like an incorrect intermediate scene.
         restartRotationTask()
         controlsTask?.cancel()
+        #if DEBUG
+        // Accessibility queries are deliberately slower than a real remote.
+        // Keep navigation visible only for deterministic UI automation; the
+        // release app still hides it after the normal five-second dwell.
+        if ProcessInfo.processInfo.environment["RAYN_KEEP_CONTROLS_VISIBLE"] == "1" {
+            return
+        }
+        #endif
         controlsTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 5_000_000_000)
             guard let self, Date().timeIntervalSince(lastInteraction) >= 4.8 else { return }
@@ -263,7 +276,7 @@ final class AppState: ObservableObject {
             } else {
                 selectedLocation = .currentPlaceholder
                 dataState = .unavailable
-                failedSources = ["地址"]
+                failedSources = [AppFailureSource.locationSearch]
             }
         }
     }
@@ -432,7 +445,7 @@ final class AppState: ObservableObject {
                 let country = address?.regionName ?? ""
                 let location = SavedLocation(
                     id: UUID(uuidString: "00000000-0000-0000-0000-000000000001") ?? UUID(),
-                    name: locality ?? "当前位置",
+                    name: locality ?? String(localized: "Current Location"),
                     administrativeArea: administrativeArea == locality ? "" : administrativeArea,
                     country: country,
                     latitude: coordinate.coordinate.latitude,
@@ -442,7 +455,7 @@ final class AppState: ObservableObject {
                 )
                 setLocation(location, usingCurrentLocation: true)
             } catch {
-                failedSources = Array(Set(failedSources + ["当前位置"]))
+                failedSources = Array(Set(failedSources + [AppFailureSource.currentLocation]))
                 if let savedLocation = savedLocations.first {
                     selectedLocation = savedLocation
                     snapshot = nil
