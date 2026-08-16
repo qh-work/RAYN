@@ -1,16 +1,16 @@
-# RAYN Project Overview
+# RAYN Weather Project Overview
 
 ## One-line description
 
-RAYN is an open-source, native tvOS weather studio that turns live weather into a calm, cinematic experience for televisions and projectors.
+RAYN Weather is an open-source, native tvOS weather studio that turns live weather into a calm, cinematic experience for televisions and projectors.
 
 ## Short introduction
 
-RAYN brings current weather, hourly and 10-day forecasts, precipitation radar, air quality, sunlight, moon phase, and optional marine conditions to Apple TV. It is designed around the Siri Remote, long viewing distances, changing display sizes, and the performance limits of real living-room hardware.
+RAYN Weather brings current weather, hourly and 10-day forecasts, precipitation radar, air quality, sunlight, moon phase, and optional marine conditions to Apple TV. It is designed around the Siri Remote, long viewing distances, changing display sizes, and the performance limits of real living-room hardware.
 
 The app does not use a hard-coded startup city or production demo weather. Its presentation is driven by live provider responses, while unavailable coverage remains visibly unavailable. Forecast, air-quality, radar, marine, and location-search services are independently replaceable so the project can evolve without rewriting its interface.
 
-## Why RAYN exists
+## Why RAYN Weather exists
 
 Phone weather apps are optimized for brief, close-range interaction. A television weather experience needs different priorities:
 
@@ -20,7 +20,7 @@ Phone weather apps are optimized for brief, close-range interaction. A televisio
 - expensive maps, materials, shadows, and transitions must be coordinated for sustained 4K use;
 - data provenance, coverage, update time, and licensing need to remain explicit in an open-source project.
 
-RAYN treats those constraints as product requirements, not finishing touches.
+RAYN Weather treats those constraints as product requirements, not finishing touches.
 
 ## Product principles
 
@@ -63,7 +63,8 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the maintenance model and [`DATA_SO
 - Provider availability, update frequency, and regional coverage vary.
 - RainViewer usage is subject to its public API terms and is not a guaranteed operational service.
 - WeatherKit requires a contributor's own Apple Developer capability and signing setup.
-- The live radar scene has been exercised on Apple TV 4K (2nd generation, A12); exhaustive remote-focus and long-duration performance passes still remain before a tagged release.
+- The live radar scene has been exercised on Apple TV 4K (2nd generation, A12); broader long-duration and memory-pressure coverage remains ongoing for future releases.
+- The public repository is a source-distributed preview. Installing on a physical Apple TV requires each user to sign the app with their own free or paid Apple Account; App Store and TestFlight distribution are not currently available.
 - The primary interface is currently Simplified Chinese; English localization is planned.
 - This is weather information, not an emergency, aviation, or marine-navigation service.
 
@@ -75,4 +76,4 @@ The maintained plan is in [`ROADMAP.md`](ROADMAP.md). Planned work is not presen
 
 ## Public attribution
 
-RAYN was created and is maintained by **QHWORK**. Source code and original repository assets are released under the MIT License; external weather data, radar tiles, platform services, and trademarks remain governed by their respective terms.
+RAYN Weather was created and is maintained by **QHWORK**. Source code and original repository assets are released under the MIT License; external weather data, radar tiles, platform services, and trademarks remain governed by their respective terms.

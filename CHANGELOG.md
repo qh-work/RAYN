@@ -1,10 +1,21 @@
 # Changelog
 
-All notable changes to RAYN will be documented in this file.
+All notable changes to RAYN Weather will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.1] - 2026-08-17
+
+### Added
+
+- Added a self-install guide for Apple TV users signing with a free Apple Account.
+
+### Changed
+
+- Changed the public app and documentation name to **RAYN Weather** while preserving the stable `RAYN` project, target, module, and icon brand.
+- Bumped the app build to 1.0.1 (2).
 
 ## [1.0.0] - 2026-08-16
 
@@ -20,5 +31,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/qh-work/RAYN/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qh-work/RAYN/releases/tag/v1.0.0

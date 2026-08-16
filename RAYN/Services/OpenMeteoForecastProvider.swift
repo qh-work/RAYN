@@ -35,7 +35,7 @@ struct OpenMeteoForecastProvider: ForecastProvider {
 
     var request = URLRequest(url: url)
     request.timeoutInterval = 12
-    request.setValue("RAYN/1.0", forHTTPHeaderField: "User-Agent")
+    request.setValue("RAYN-Weather/1.0.1", forHTTPHeaderField: "User-Agent")
     let data = try await httpClient.data(for: request)
 
     let payload = try JSONDecoder().decode(OpenMeteoForecastPayload.self, from: data)

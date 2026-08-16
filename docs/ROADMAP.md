@@ -1,6 +1,6 @@
-# RAYN Roadmap
+# RAYN Weather Roadmap
 
-RAYN aims to become a dependable, provider-neutral weather experience for the largest screen in the home. This roadmap describes direction, not a promise of release dates. Items move only after they work with live data, pass focus and accessibility checks, and remain responsive on Apple TV 4K (2nd generation, A12).
+RAYN Weather aims to become a dependable, provider-neutral weather experience for the largest screen in the home. This roadmap describes direction, not a promise of release dates. Items move only after they work with live data, pass focus and accessibility checks, and remain responsive on Apple TV 4K (2nd generation, A12).
 
 ## What is available now
 
@@ -44,20 +44,20 @@ RAYN aims to become a dependable, provider-neutral weather experience for the la
 - Add screenshot-diff checks for core layouts and a documented physical-device release checklist.
 - Improve contributor documentation for Xcode signing, WeatherKit capability setup, and data-attribution review.
 
-## Mid term — RAYN 2
+## Mid term — RAYN Weather 2
 
 - Ship a production-ready WeatherKit adapter path with required Apple attribution and a clear bring-your-own-Apple-Developer configuration.
 - Add alternative, properly licensed radar adapters, with regional coverage and update-frequency metadata exposed through the common radar contract.
 - Add official weather-alert support when a configured provider supplies authoritative alerts for the selected region.
 - Support multiple saved places with a deliberate remote-control flow and per-place refresh status.
 - Allow users to choose scene order and a small set of legibility-tested visual modes without disconnecting visuals from real weather conditions.
-- Introduce provider comparison diagnostics for maintainers. RAYN will not silently blend conflicting sources or label estimates as observations.
+- Introduce provider comparison diagnostics for maintainers. RAYN Weather will not silently blend conflicting sources or label estimates as observations.
 
 ## Longer-term exploration
 
 - Share the provider and model layer with companion Apple-platform clients while keeping the television experience purpose-built.
 - Establish a community-maintained provider registry with licensing, attribution, region, freshness, and conformance metadata.
-- Explore privacy-preserving settings sync only if it can remain optional and does not require a RAYN account.
+- Explore privacy-preserving settings sync only if it can remain optional and does not require a RAYN Weather account.
 - Evaluate public TestFlight or App Store distribution after data licensing, operational ownership, accessibility, and physical-device reliability are ready.
 
 ## Explicit non-goals

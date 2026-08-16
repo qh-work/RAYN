@@ -1,14 +1,16 @@
-# RAYN
+# RAYN Weather for Apple TV
 
 [English](README.md) | 简体中文
 
 **Weather, alive.**
 
-原生 Apple TV 天气演播室，目标平台为 tvOS 27。界面、动画和数据层彼此分离，方便公开协作，也方便后续替换天气或雷达服务。
+> **项目状态：公开开源预览版。** 已提供可构建源码、测试、真机验证和自行安装说明；目前没有 App Store 或 TestFlight 分发。
+
+RAYN Weather 是面向 tvOS 27 的原生 Apple TV 天气演播室。界面、动画和数据层彼此分离，方便公开协作，也方便后续替换天气或雷达服务。
 
 ## 实机界面预览
 
-![RAYN 在 tvOS 27 上的当前天气界面](docs/media/screenshots/01-current-weather.png)
+![RAYN Weather 在 tvOS 27 上的当前天气界面](docs/media/screenshots/01-current-weather.png)
 
 更多真实运行截图与 tvOS 27 演示视频见 [`docs/media/README.md`](docs/media/README.md)。项目定位、限制与完整介绍见 [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md)，后续开发计划见 [`docs/ROADMAP.md`](docs/ROADMAP.md)。规划中的能力不会被写成已经完成的功能。
 
@@ -71,6 +73,10 @@ static let locationSearchSource: LocationSearchSource = .openMeteo
 
 启用 WeatherKit 时，将 `forecastSource` 改成 `.weatherKit`，然后在自己的 Apple Developer App ID 中开启 WeatherKit capability，并使用自己的签名配置构建。私钥、Service ID、JWT 或账号信息不能进入仓库。适配代码在 `WeatherKitForecastProvider.swift`，其余业务代码不依赖 WeatherKit 类型。
 
+## 安装到 Apple TV
+
+自行安装不要求付费 Apple Developer Program 会员。使用免费 Apple 账号登录 Xcode、选择 Personal Team 后即可签名并安装到自己的 Apple TV；免费描述文件有效期为 7 天，到期需要重新构建安装。完整步骤与限制见 [`docs/INSTALLATION.md`](docs/INSTALLATION.md)。
+
 ## 本地构建与测试
 
 使用 Xcode 27 beta、Apple TV SDK 27：
@@ -103,6 +109,6 @@ A12 设备的雷达切换根因、已完成优化、真机验收标准和后续�
 
 ## 作者与许可证
 
-RAYN 由 **QHWORK** 创建并维护，欢迎通过 Issue 和 Pull Request 参与贡献。
+RAYN Weather 由 **QHWORK** 创建并维护，欢迎通过 Issue 和 Pull Request 参与贡献。
 
 项目源代码与原创资源采用 [MIT License](LICENSE) 开放。天气数据、雷达瓦片、Apple 平台框架与相关商标不属于 MIT 授权范围，分别受其提供方条款约束。详见 [`NOTICE.md`](NOTICE.md)。

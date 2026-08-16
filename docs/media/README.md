@@ -1,6 +1,6 @@
-# RAYN Media
+# RAYN Weather Media
 
-Every item in this directory is a capture of a real RAYN Debug build using live provider responses. These are product captures, not concept art or substituted weather mockups.
+Every item in this directory is a capture of a real RAYN Weather Debug build using live provider responses. These are product captures, not concept art or substituted weather mockups.
 
 Repository media uses only public city coordinates. Beijing is used for the general scene gallery, and New York City is used for radar and the walkthrough. No personal location is included. Live values can differ when the providers are queried again.
 
@@ -28,4 +28,4 @@ The Debug-only `RAYN_CAPTURE_LOCATION` hook accepts `beijing`, `shanghai`, `new-
 
 For simulator video capture, `RAYN_SIMULATOR_RADAR=1` opts the Debug build into the same live radar tile renderer used on Apple TV hardware. The simulator continues to show its deterministic unavailable state by default.
 
-Files may be reused when describing or reviewing RAYN, provided the project is identified accurately. Apple, tvOS, and third-party service trademarks remain the property of their owners.
+Files may be reused when describing or reviewing RAYN Weather, provided the project is identified accurately. Apple, tvOS, and third-party service trademarks remain the property of their owners.

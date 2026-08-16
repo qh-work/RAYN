@@ -1,7 +1,9 @@
 import Foundation
 
 enum AppConfiguration {
-    static let displayName = "RAYN"
+    // The public name explains the product at a glance while the shorter
+    // internal name keeps targets, modules, paths, and icon artwork stable.
+    static let displayName = "RAYN Weather"
     static let productName = "RAYN"
     static let weatherRefreshInterval: TimeInterval = 15 * 60
     static let airQualityRefreshInterval: TimeInterval = 45 * 60

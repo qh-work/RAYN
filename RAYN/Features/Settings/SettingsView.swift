@@ -237,7 +237,7 @@ struct SettingsView: View {
 
     private var privacySection: some View {
         settingsCard(title: "隐私说明", symbol: "lock.shield.fill") {
-            Text("RAYN 不要求账号登录，不包含广告、分析追踪或后台用户画像。开启“使用当前位置”后，应用才会请求位置权限；天气服务请求只发送用于查询天气的经纬度，不保存位置历史。收藏城市和设置仅保存在本机。")
+            Text("RAYN Weather 不要求账号登录，不包含广告、分析追踪或后台用户画像。开启“使用当前位置”后，应用才会请求位置权限；天气服务请求只发送用于查询天气的经纬度，不保存位置历史。收藏城市和设置仅保存在本机。")
                 .font(.system(size: 19, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.70))
                 .fixedSize(horizontal: false, vertical: true)

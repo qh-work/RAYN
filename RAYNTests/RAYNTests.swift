@@ -14,6 +14,15 @@ extension SavedLocation {
 }
 
 final class RAYNTests: XCTestCase {
+  func testPublicNameExplainsTheProductWithoutRenamingInternalTargets() {
+    XCTAssertEqual(AppConfiguration.displayName, "RAYN Weather")
+    XCTAssertEqual(AppConfiguration.productName, "RAYN")
+    XCTAssertEqual(
+      Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String,
+      AppConfiguration.displayName
+    )
+  }
+
   func testPublicCitySearchAliasesAreUnambiguous() {
     let newYork = OpenMeteoLocationSearchProvider.searchRequest(for: "纽约")
     XCTAssertEqual(newYork.name, "New York City")

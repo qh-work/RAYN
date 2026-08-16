@@ -3,7 +3,7 @@ import CoreLocation
 import Foundation
 import WeatherKit
 
-/// Adapts Apple's WeatherKit model to RAYN's provider-neutral weather model.
+/// Adapts Apple's WeatherKit model to RAYN Weather's provider-neutral weather model.
 ///
 /// The app does not embed credentials. A release build that selects this provider
 /// must enable the WeatherKit capability for its own App ID in the Apple Developer

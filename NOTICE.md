@@ -1,8 +1,8 @@
 # Notices and attribution
 
-## RAYN
+## RAYN Weather
 
-Copyright (c) 2026 QHWORK. RAYN source code and original repository assets are distributed under the MIT License unless a file states otherwise.
+Copyright (c) 2026 QHWORK. RAYN Weather source code and original repository assets are distributed under the MIT License unless a file states otherwise.
 
 ## Weather and environmental data
 
@@ -19,8 +19,8 @@ Provider terms can change independently of this repository. Distributors are res
 
 Apple, Apple TV, tvOS, WeatherKit, Apple Weather, MapKit, SwiftUI, Xcode, and SF Symbols are trademarks or services of Apple Inc. Other names belong to their respective owners.
 
-RAYN is an independent open-source project and is not affiliated with, sponsored by, or endorsed by Apple, Open-Meteo, RainViewer, or any government weather agency.
+RAYN Weather is an independent open-source project and is not affiliated with, sponsored by, or endorsed by Apple, Open-Meteo, RainViewer, or any government weather agency.
 
 ## Safety disclaimer
 
-Weather forecasts and radar imagery can be delayed, unavailable, incomplete, or inaccurate. RAYN is an informational display and must not be the sole source for emergency response, aviation, marine navigation, severe-weather safety, or other safety-critical decisions. Follow official local authorities and warning services.
+Weather forecasts and radar imagery can be delayed, unavailable, incomplete, or inaccurate. RAYN Weather is an informational display and must not be the sole source for emergency response, aviation, marine navigation, severe-weather safety, or other safety-critical decisions. Follow official local authorities and warning services.

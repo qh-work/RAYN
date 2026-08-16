@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible RAYN defect
+description: Report a reproducible RAYN Weather defect
 title: "[Bug]: "
 labels:
   - bug
@@ -17,8 +17,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: RAYN version or commit
-      placeholder: v1.0.0 or commit hash
+      label: RAYN Weather version or commit
+      placeholder: v1.0.1 or commit hash
     validations:
       required: true
   - type: input

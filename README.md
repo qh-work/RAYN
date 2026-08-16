@@ -1,16 +1,20 @@
-# RAYN
+# RAYN Weather for Apple TV
 
 **Weather, alive.**
 
+[![tvOS CI](https://github.com/qh-work/RAYN/actions/workflows/ci.yml/badge.svg)](https://github.com/qh-work/RAYN/actions/workflows/ci.yml)
+
+> **Project status:** Public open-source preview. Source builds, tests, hardware validation, and self-install instructions are available; App Store and TestFlight distribution are not currently provided.
+
 [简体中文](README.zh-CN.md) | English
 
-RAYN is a native, open-source weather studio for Apple TV. It turns live weather, air quality, radar, sunlight, moon, and marine conditions into a cinematic interface designed for televisions and projectors.
+RAYN Weather is a native, open-source weather studio for Apple TV. It turns live weather, air quality, radar, sunlight, moon, and marine conditions into a cinematic interface designed for televisions and projectors.
 
 The production launch path uses real network data only. It does not fall back to demo weather, a hard-coded city, or invented radar imagery when a provider is unavailable.
 
 ## Preview
 
-![RAYN current weather on tvOS 27](docs/media/screenshots/01-current-weather.png)
+![RAYN Weather current conditions on tvOS 27](docs/media/screenshots/01-current-weather.png)
 
 More live captures and a tvOS 27 walkthrough are available in the [media gallery](docs/media/README.md).
 
@@ -32,9 +36,11 @@ More live captures and a tvOS 27 walkthrough are available in the [media gallery
 - Xcode 27 beta or newer with the tvOS 27 SDK.
 - A tvOS 27 simulator or Apple TV capable of running the configured deployment target.
 - Internet access for live providers.
-- An Apple Development team only when installing on physical hardware.
+- An Apple Development team only when installing on physical hardware; Xcode's free Personal Team is sufficient for a seven-day self-signed installation.
 
-## Build
+## Install or build
+
+No paid Apple Developer Program membership is required to build RAYN Weather for your own Apple TV. A free Apple Account can sign the app through Xcode's Personal Team, but Apple's free provisioning profile expires after seven days and then requires another build and install. See the step-by-step [Apple TV installation guide](docs/INSTALLATION.md).
 
 Clone the repository, open `RAYN.xcodeproj`, select the `RAYN` scheme, and run it on an Apple TV simulator.
 
@@ -97,7 +103,7 @@ For the product story, current limitations, and public-facing introduction, see 
 - Unit tests cover weather-code mapping, themes, model conversion, provider configuration, source attribution, and failure isolation.
 - UI tests cover hourly-to-daily-to-radar handoff, all 10 daily detail selections, settings navigation, scene traversal, and focus restoration.
 - CI builds with the public Xcode 27 runner and executes deterministic unit tests.
-- MapKit composition and remote focus must still be checked on physical Apple TV hardware before a release.
+- MapKit composition and remote focus are checked on physical Apple TV hardware before each release.
 
 ## Contributing
 
@@ -107,10 +113,10 @@ The production application must continue to use real provider responses. Fixture
 
 ## Creator
 
-RAYN was created and is maintained by **QHWORK**. See [`AUTHORS.md`](AUTHORS.md) for the public attribution policy.
+RAYN Weather was created and is maintained by **QHWORK**. See [`AUTHORS.md`](AUTHORS.md) for the public attribution policy.
 
 ## License and disclaimer
 
 Source code and original repository assets are available under the [MIT License](LICENSE). Third-party data, platform services, trademarks, and provider output remain subject to their own terms.
 
-RAYN is not affiliated with or endorsed by Apple, Open-Meteo, RainViewer, or any government weather agency. Forecasts can be delayed, incomplete, or inaccurate and must not be used as the sole source for emergency, aviation, marine-navigation, or other safety-critical decisions.
+RAYN Weather is not affiliated with or endorsed by Apple, Open-Meteo, RainViewer, or any government weather agency. Forecasts can be delayed, incomplete, or inaccurate and must not be used as the sole source for emergency, aviation, marine-navigation, or other safety-critical decisions.

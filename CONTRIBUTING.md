@@ -1,6 +1,6 @@
-# Contributing to RAYN
+# Contributing to RAYN Weather
 
-Thank you for helping improve RAYN. Contributions should preserve the project's real-data, provider-neutral, and television-first design.
+Thank you for helping improve RAYN Weather. Contributions should preserve the project's real-data, provider-neutral, and television-first design.
 
 ## Before opening a pull request
 

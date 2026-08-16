@@ -1,6 +1,6 @@
 # Community Code of Conduct
 
-RAYN welcomes contributors of every background and experience level.
+RAYN Weather welcomes contributors of every background and experience level.
 
 ## Expected behavior
 
