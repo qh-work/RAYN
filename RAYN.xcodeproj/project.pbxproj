@@ -1,0 +1,663 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B00001 /* RAYNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00001 /* RAYNApp.swift */; };
+		B00002 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00002 /* AppConfiguration.swift */; };
+		B00003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00003 /* AppState.swift */; };
+		B00004 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00004 /* WeatherModels.swift */; };
+		B00020 /* ProviderContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00020 /* ProviderContracts.swift */; };
+		B00021 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00021 /* HTTPClient.swift */; };
+		B00022 /* ProviderSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00022 /* ProviderSupport.swift */; };
+		B00023 /* OpenMeteoForecastProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00023 /* OpenMeteoForecastProvider.swift */; };
+		B00024 /* OpenMeteoAirQualityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00024 /* OpenMeteoAirQualityProvider.swift */; };
+		B00025 /* RainViewerRadarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00025 /* RainViewerRadarProvider.swift */; };
+		B00026 /* OpenMeteoMarineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00026 /* OpenMeteoMarineProvider.swift */; };
+		B00027 /* OpenMeteoLocationSearchProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00027 /* OpenMeteoLocationSearchProvider.swift */; };
+		B00028 /* RefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00028 /* RefreshCoordinator.swift */; };
+		B00006 /* WeatherTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00006 /* WeatherTheme.swift */; };
+		B00007 /* DynamicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00007 /* DynamicSkyView.swift */; };
+		B00008 /* BroadcastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00008 /* BroadcastView.swift */; };
+		B00009 /* SceneViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00009 /* SceneViews.swift */; };
+		B00010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00010 /* SettingsView.swift */; };
+		B00011 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00011 /* Components.swift */; };
+		B00012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F00012 /* Assets.xcassets */; };
+		B00013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F00013 /* PrivacyInfo.xcprivacy */; };
+		B00015 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F00015 /* SwiftUI.framework */; };
+		B00016 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F00016 /* Charts.framework */; };
+		B00017 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00017 /* LocationService.swift */; };
+		B00018 /* WeatherKitForecastProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00018 /* WeatherKitForecastProvider.swift */; };
+		B00019 /* ProviderConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00019 /* ProviderConfiguration.swift */; };
+		BT001 /* RAYNTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FT001 /* RAYNTests.swift */; };
+		BU001 /* RAYNUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FU001 /* RAYNUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C00001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T00001;
+			remoteInfo = RAYN;
+		};
+		C00002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T00001;
+			remoteInfo = RAYN;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F00001 /* RAYNApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAYNApp.swift; sourceTree = "<group>"; };
+		F00002 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		F00003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		F00004 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
+		F00020 /* ProviderContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderContracts.swift; sourceTree = "<group>"; };
+		F00021 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		F00022 /* ProviderSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderSupport.swift; sourceTree = "<group>"; };
+		F00023 /* OpenMeteoForecastProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoForecastProvider.swift; sourceTree = "<group>"; };
+		F00024 /* OpenMeteoAirQualityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoAirQualityProvider.swift; sourceTree = "<group>"; };
+		F00025 /* RainViewerRadarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainViewerRadarProvider.swift; sourceTree = "<group>"; };
+		F00026 /* OpenMeteoMarineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoMarineProvider.swift; sourceTree = "<group>"; };
+		F00027 /* OpenMeteoLocationSearchProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoLocationSearchProvider.swift; sourceTree = "<group>"; };
+		F00028 /* RefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshCoordinator.swift; sourceTree = "<group>"; };
+		F00006 /* WeatherTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherTheme.swift; sourceTree = "<group>"; };
+		F00007 /* DynamicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicSkyView.swift; sourceTree = "<group>"; };
+		F00008 /* BroadcastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastView.swift; sourceTree = "<group>"; };
+		F00009 /* SceneViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneViews.swift; sourceTree = "<group>"; };
+		F00010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F00011 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		F00012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F00013 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F00015 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		F00016 /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = System/Library/Frameworks/Charts.framework; sourceTree = SDKROOT; };
+		F00017 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		F00018 /* WeatherKitForecastProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherKitForecastProvider.swift; sourceTree = "<group>"; };
+		F00019 /* ProviderConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfiguration.swift; sourceTree = "<group>"; };
+		FT001 /* RAYNTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAYNTests.swift; sourceTree = "<group>"; };
+		FU001 /* RAYNUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAYNUITests.swift; sourceTree = "<group>"; };
+		P00001 /* RAYN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RAYN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		P00002 /* RAYNTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAYNTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		P00003 /* RAYNUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RAYNUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		PBXFRAMEWORKS /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00015 /* SwiftUI.framework in Frameworks */,
+				B00016 /* Charts.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A81D5B9303123C100706CB4 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				F00015 /* SwiftUI.framework */,
+				F00016 /* Charts.framework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		G00001 = {
+			isa = PBXGroup;
+			children = (
+				G00014 /* RAYN */,
+				G00009 /* Products */,
+				G00011 /* RAYNTests */,
+				G00015 /* RAYNUITests */,
+				0A81D5B9303123C100706CB4 /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		G00002 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F00002 /* AppConfiguration.swift */,
+				F00003 /* AppState.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		G00003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F00004 /* WeatherModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		G00004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F00020 /* ProviderContracts.swift */,
+				F00021 /* HTTPClient.swift */,
+				F00022 /* ProviderSupport.swift */,
+				F00028 /* RefreshCoordinator.swift */,
+				F00023 /* OpenMeteoForecastProvider.swift */,
+				F00024 /* OpenMeteoAirQualityProvider.swift */,
+				F00026 /* OpenMeteoMarineProvider.swift */,
+				F00027 /* OpenMeteoLocationSearchProvider.swift */,
+				F00025 /* RainViewerRadarProvider.swift */,
+				F00018 /* WeatherKitForecastProvider.swift */,
+				F00019 /* ProviderConfiguration.swift */,
+				F00017 /* LocationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		G00005 /* VisualEffects */ = {
+			isa = PBXGroup;
+			children = (
+				F00006 /* WeatherTheme.swift */,
+				F00007 /* DynamicSkyView.swift */,
+			);
+			path = VisualEffects;
+			sourceTree = "<group>";
+		};
+		G00006 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				G00012 /* Broadcast */,
+				G00013 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		G00007 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				F00011 /* Components.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		G00008 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F00012 /* Assets.xcassets */,
+				F00013 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		G00009 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				P00001 /* RAYN.app */,
+				P00002 /* RAYNTests.xctest */,
+				P00003 /* RAYNUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		G00011 /* RAYNTests */ = {
+			isa = PBXGroup;
+			children = (
+				FT001 /* RAYNTests.swift */,
+			);
+			path = RAYNTests;
+			sourceTree = "<group>";
+		};
+		G00012 /* Broadcast */ = {
+			isa = PBXGroup;
+			children = (
+				F00008 /* BroadcastView.swift */,
+				F00009 /* SceneViews.swift */,
+			);
+			path = Broadcast;
+			sourceTree = "<group>";
+		};
+		G00013 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F00010 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		G00014 /* RAYN */ = {
+			isa = PBXGroup;
+			children = (
+				G00002 /* App */,
+				G00003 /* Models */,
+				G00004 /* Services */,
+				G00005 /* VisualEffects */,
+				G00006 /* Features */,
+				G00007 /* Shared */,
+				G00008 /* Resources */,
+				F00001 /* RAYNApp.swift */,
+			);
+			path = RAYN;
+			sourceTree = "<group>";
+		};
+		G00015 /* RAYNUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FU001 /* RAYNUITests.swift */,
+			);
+			path = RAYNUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T00001 /* RAYN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFIGLIST_APP /* Build configuration list for PBXNativeTarget "RAYN" */;
+			buildPhases = (
+				PHASE_SOURCES_APP /* Sources */,
+				PHASE_RESOURCES_APP /* Resources */,
+				PBXFRAMEWORKS /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RAYN;
+			productName = RAYN;
+			productReference = P00001 /* RAYN.app */;
+			productType = "com.apple.product-type.application";
+		};
+		T00002 /* RAYNTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFIGLIST_TEST /* Build configuration list for PBXNativeTarget "RAYNTests" */;
+			buildPhases = (
+				PHASE_SOURCES_TEST /* Sources */,
+				PHASE_RESOURCES_TEST /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DEP_TEST_APP /* PBXTargetDependency */,
+			);
+			name = RAYNTests;
+			productName = RAYNTests;
+			productReference = P00002 /* RAYNTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		T00003 /* RAYNUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFIGLIST_UI_TEST /* Build configuration list for PBXNativeTarget "RAYNUITests" */;
+			buildPhases = (
+				PHASE_SOURCES_UI_TEST /* Sources */,
+				PHASE_RESOURCES_UI_TEST /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DEP_UI_TEST_APP /* PBXTargetDependency */,
+			);
+			name = RAYNUITests;
+			productName = RAYNUITests;
+			productReference = P00003 /* RAYNUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					T00001 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					T00002 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = T00001;
+					};
+					T00003 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = T00001;
+					};
+				};
+			};
+			buildConfigurationList = CFIGLIST_PROJECT /* Build configuration list for PBXProject "RAYN" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = G00001;
+			productRefGroup = G00009 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T00001 /* RAYN */,
+				T00002 /* RAYNTests */,
+				T00003 /* RAYNUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		PHASE_RESOURCES_APP /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00012 /* Assets.xcassets in Resources */,
+				B00013 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		PHASE_RESOURCES_TEST /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		PHASE_RESOURCES_UI_TEST /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		PHASE_SOURCES_APP /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00001 /* RAYNApp.swift in Sources */,
+				B00002 /* AppConfiguration.swift in Sources */,
+				B00003 /* AppState.swift in Sources */,
+				B00004 /* WeatherModels.swift in Sources */,
+				B00020 /* ProviderContracts.swift in Sources */,
+				B00021 /* HTTPClient.swift in Sources */,
+				B00022 /* ProviderSupport.swift in Sources */,
+				B00023 /* OpenMeteoForecastProvider.swift in Sources */,
+				B00024 /* OpenMeteoAirQualityProvider.swift in Sources */,
+				B00025 /* RainViewerRadarProvider.swift in Sources */,
+				B00026 /* OpenMeteoMarineProvider.swift in Sources */,
+				B00027 /* OpenMeteoLocationSearchProvider.swift in Sources */,
+				B00028 /* RefreshCoordinator.swift in Sources */,
+				B00018 /* WeatherKitForecastProvider.swift in Sources */,
+				B00019 /* ProviderConfiguration.swift in Sources */,
+				B00017 /* LocationService.swift in Sources */,
+				B00006 /* WeatherTheme.swift in Sources */,
+				B00007 /* DynamicSkyView.swift in Sources */,
+				B00008 /* BroadcastView.swift in Sources */,
+				B00009 /* SceneViews.swift in Sources */,
+				B00010 /* SettingsView.swift in Sources */,
+				B00011 /* Components.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		PHASE_SOURCES_TEST /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BT001 /* RAYNTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		PHASE_SOURCES_UI_TEST /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BU001 /* RAYNUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DEP_TEST_APP /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T00001 /* RAYN */;
+			targetProxy = C00001 /* PBXContainerItemProxy */;
+		};
+		DEP_UI_TEST_APP /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T00001 /* RAYN */;
+			targetProxy = C00002 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CONFIG_APP_DEBUG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RAYN;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "用于显示当前位置的天气与空气质量。";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		CONFIG_APP_RELEASE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RAYN;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "用于显示当前位置的天气与空气质量。";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+		CONFIG_PROJECT_DEBUG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEVELOPMENT_TEAM = "";
+				SDKROOT = appletvos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		CONFIG_PROJECT_RELEASE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEVELOPMENT_TEAM = "";
+				SDKROOT = appletvos;
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+		CONFIG_TEST_DEBUG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv.tests;
+				PRODUCT_NAME = RAYNTests;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RAYN.app/RAYN";
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		CONFIG_TEST_RELEASE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv.tests;
+				PRODUCT_NAME = RAYNTests;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RAYN.app/RAYN";
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+		CONFIG_UI_TEST_DEBUG /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv.uitests;
+				PRODUCT_NAME = RAYNUITests;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = RAYN;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		CONFIG_UI_TEST_RELEASE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv.uitests;
+				PRODUCT_NAME = RAYNUITests;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = RAYN;
+				TVOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CFIGLIST_APP /* Build configuration list for PBXNativeTarget "RAYN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CONFIG_APP_DEBUG /* Debug */,
+				CONFIG_APP_RELEASE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFIGLIST_PROJECT /* Build configuration list for PBXProject "RAYN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CONFIG_PROJECT_DEBUG /* Debug */,
+				CONFIG_PROJECT_RELEASE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFIGLIST_TEST /* Build configuration list for PBXNativeTarget "RAYNTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CONFIG_TEST_DEBUG /* Debug */,
+				CONFIG_TEST_RELEASE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFIGLIST_UI_TEST /* Build configuration list for PBXNativeTarget "RAYNUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CONFIG_UI_TEST_DEBUG /* Debug */,
+				CONFIG_UI_TEST_RELEASE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000000001 /* Project object */;
+}

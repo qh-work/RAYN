@@ -1,0 +1,51 @@
+name: tvOS CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: xcode-27
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Show Apple toolchain
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Build RAYN
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project RAYN.xcodeproj \
+            -scheme RAYN \
+            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=27.0' \
+            -derivedDataPath .build/DerivedData-ci \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Run deterministic unit tests
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project RAYN.xcodeproj \
+            -scheme RAYN \
+            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=27.0' \
+            -derivedDataPath .build/DerivedData-ci \
+            CODE_SIGNING_ALLOWED=NO \
+            -only-testing:RAYNTests \
+            test

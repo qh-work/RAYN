@@ -1,0 +1,38 @@
+name: Feature request
+description: Propose a focused improvement to RAYN
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: Explain the large-screen weather use case, not only the proposed implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: provider
+    attributes:
+      label: Data, licensing, and regional considerations
+      description: Identify any new provider, attribution, API key, coverage, or commercial-use requirement.
+  - type: textarea
+    id: focus
+    attributes:
+      label: tvOS focus and performance considerations
+      description: Describe remote navigation, accessibility, animation, and A12 implications.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and pull requests.
+          required: true
+        - label: The proposal does not require fake production weather or radar data.
+          required: true

@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Xcode user state and local build products
+.build/
+DerivedData/
+build/
+xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Local signing and secrets
+.env
+.env.*
+!.env.example
+*.cer
+*.p8
+*.p12
+*.mobileprovision
+Local.xcconfig
+Secrets.xcconfig
+
+# Codex / ChatGPT project metadata (not part of the application)
+AGENTS.md
+.codex/
+sources/

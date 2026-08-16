@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a reproducible RAYN defect
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include precise locations, credentials, Apple IDs, device identifiers, or other private information.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the visible behavior and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: RAYN version or commit
+      placeholder: v1.0.0 or commit hash
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Apple TV model, tvOS version, Xcode version, simulator or physical device
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: A minimal numbered sequence
+    validations:
+      required: true
+  - type: dropdown
+    id: scene
+    attributes:
+      label: Affected area
+      options:
+        - Current weather
+        - Hourly forecast
+        - 10-day forecast
+        - Radar
+        - Air quality
+        - Sun, moon, or marine
+        - Settings or location
+        - Build, test, or documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Remove personal location, account, signing, and device information first.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: This is not a private security vulnerability.
+          required: true

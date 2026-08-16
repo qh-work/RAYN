@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use RAYN in research, education, or another open-source project, please cite the software."
+title: RAYN
+type: software
+authors:
+  - alias: QHWORK
+version: 1.0.0
+date-released: 2026-08-16
+license: MIT
+repository-code: "https://github.com/qh-work/RAYN"
+url: "https://github.com/qh-work/RAYN"
+abstract: "A native, provider-neutral weather studio for Apple TV and tvOS 27."
