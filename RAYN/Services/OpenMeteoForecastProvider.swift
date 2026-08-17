@@ -191,7 +191,8 @@ struct OpenMeteoForecastProvider: ForecastProvider {
       marine: nil,
       alerts: [],
       summary: .empty,
-      updatedAt: now,
+      updatedAt: currentTime,
+      fetchedAt: now,
       source: "Open-Meteo",
       isOffline: false,
       theme: WeatherTheme.from(

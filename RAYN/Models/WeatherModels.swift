@@ -192,6 +192,8 @@ struct CurrentConditions: Codable, Equatable {
     var cloudCoverMid: Double? = nil
     var cloudCoverHigh: Double? = nil
     var daylightDuration: Double? = nil
+    var moonrise: Date? = nil
+    var moonset: Date? = nil
 }
 
 struct HourlyForecastPoint: Codable, Identifiable, Equatable {
@@ -245,6 +247,8 @@ struct AirQualitySnapshot: Codable, Equatable {
     var sulphurDioxide: Double
     var carbonMonoxide: Double
     var updatedAt: Date
+    /// Time at which the provider response was received by the app.
+    var fetchedAt: Date? = nil
     var hourlyAQI: [Double]
 
     var level: String {
@@ -341,6 +345,8 @@ struct MarineSnapshot: Codable, Equatable {
     var windWaveHeight: Double
     var swellWaveHeight: Double
     var updatedAt: Date
+    /// Time at which the provider response was received by the app.
+    var fetchedAt: Date? = nil
     var seaSurfaceTemperature: Double? = nil
     var oceanCurrentVelocity: Double? = nil
     var oceanCurrentDirection: Double? = nil
@@ -512,6 +518,291 @@ enum MoonPhaseCalculator {
     }
 }
 
+/// A calculated solar position. The calculation uses the selected location's
+/// coordinates and the current time; it is not presented as a provider
+/// observation. Sunrise and sunset remain provider-backed fields.
+struct SolarPositionInfo: Equatable {
+    var elevation: Double
+    var azimuth: Double
+    var morningGoldenHourStart: Date?
+    var morningGoldenHourEnd: Date?
+    var eveningGoldenHourStart: Date?
+    var eveningGoldenHourEnd: Date?
+}
+
+enum SolarPositionCalculator {
+    private static let degreesToRadians = Double.pi / 180
+    private static let radiansToDegrees = 180 / Double.pi
+
+    static func info(at date: Date, location: SavedLocation) -> SolarPositionInfo {
+        let position = solarPosition(at: date, location: location)
+        let goldenHours = goldenHours(for: date, location: location)
+        return SolarPositionInfo(
+            elevation: position.elevation,
+            azimuth: position.azimuth,
+            morningGoldenHourStart: goldenHours.morningStart,
+            morningGoldenHourEnd: goldenHours.morningEnd,
+            eveningGoldenHourStart: goldenHours.eveningStart,
+            eveningGoldenHourEnd: goldenHours.eveningEnd
+        )
+    }
+
+    private static func solarPosition(at date: Date, location: SavedLocation) -> (elevation: Double, azimuth: Double) {
+        let julianDate = date.timeIntervalSince1970 / 86_400 + 2_440_587.5
+        let daysSinceJ2000 = julianDate - 2_451_545.0
+        let meanLongitude = normalizedDegrees(280.460 + 0.9856474 * daysSinceJ2000)
+        let meanAnomaly = normalizedDegrees(357.528 + 0.9856003 * daysSinceJ2000) * degreesToRadians
+        let eclipticLongitude = normalizedDegrees(
+            meanLongitude + 1.915 * sin(meanAnomaly) + 0.020 * sin(2 * meanAnomaly)
+        ) * degreesToRadians
+        let obliquity = (23.439 - 0.0000004 * daysSinceJ2000) * degreesToRadians
+
+        let rightAscension = atan2(cos(obliquity) * sin(eclipticLongitude), cos(eclipticLongitude)) * radiansToDegrees
+        let declination = asin(sin(obliquity) * sin(eclipticLongitude)) * radiansToDegrees
+        let siderealHours = normalizedHours(18.697374558 + 24.06570982441908 * daysSinceJ2000)
+        let localSiderealDegrees = normalizedDegrees(siderealHours * 15 + location.longitude)
+        // `rightAscension` is already expressed in degrees. Multiplying it by
+        // 15 a second time moves the Sun to the wrong part of the sky.
+        let hourAngle = normalizedDegrees(localSiderealDegrees - rightAscension) * degreesToRadians
+        let latitude = location.latitude * degreesToRadians
+        let declinationRadians = declination * degreesToRadians
+
+        let elevation = asin(
+            sin(latitude) * sin(declinationRadians)
+                + cos(latitude) * cos(declinationRadians) * cos(hourAngle)
+        ) * radiansToDegrees
+        let azimuth = normalizedDegrees(
+            atan2(
+                sin(hourAngle),
+                cos(hourAngle) * sin(latitude) - tan(declinationRadians) * cos(latitude)
+            ) * radiansToDegrees + 180
+        )
+        return (elevation, azimuth)
+    }
+
+    private static func goldenHours(for date: Date, location: SavedLocation) -> (
+        morningStart: Date?, morningEnd: Date?, eveningStart: Date?, eveningEnd: Date?
+    ) {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: location.timezoneIdentifier) ?? .current
+        let startOfDay = calendar.startOfDay(for: date)
+        let step: TimeInterval = 300
+        var previousDate = startOfDay
+        var previousElevation = solarPosition(at: previousDate, location: location).elevation
+        var morningStart: Date?
+        var morningEnd: Date?
+        var eveningStart: Date?
+        var eveningEnd: Date?
+
+        for stepIndex in 1...288 {
+            let currentDate = startOfDay.addingTimeInterval(Double(stepIndex) * step)
+            let currentElevation = solarPosition(at: currentDate, location: location).elevation
+
+            if morningStart == nil, previousElevation < -4, currentElevation >= -4 {
+                morningStart = crossingDate(
+                    previousDate: previousDate,
+                    previousElevation: previousElevation,
+                    currentDate: currentDate,
+                    currentElevation: currentElevation,
+                    threshold: -4
+                )
+            }
+            if morningEnd == nil, previousElevation < 6, currentElevation >= 6 {
+                morningEnd = crossingDate(
+                    previousDate: previousDate,
+                    previousElevation: previousElevation,
+                    currentDate: currentDate,
+                    currentElevation: currentElevation,
+                    threshold: 6
+                )
+            }
+            if eveningStart == nil, previousElevation >= 6, currentElevation < 6 {
+                eveningStart = crossingDate(
+                    previousDate: previousDate,
+                    previousElevation: previousElevation,
+                    currentDate: currentDate,
+                    currentElevation: currentElevation,
+                    threshold: 6
+                )
+            }
+            if eveningEnd == nil, previousElevation >= -4, currentElevation < -4 {
+                eveningEnd = crossingDate(
+                    previousDate: previousDate,
+                    previousElevation: previousElevation,
+                    currentDate: currentDate,
+                    currentElevation: currentElevation,
+                    threshold: -4
+                )
+            }
+
+            previousDate = currentDate
+            previousElevation = currentElevation
+        }
+        return (morningStart, morningEnd, eveningStart, eveningEnd)
+    }
+
+    private static func crossingDate(
+        previousDate: Date,
+        previousElevation: Double,
+        currentDate: Date,
+        currentElevation: Double,
+        threshold: Double
+    ) -> Date {
+        let span = currentElevation - previousElevation
+        guard abs(span) > 0.0001 else { return currentDate }
+        let fraction = min(max((threshold - previousElevation) / span, 0), 1)
+        return previousDate.addingTimeInterval(currentDate.timeIntervalSince(previousDate) * fraction)
+    }
+
+    private static func normalizedDegrees(_ value: Double) -> Double {
+        let result = value.truncatingRemainder(dividingBy: 360)
+        return result >= 0 ? result : result + 360
+    }
+
+    private static func normalizedHours(_ value: Double) -> Double {
+        let result = value.truncatingRemainder(dividingBy: 24)
+        return result >= 0 ? result : result + 24
+    }
+}
+
+enum WeatherAdvisoryLevel: String, Codable, Equatable {
+    case warning
+    case caution
+}
+
+struct WeatherAdvisory: Identifiable, Codable, Equatable {
+    var id: String
+    var title: String
+    var detail: String
+    var symbolName: String
+    var level: WeatherAdvisoryLevel
+    var isOfficial: Bool
+}
+
+enum WeatherAdvisoryBuilder {
+    static func make(from snapshot: WeatherSnapshot) -> [WeatherAdvisory] {
+        var advisories = snapshot.alerts.map { alert in
+            WeatherAdvisory(
+                id: "official-\(alert.id.uuidString)",
+                title: alert.title,
+                detail: String(localized: "Official Alert"),
+                symbolName: "exclamationmark.triangle.fill",
+                level: .warning,
+                isOfficial: true
+            )
+        }
+
+        let current = snapshot.current
+        let condition = WeatherCodeMapper.description(
+            for: current.weatherCode,
+            isDay: current.isDay,
+            visibility: current.visibility
+        )
+        switch current.weatherCode {
+        case 95:
+            advisories.append(
+                WeatherAdvisory(
+                    id: "thunderstorm",
+                    title: condition,
+                    detail: String(localized: "Thunderstorms are present in the current forecast. Seek shelter and avoid exposed areas."),
+                    symbolName: "cloud.bolt.rain.fill",
+                    level: .warning,
+                    isOfficial: false
+                )
+            )
+        case 96, 99:
+            advisories.append(
+                WeatherAdvisory(
+                    id: "hail",
+                    title: condition,
+                    detail: String(localized: "Thunderstorms or hail are present in the current forecast. Seek shelter and avoid exposed areas."),
+                    symbolName: "cloud.bolt.rain.fill",
+                    level: .warning,
+                    isOfficial: false
+                )
+            )
+        case 56, 57, 66, 67:
+            advisories.append(
+                WeatherAdvisory(
+                    id: "freezing-precipitation",
+                    title: condition,
+                    detail: String(localized: "Freezing precipitation may make roads and walkways slippery."),
+                    symbolName: "thermometer.snowflake",
+                    level: .warning,
+                    isOfficial: false
+                )
+            )
+        case 71, 73, 75, 77, 85, 86:
+            advisories.append(
+                WeatherAdvisory(
+                    id: "snow",
+                    title: condition,
+                    detail: String(localized: "Snowfall may reduce visibility and travel safety."),
+                    symbolName: "cloud.snow.fill",
+                    level: .caution,
+                    isOfficial: false
+                )
+            )
+        default:
+            break
+        }
+
+        let maximumGust = max(
+            current.windGust,
+            snapshot.hourly.compactMap(\.windGust).max() ?? current.windGust
+        )
+        if maximumGust >= 60 {
+            advisories.append(
+                WeatherAdvisory(
+                    id: "strong-wind",
+                    title: String(localized: "Wind Gusts"),
+                    detail: String(localized: "Wind gusts may reach \(Int(maximumGust.rounded())) km/h. Coastal areas should monitor changing winds."),
+                    symbolName: "wind",
+                    level: .caution,
+                    isOfficial: false
+                )
+            )
+        }
+
+        let maximumRainChance = max(
+            current.precipitationProbability,
+            snapshot.hourly.prefix(24).map(\.precipitationProbability).max() ?? current.precipitationProbability
+        )
+        if maximumRainChance >= 80 {
+            advisories.append(
+                WeatherAdvisory(
+                    id: "heavy-rain-chance",
+                    title: String(localized: "Rain Chance"),
+                    detail: String(localized: "The highest rain chance in the next 24 hours is about \(Int(maximumRainChance.rounded()))%. Carry an umbrella."),
+                    symbolName: "cloud.rain.fill",
+                    level: .caution,
+                    isOfficial: false
+                )
+            )
+        }
+
+        if current.visibility < 1 {
+            advisories.append(
+                WeatherAdvisory(
+                    id: "low-visibility",
+                    title: String(localized: "Haze / Low Visibility"),
+                    detail: String(localized: "Visibility is reduced to \(current.visibility.formattedNumber(decimals: 1)) km. Use extra caution when traveling."),
+                    symbolName: "eye.slash.fill",
+                    level: .caution,
+                    isOfficial: false
+                )
+            )
+        }
+
+        var unique = [WeatherAdvisory]()
+        var seen = Set<String>()
+        for advisory in advisories where seen.insert(advisory.id).inserted {
+            unique.append(advisory)
+        }
+        return Array(unique.prefix(3))
+    }
+}
+
 struct WeatherSnapshot: Codable, Equatable {
     var location: SavedLocation
     var timezoneIdentifier: String
@@ -524,6 +815,9 @@ struct WeatherSnapshot: Codable, Equatable {
     var alerts: [WeatherAlertItem]
     var summary: WeatherSummary
     var updatedAt: Date
+    /// Time at which this provider response was received by the app.
+    /// `updatedAt` remains the source/model time when the provider exposes it.
+    var fetchedAt: Date? = nil
     var source: String
     var isOffline: Bool
     var theme: WeatherTheme
@@ -582,7 +876,12 @@ enum WeatherSummaryBuilder {
             insights.append(String(localized: "Weather conditions are stable, so planned activities can continue."))
         }
 
-        return WeatherSummary(headline: headline, detail: detailParts.joined(separator: " "), insights: insights, hasAlert: !snapshot.alerts.isEmpty)
+        return WeatherSummary(
+            headline: headline,
+            detail: detailParts.joined(separator: " "),
+            insights: insights,
+            hasAlert: !WeatherAdvisoryBuilder.make(from: snapshot).isEmpty
+        )
     }
 
     private static func formatHour(_ date: Date, timezone: String) -> String {

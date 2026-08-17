@@ -62,20 +62,10 @@ struct BroadcastView: View {
         .onPlayPauseCommand {
             appState.togglePause()
         }
-        .onExitCommand {
-            if appState.showSettings {
-                appState.showSettings = false
-            } else if selectedDailyDayID != nil {
-                selectedDailyDayID = nil
-            } else if appState.currentScene != .current {
-                // A second-level weather scene should return to the main
-                // weather scene with one Menu press, matching tvOS back
-                // navigation instead of trapping the user in the tab.
-                appState.select(scene: .current)
-            } else {
-                appState.revealControls()
-            }
-        }
+        // Supplying nil on the root scene leaves the Menu/Back command to
+        // tvOS, so a press exits to the Home Screen. Secondary weather scenes
+        // still consume one press to return here first.
+        .onExitCommand(perform: shouldInterceptExitCommand ? handleExitCommand : nil)
         .task {
             presentedScene = appState.currentScene
             appState.start()
@@ -101,6 +91,18 @@ struct BroadcastView: View {
         .fullScreenCover(isPresented: $appState.showSettings) {
             SettingsView()
                 .environmentObject(appState)
+        }
+    }
+
+    private var shouldInterceptExitCommand: Bool {
+        appState.currentScene != .current
+    }
+
+    private func handleExitCommand() {
+        if selectedDailyDayID != nil {
+            selectedDailyDayID = nil
+        } else {
+            appState.select(scene: .current)
         }
     }
 
@@ -240,9 +242,11 @@ struct BroadcastView: View {
                     .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.yellow)
             }
-            Text("Updated \(snapshot.updatedAt.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier))")
-                .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.54))
+            DataFreshnessLabel(
+                updatedAt: snapshot.updatedAt,
+                fetchedAt: snapshot.fetchedAt,
+                timezoneIdentifier: snapshot.timezoneIdentifier
+            )
         }
         .padding(.horizontal, 22 * layoutScale)
         .frame(height: 54 * layoutScale)

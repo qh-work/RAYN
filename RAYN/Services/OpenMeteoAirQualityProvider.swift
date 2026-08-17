@@ -25,6 +25,8 @@ struct OpenMeteoAirQualityProvider: AirQualityProvider {
     request.timeoutInterval = 12
     let data = try await httpClient.data(for: request)
     let payload = try JSONDecoder().decode(OpenMeteoAirQualityPayload.self, from: data)
+    let fetchedAt = Date()
+    let timezone = TimeZone(identifier: payload.timezone ?? location.timezoneIdentifier) ?? .current
     guard let current = payload.current,
       let europeanAQI = current.europeanAQI,
       let pm25 = current.pm25,
@@ -44,17 +46,20 @@ struct OpenMeteoAirQualityProvider: AirQualityProvider {
       nitrogenDioxide: nitrogenDioxide,
       sulphurDioxide: sulphurDioxide,
       carbonMonoxide: carbonMonoxide,
-      updatedAt: Date(),
+      updatedAt: current.time.flatMap { WeatherDateParser.date(from: $0, timezone: timezone) } ?? fetchedAt,
+      fetchedAt: fetchedAt,
       hourlyAQI: payload.hourly?.europeanAQI ?? []
     )
   }
 }
 
 private struct OpenMeteoAirQualityPayload: Decodable {
+  var timezone: String?
   var current: Current?
   var hourly: Hourly?
 
   struct Current: Decodable {
+    var time: String?
     var europeanAQI: Double?
     var pm25: Double?
     var pm10: Double?
@@ -64,6 +69,7 @@ private struct OpenMeteoAirQualityPayload: Decodable {
     var carbonMonoxide: Double?
 
     enum CodingKeys: String, CodingKey {
+      case time
       case europeanAQI = "european_aqi"
       case pm25 = "pm2_5"
       case pm10

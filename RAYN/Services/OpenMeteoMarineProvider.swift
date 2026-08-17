@@ -33,6 +33,7 @@ struct OpenMeteoMarineProvider: MarineWeatherProvider {
     request.timeoutInterval = 12
     let data = try await httpClient.data(for: request)
     let payload = try JSONDecoder().decode(OpenMeteoMarinePayload.self, from: data)
+    let fetchedAt = Date()
     let timezone = TimeZone(identifier: payload.timezone ?? location.timezoneIdentifier) ?? .current
     let hourlyPoints = marineForecastPoints(from: payload.hourly, timezone: timezone)
     if let current = payload.current, let waveHeight = current.waveHeight {
@@ -43,7 +44,8 @@ struct OpenMeteoMarineProvider: MarineWeatherProvider {
         windWaveHeight: current.windWaveHeight ?? 0,
         swellWaveHeight: current.swellWaveHeight ?? 0,
         updatedAt: current.time.flatMap { WeatherDateParser.date(from: $0, timezone: timezone) }
-          ?? Date(),
+          ?? fetchedAt,
+        fetchedAt: fetchedAt,
         seaSurfaceTemperature: current.seaSurfaceTemperature,
         oceanCurrentVelocity: current.oceanCurrentVelocity,
         oceanCurrentDirection: current.oceanCurrentDirection,
@@ -61,6 +63,7 @@ struct OpenMeteoMarineProvider: MarineWeatherProvider {
         windWaveHeight: nearest.windWaveHeight,
         swellWaveHeight: nearest.swellWaveHeight,
         updatedAt: nearest.time,
+        fetchedAt: fetchedAt,
         seaSurfaceTemperature: nearest.seaSurfaceTemperature,
         oceanCurrentVelocity: nearest.oceanCurrentVelocity,
         oceanCurrentDirection: nearest.oceanCurrentDirection,

@@ -14,6 +14,17 @@ RAYN Weather aims to become a dependable, provider-neutral weather experience fo
 - Independent forecast, air-quality, radar, marine, and location-search provider boundaries.
 - Unit tests, remote-navigation UI tests, privacy documentation, provider attribution, and a public CI workflow.
 
+## Delivery record — 2026-08-17
+
+The following near-term items are now implemented and covered by the change record linked below:
+
+- [x] Solar elevation, azimuth, golden-hour boundaries, and the existing provider-backed daylight timeline.
+- [x] Lunar illumination, phase age, upcoming phase milestone, seven-day phase strip, and WeatherKit moonrise/moonset when supplied.
+- [x] Visible severe-condition notices plus a separate presentation path for provider-supplied official alerts.
+- [x] Separate provider/model update time and app response-check time for forecast, air-quality, marine, and WeatherKit data.
+
+The implementation deliberately does not infer moonrise/moonset for Open-Meteo, does not call condition-derived notices official warnings, and does not turn an app check time into a claim that the source data itself is current. See [`docs/CHANGE_RECORDS/2026-08-17-astronomy-advisories-freshness.md`](CHANGE_RECORDS/2026-08-17-astronomy-advisories-freshness.md).
+
 ## Near term — solidify the 1.x foundation
 
 ### Performance and reliability
@@ -32,14 +43,14 @@ RAYN Weather aims to become a dependable, provider-neutral weather experience fo
 
 ### Weather detail
 
-- Expand solar detail with elevation, azimuth, golden-hour boundaries, and a clearer daylight timeline where the provider can supply or derive them accurately.
-- Expand lunar detail with illumination, phase age, rise and set times, and upcoming phase milestones.
+- Add provider-specific solar precision metadata and test the calculated position against a reference implementation before changing the current approximation.
+- Add a provider-neutral lunar rise/set capability so sources other than WeatherKit can contribute verified moon events.
 - Keep marine information compact and conditional, with better explanation of coastal coverage and unavailable values.
-- Improve severe-condition messaging and make provider update time more prominent without cluttering the primary scene.
+- Expand severe-condition messaging to providers that supply authoritative regional alerts, with jurisdiction and expiration metadata.
 
 ### Open-source readiness
 
-- Add English localization while retaining Simplified Chinese.
+- Maintain localization parity across the nine supported interface locales as new features land.
 - Publish provider conformance tests and a sample adapter that can be implemented without changing views.
 - Add screenshot-diff checks for core layouts and a documented physical-device release checklist.
 - Improve contributor documentation for Xcode signing, WeatherKit capability setup, and data-attribution review.

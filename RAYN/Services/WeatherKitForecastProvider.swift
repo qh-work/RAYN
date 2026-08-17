@@ -70,7 +70,9 @@ struct AppleWeatherKitProvider: ForecastProvider {
             cloudCoverLow: nil,
             cloudCoverMid: nil,
             cloudCoverHigh: nil,
-            daylightDuration: Self.daylightDuration(sunrise: currentDay?.sun.sunrise, sunset: currentDay?.sun.sunset)
+            daylightDuration: Self.daylightDuration(sunrise: currentDay?.sun.sunrise, sunset: currentDay?.sun.sunset),
+            moonrise: currentDay?.moon.moonrise,
+            moonset: currentDay?.moon.moonset
         )
 
         let hourly = hourlyForecast.map { hour in
@@ -146,6 +148,7 @@ struct AppleWeatherKitProvider: ForecastProvider {
             },
             summary: .empty,
             updatedAt: currentWeather.date,
+            fetchedAt: now,
             source: "WeatherKit",
             isOffline: false,
             theme: WeatherTheme.from(

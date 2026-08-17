@@ -72,6 +72,32 @@ struct PageHeader: View {
     }
 }
 
+/// Displays the provider/model timestamp separately from the time this app
+/// received the response. This keeps a stale source observation from looking
+/// like a fresh network response while avoiding provider names in the UI.
+struct DataFreshnessLabel: View {
+    let updatedAt: Date
+    let fetchedAt: Date?
+    let timezoneIdentifier: String
+    var alignment: HorizontalAlignment = .trailing
+
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        VStack(alignment: alignment, spacing: 2 * layoutScale) {
+            Text("Updated \(updatedAt.formatted(.time, timezoneIdentifier: timezoneIdentifier))")
+            if let fetchedAt {
+                Text("Checked \(fetchedAt.formatted(.time, timezoneIdentifier: timezoneIdentifier))")
+                    .foregroundStyle(.white.opacity(0.34))
+            }
+        }
+        .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
+        .monospacedDigit()
+        .foregroundStyle(.white.opacity(0.48))
+        .lineLimit(1)
+    }
+}
+
 struct WeatherSymbol: View {
     let code: Int
     let isDay: Bool

@@ -114,6 +114,56 @@ final class RAYNTests: XCTestCase {
     XCTAssertGreaterThan(snapshot.summary.insights.count, drySummary.insights.count)
   }
 
+  func testSolarPositionAddsDaylightGeometryAndGoldenHours() throws {
+    let formatter = ISO8601DateFormatter()
+    let midday = try XCTUnwrap(formatter.date(from: "2026-03-20T04:00:00Z"))
+    let middayInfo = SolarPositionCalculator.info(at: midday, location: .beijing)
+
+    XCTAssertGreaterThan(middayInfo.elevation, 30)
+    XCTAssertLessThan(middayInfo.elevation, 90)
+    XCTAssertGreaterThan(middayInfo.azimuth, 120)
+    XCTAssertLessThan(middayInfo.azimuth, 240)
+
+    let nearSunrise = try XCTUnwrap(formatter.date(from: "2026-08-16T21:27:00Z"))
+    let sunriseInfo = SolarPositionCalculator.info(at: nearSunrise, location: .beijing)
+    XCTAssertLessThan(abs(sunriseInfo.elevation), 5)
+    XCTAssertGreaterThan(sunriseInfo.azimuth, 30)
+    XCTAssertLessThan(sunriseInfo.azimuth, 120)
+    XCTAssertNotNil(sunriseInfo.morningGoldenHourStart)
+    XCTAssertNotNil(sunriseInfo.morningGoldenHourEnd)
+    XCTAssertNotNil(sunriseInfo.eveningGoldenHourStart)
+    XCTAssertNotNil(sunriseInfo.eveningGoldenHourEnd)
+  }
+
+  func testWeatherAdvisoryBuilderSurfacesLiveConditionNotices() {
+    var snapshot = WeatherSnapshot.testFixture
+    snapshot.current.weatherCode = 95
+    let stormAdvisories = WeatherAdvisoryBuilder.make(from: snapshot)
+    XCTAssertTrue(stormAdvisories.contains { $0.id == "thunderstorm" && $0.level == .warning })
+    XCTAssertTrue(stormAdvisories.contains { !$0.isOfficial })
+
+    snapshot.current.weatherCode = 2
+    snapshot.current.windGust = 72
+    snapshot.hourly = []
+    let windAdvisories = WeatherAdvisoryBuilder.make(from: snapshot)
+    XCTAssertTrue(windAdvisories.contains { $0.id == "strong-wind" && $0.level == .caution })
+  }
+
+  func testWeatherAdvisoryBuilderKeepsOfficialAlertDistinct() {
+    var snapshot = WeatherSnapshot.testFixture
+    snapshot.alerts = [
+      WeatherAlertItem(
+        title: "Official test alert",
+        issuer: "Test issuer",
+        startDate: snapshot.updatedAt,
+        endDate: snapshot.updatedAt.addingTimeInterval(3_600)
+      )
+    ]
+
+    let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
+    XCTAssertTrue(advisories.contains { $0.isOfficial && $0.id.hasPrefix("official-") })
+  }
+
   func testAQILevelsAndAdvice() {
     var air = WeatherSnapshot.testFixture.airQuality!
     air.europeanAQI = 18
@@ -127,6 +177,9 @@ final class RAYNTests: XCTestCase {
 
   func testOptionalFieldsSurviveRoundTrip() throws {
     var snapshot = WeatherSnapshot.testFixture
+    snapshot.fetchedAt = snapshot.updatedAt.addingTimeInterval(45)
+    snapshot.airQuality?.fetchedAt = snapshot.updatedAt.addingTimeInterval(46)
+    snapshot.marine?.fetchedAt = snapshot.updatedAt.addingTimeInterval(47)
     snapshot.marine = nil
     snapshot.airQuality = nil
     snapshot.radar = .unavailable
@@ -134,6 +187,7 @@ final class RAYNTests: XCTestCase {
     let decoded = try JSONDecoder().decode(WeatherSnapshot.self, from: encoded)
     XCTAssertNil(decoded.marine)
     XCTAssertNil(decoded.airQuality)
+    XCTAssertEqual(decoded.fetchedAt, snapshot.fetchedAt)
     XCTAssertFalse(decoded.radar.isAvailable)
   }
 
@@ -165,6 +219,11 @@ final class RAYNTests: XCTestCase {
     XCTAssertEqual(snapshot.current.weatherCode, 61)
     XCTAssertEqual(snapshot.hourly.count, 1)
     XCTAssertEqual(snapshot.daily.count, 0)
+    XCTAssertEqual(
+      snapshot.updatedAt,
+      WeatherDateParser.date(from: "2026-08-16T12:00", timezone: TimeZone(identifier: "Asia/Shanghai")!)
+    )
+    XCTAssertNotNil(snapshot.fetchedAt)
   }
 
   func testOpenMeteoFieldsAndCurrentProbabilityAreMapped() throws {
@@ -214,6 +273,43 @@ final class RAYNTests: XCTestCase {
     XCTAssertEqual(snapshot.hourly.first?.windGust, 35)
     XCTAssertEqual(snapshot.hourly.first?.visibility, 12)
     XCTAssertEqual(snapshot.hourly.first?.uvIndex, 5.2)
+  }
+
+  func testAirQualityProviderKeepsSourceTimeAndReceiptTime() async throws {
+    let json = #"{"timezone":"Asia/Shanghai","current":{"time":"2026-08-16T12:00","european_aqi":32,"pm2_5":18,"pm10":42,"ozone":96,"nitrogen_dioxide":22,"sulphur_dioxide":6,"carbon_monoxide":310},"hourly":{"european_aqi":[32]}}"#
+    let sourceDate = try XCTUnwrap(
+      WeatherDateParser.date(from: "2026-08-16T12:00", timezone: TimeZone(identifier: "Asia/Shanghai")!)
+    )
+    let before = Date()
+    let snapshot = try await OpenMeteoAirQualityProvider(
+      httpClient: StaticHTTPClient(response: Data(json.utf8))
+    ).fetchAirQuality(for: .beijing)
+    let after = Date()
+
+    XCTAssertEqual(snapshot.updatedAt, sourceDate)
+    XCTAssertNotNil(snapshot.fetchedAt)
+    XCTAssertGreaterThanOrEqual(snapshot.fetchedAt!, before)
+    XCTAssertLessThanOrEqual(snapshot.fetchedAt!, after)
+  }
+
+  func testMarineProviderKeepsSourceTimeAndReceiptTime() async throws {
+    let json = #"{"timezone":"Asia/Shanghai","current":{"time":"2026-08-16T12:00","wave_height":0.8},"hourly":{"time":["2026-08-16T12:00"],"wave_height":[0.8]}}"#
+    let sourceDate = try XCTUnwrap(
+      WeatherDateParser.date(from: "2026-08-16T12:00", timezone: TimeZone(identifier: "Asia/Shanghai")!)
+    )
+    let before = Date()
+    let result = try await OpenMeteoMarineProvider(
+      httpClient: StaticHTTPClient(response: Data(json.utf8))
+    ).fetchMarineWeather(for: .beijing)
+    let snapshot = try XCTUnwrap(
+      result
+    )
+    let after = Date()
+
+    XCTAssertEqual(snapshot.updatedAt, sourceDate)
+    XCTAssertNotNil(snapshot.fetchedAt)
+    XCTAssertGreaterThanOrEqual(snapshot.fetchedAt!, before)
+    XCTAssertLessThanOrEqual(snapshot.fetchedAt!, after)
   }
 
   func testForecastProviderKeepsAllTenDailyPoints() throws {

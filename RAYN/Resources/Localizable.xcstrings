@@ -16994,6 +16994,227 @@
           }
         }
       }
+    },
+    "Checked %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geprüft %1$@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checked %1$@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Comprobado %1$@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vérifié %1$@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Verificato %1$@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%1$@ 確認" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%1$@ 확인" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检查于 %1$@" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "檢查於 %1$@" } }
+      }
+    },
+    "Freezing precipitation may make roads and walkways slippery." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gefrierender Niederschlag kann Straßen und Wege rutschig machen." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Freezing precipitation may make roads and walkways slippery." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "La precipitación helada puede hacer resbaladizos los caminos y las aceras." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les précipitations verglaçantes peuvent rendre les routes et les trottoirs glissants." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Le precipitazioni gelate possono rendere scivolose strade e marciapiedi." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "凍結する降水により、道路や歩道が滑りやすくなるおそれがあります。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "어는 비나 눈으로 도로와 보도가 미끄러울 수 있습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "冻降水可能使道路和人行道变得湿滑。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "凍結性降水可能使道路和人行道變得濕滑。" } }
+      }
+    },
+    "Golden Hour" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Goldene Stunde" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Golden Hour" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hora dorada" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Heure dorée" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ora dorata" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ゴールデンアワー" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "골든 아워" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "黄金时段" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "黃金時段" } }
+      }
+    },
+    "Haze / Low Visibility" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dunst / schlechte Sicht" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Haze / Low Visibility" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Calima / poca visibilidad" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Brume / faible visibilité" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Foschia / scarsa visibilità" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "かすみ / 視界不良" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "연무 / 낮은 가시거리" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "霾 / 能见度低" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "霾 / 能見度低" } }
+      }
+    },
+    "Moonrise" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mondaufgang" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moonrise" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Salida de la luna" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Lever de lune" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sorgere della luna" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "月の出" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "월출" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月升" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "月升" } }
+      }
+    },
+    "Moonset" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Monduntergang" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moonset" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Puesta de la luna" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Coucher de lune" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Tramonto della luna" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "月の入り" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "월몰" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月落" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "月落" } }
+      }
+    },
+    "Morning %@ · Evening %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Morgens %1$@ · Abends %2$@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Morning %1$@ · Evening %2$@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mañana %1$@ · Tarde %2$@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Matin %1$@ · Soir %2$@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mattina %1$@ · Sera %2$@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "朝 %1$@ · 夕方 %2$@" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "아침 %1$@ · 저녁 %2$@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "早晨 %1$@ · 傍晚 %2$@" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "早晨 %1$@ · 傍晚 %2$@" } }
+      }
+    },
+    "Snowfall may reduce visibility and travel safety." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Schneefall kann die Sicht und die Reisesicherheit beeinträchtigen." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snowfall may reduce visibility and travel safety." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "La nieve puede reducir la visibilidad y la seguridad al viajar." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les chutes de neige peuvent réduire la visibilité et la sécurité des déplacements." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "La neve può ridurre la visibilità e la sicurezza degli spostamenti." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "降雪により視界が悪化し、移動の安全性が低下するおそれがあります。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "눈으로 시야와 이동 안전이 저하될 수 있습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "降雪可能降低能见度和出行安全。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "降雪可能降低能見度和出行安全。" } }
+      }
+    },
+    "Solar Position" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonnenstand" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Solar Position" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Posición solar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Position du soleil" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Posizione del sole" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "太陽の位置" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "태양 위치" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "太阳位置" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "太陽位置" } }
+      }
+    },
+    "Sun Azimuth" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonnenazimut" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sun Azimuth" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acimut solar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Azimut du soleil" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Azimut del sole" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "太陽方位角" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "태양 방위각" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "太阳方位角" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "太陽方位角" } }
+      }
+    },
+    "Sun Elevation" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonnenhöhe" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sun Elevation" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elevación solar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Élévation du soleil" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Altezza del sole" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "太陽高度" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "태양 고도" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "太阳高度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "太陽高度" } }
+      }
+    },
+    "Thunderstorms are present in the current forecast. Seek shelter and avoid exposed areas." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Im aktuellen Vorhersagezeitraum treten Gewitter auf. Suchen Sie Schutz und meiden Sie ungeschützte Bereiche." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Thunderstorms are present in the current forecast. Seek shelter and avoid exposed areas." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hay tormentas en la previsión actual. Busca refugio y evita las zonas expuestas." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Des orages sont prévus actuellement. Abritez-vous et évitez les zones exposées." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sono presenti temporali nelle previsioni attuali. Cerca riparo ed evita le aree esposte." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在の予報では雷雨が発生しています。安全な場所に避難し、開けた場所を避けてください。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "현재 예보에 뇌우가 있습니다. 안전한 곳으로 대피하고 노출된 지역을 피하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前预报有雷暴。请寻找避护处并避开空旷暴露区域。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "目前預報有雷暴。請尋找避護處並避開空曠暴露區域。" } }
+      }
+    },
+    "Thunderstorms or hail are present in the current forecast. Seek shelter and avoid exposed areas." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Im aktuellen Vorhersagezeitraum treten Gewitter oder Hagel auf. Suchen Sie Schutz und meiden Sie ungeschützte Bereiche." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Thunderstorms or hail are present in the current forecast. Seek shelter and avoid exposed areas." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hay tormentas o granizo en la previsión actual. Busca refugio y evita las zonas expuestas." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Des orages ou de la grêle sont prévus actuellement. Abritez-vous et évitez les zones exposées." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sono presenti temporali o grandine nelle previsioni attuali. Cerca riparo ed evita le aree esposte." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在の予報では雷雨またはひょうが発生しています。安全な場所に避難し、開けた場所を避けてください。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "현재 예보에 뇌우 또는 우박이 있습니다. 안전한 곳으로 대피하고 노출된 지역을 피하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前预报有雷暴或冰雹。请寻找避护处并避开空旷暴露区域。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "目前預報有雷暴或冰雹。請尋找避護處並避開空曠暴露區域。" } }
+      }
+    },
+    "Visibility is reduced to %@ km. Use extra caution when traveling." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Sichtweite ist auf %1$@ km reduziert. Seien Sie unterwegs besonders vorsichtig." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Visibility is reduced to %1$@ km. Use extra caution when traveling." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "La visibilidad se reduce a %1$@ km. Extrema la precaución al viajar." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La visibilité est réduite à %1$@ km. Soyez très prudent lors de vos déplacements." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "La visibilità è ridotta a %1$@ km. Presta particolare attenzione durante gli spostamenti." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "視程が %1$@ km まで低下しています。移動の際は十分注意してください。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "가시거리가 %1$@ km로 낮습니다. 이동할 때 각별히 주의하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "能见度已降至 %1$@ km。出行时请格外小心。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "能見度已降至 %1$@ km。出行時請格外小心。" } }
+      }
+    },
+    "Weather Alert" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterwarnung" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Weather Alert" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Alerta meteorológica" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Alerte météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Allerta meteo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "気象警報" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "기상 경보" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "天气警报" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "天氣警報" } }
+      }
+    },
+    "Weather Notice" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterhinweis" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Weather Notice" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aviso meteorológico" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Avis météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Avviso meteo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "気象通知" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "기상 알림" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "天气提示" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "天氣提示" } }
+      }
+    },
+    "Official Alert" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Offizielle Warnung" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Official Alert" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Alerta oficial" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Alerte officielle" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Allerta ufficiale" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "公式警報" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "공식 경보" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "官方警报" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "官方警報" } }
+      }
     }
   },
   "version" : "1.0"

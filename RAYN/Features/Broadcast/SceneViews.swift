@@ -9,6 +9,7 @@ struct CurrentWeatherScene: View {
 
     var body: some View {
         let clothing = ClothingAdviceBuilder.make(from: snapshot.current)
+        let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
 
         VStack(alignment: .leading, spacing: 26 * layoutScale) {
             PageHeader(
@@ -51,6 +52,14 @@ struct CurrentWeatherScene: View {
                     }
                 }
                 .frame(width: 560 * layoutScale)
+            }
+            if !advisories.isEmpty {
+                HStack(spacing: 14 * layoutScale) {
+                    ForEach(Array(advisories.prefix(2))) { advisory in
+                        WeatherAdvisoryCard(advisory: advisory)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             Spacer(minLength: 0)
             HStack(spacing: 36 * layoutScale) {
@@ -118,6 +127,47 @@ private struct ClothingAdviceCard: View {
                 Spacer(minLength: 0)
             }
         }
+    }
+}
+
+private struct WeatherAdvisoryCard: View {
+    let advisory: WeatherAdvisory
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    private var tint: Color {
+        switch advisory.level {
+        case .warning: return .red
+        case .caution: return .yellow
+        }
+    }
+
+    var body: some View {
+        GlassCard(cornerRadius: 22, tint: tint) {
+            HStack(alignment: .top, spacing: 14 * layoutScale) {
+                Image(systemName: advisory.symbolName)
+                    .font(.system(size: 28 * layoutScale, weight: .semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 42 * layoutScale, height: 42 * layoutScale)
+                    .background(tint.opacity(0.14), in: Circle())
+
+                VStack(alignment: .leading, spacing: 4 * layoutScale) {
+                    Text(advisory.isOfficial ? String(localized: "Weather Alert") : String(localized: "Weather Notice"))
+                        .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(tint)
+                    Text(advisory.title)
+                        .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                    Text(advisory.detail)
+                        .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.64))
+                        .lineLimit(3)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -1661,14 +1711,17 @@ private struct AirQualityHero: View {
                         .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.68))
                         .fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: 7 * layoutScale) {
+                    HStack(alignment: .center, spacing: 7 * layoutScale) {
                         Circle()
                             .fill(aqiColor(air.europeanAQI))
                             .frame(width: 8 * layoutScale, height: 8 * layoutScale)
-                        Text("Updated \(air.updatedAt.formatted(.time, timezoneIdentifier: timezone))")
+                        DataFreshnessLabel(
+                            updatedAt: air.updatedAt,
+                            fetchedAt: air.fetchedAt,
+                            timezoneIdentifier: timezone,
+                            alignment: .leading
+                        )
                     }
-                    .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.48))
                 }
             }
         }
@@ -1893,6 +1946,8 @@ struct AstronomyScene: View {
                             info: MoonPhaseCalculator.info(at: Date()),
                             daily: snapshot.daily,
                             timezone: snapshot.timezoneIdentifier,
+                            moonrise: snapshot.current.moonrise,
+                            moonset: snapshot.current.moonset,
                             compact: hasMarine
                         )
                         .frame(width: availableWidth * 0.41)
@@ -1952,6 +2007,12 @@ private struct SolarConditionCard: View {
                     )
                 }
 
+                SolarPositionPanel(
+                    info: SolarPositionCalculator.info(at: Date(), location: snapshot.location),
+                    timezone: snapshot.timezoneIdentifier,
+                    compact: compact
+                )
+
                 SunlightForecastStrip(daily: snapshot.daily, timezone: snapshot.timezoneIdentifier)
                     .frame(height: (compact ? 104 : 150) * layoutScale)
             }
@@ -2004,6 +2065,91 @@ private struct SolarConditionCard: View {
         if let duration = point.daylightDuration { return duration }
         guard let sunrise = point.sunrise, let sunset = point.sunset, sunset > sunrise else { return nil }
         return sunset.timeIntervalSince(sunrise)
+    }
+}
+
+private struct SolarPositionPanel: View {
+    let info: SolarPositionInfo
+    let timezone: String
+    let compact: Bool
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: (compact ? 6 : 8) * layoutScale) {
+            Text("Solar Position")
+                .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.52))
+
+            HStack(spacing: 9 * layoutScale) {
+                solarMetric(symbol: "sun.max.fill", title: String(localized: "Sun Elevation"), value: signedDegrees(info.elevation), accent: .yellow)
+                solarMetric(symbol: "location.north.line.fill", title: String(localized: "Sun Azimuth"), value: degrees(info.azimuth), accent: .mint)
+            }
+
+            HStack(alignment: .top, spacing: 10 * layoutScale) {
+                Image(systemName: "sunrise.fill")
+                    .font(.system(size: 16 * layoutScale, weight: .semibold))
+                    .foregroundStyle(.orange)
+                    .frame(width: 22 * layoutScale)
+                VStack(alignment: .leading, spacing: 2 * layoutScale) {
+                    Text("Golden Hour")
+                        .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.48))
+                    Text(goldenHourText)
+                        .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.78))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
+                }
+            }
+        }
+        .padding(.horizontal, 11 * layoutScale)
+        .padding(.vertical, (compact ? 7 : 9) * layoutScale)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14 * layoutScale, style: .continuous))
+    }
+
+    private func solarMetric(symbol: String, title: String, value: String, accent: Color) -> some View {
+        HStack(spacing: 6 * layoutScale) {
+            Image(systemName: symbol)
+                .font(.system(size: 15 * layoutScale, weight: .semibold))
+                .foregroundStyle(accent)
+            VStack(alignment: .leading, spacing: 1 * layoutScale) {
+                Text(title)
+                    .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.46))
+                Text(value)
+                    .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 8 * layoutScale)
+        .padding(.vertical, 6 * layoutScale)
+        .frame(maxWidth: .infinity)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 11 * layoutScale, style: .continuous))
+    }
+
+    private var goldenHourText: String {
+        let morning = goldenRange(start: info.morningGoldenHourStart, end: info.morningGoldenHourEnd)
+        let evening = goldenRange(start: info.eveningGoldenHourStart, end: info.eveningGoldenHourEnd)
+        guard morning != nil || evening != nil else { return "--" }
+        let morningText = morning ?? "--"
+        let eveningText = evening ?? "--"
+        return String(localized: "Morning \(morningText) · Evening \(eveningText)")
+    }
+
+    private func goldenRange(start: Date?, end: Date?) -> String? {
+        guard let start, let end else { return nil }
+        return "\(start.formatted(.time, timezoneIdentifier: timezone))–\(end.formatted(.time, timezoneIdentifier: timezone))"
+    }
+
+    private func signedDegrees(_ value: Double) -> String {
+        let sign = value >= 0 ? "+" : ""
+        return "\(sign)\(value.formattedNumber(decimals: 1))°"
+    }
+
+    private func degrees(_ value: Double) -> String {
+        "\(value.formattedNumber(decimals: 0))°"
     }
 }
 
@@ -2112,6 +2258,8 @@ private struct MoonPhaseCard: View {
     let info: MoonPhaseInfo
     let daily: [DailyForecastPoint]
     let timezone: String
+    let moonrise: Date?
+    let moonset: Date?
     let compact: Bool
     @Environment(\.raynLayoutScale) private var layoutScale
 
@@ -2157,6 +2305,21 @@ private struct MoonPhaseCard: View {
                 .padding(11 * layoutScale)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14 * layoutScale, style: .continuous))
+
+                HStack(spacing: 10 * layoutScale) {
+                    AstronomyMetric(
+                        symbol: "moonrise.fill",
+                        title: String(localized: "Moonrise"),
+                        value: moonrise?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--",
+                        accent: .indigo
+                    )
+                    AstronomyMetric(
+                        symbol: "moonset.fill",
+                        title: String(localized: "Moonset"),
+                        value: moonset?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--",
+                        accent: .purple
+                    )
+                }
 
                 Text("7-Day Moon Phases")
                     .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
@@ -2261,9 +2424,14 @@ private struct MarineConditionCard: View {
                         Text("\(marine.waveHeight.formattedNumber(decimals: 1)) m")
                             .font(.system(size: 35 * layoutScale, weight: .bold, design: .rounded))
                             .monospacedDigit()
-                        Text("Significant wave height · Updated \(marine.updatedAt.formatted(.time, timezoneIdentifier: timezone))")
-                            .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.42))
+                        DataFreshnessLabel(
+                            updatedAt: marine.updatedAt,
+                            fetchedAt: marine.fetchedAt,
+                            timezoneIdentifier: timezone,
+                            alignment: .leading
+                        )
+                        .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.42))
                     }
                 }
                 .frame(width: 285 * layoutScale, alignment: .leading)

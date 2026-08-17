@@ -16,6 +16,24 @@ final class RAYNUITests: XCTestCase {
         app = nil
     }
 
+    func testMenuReturnsToHomeFromRoot() throws {
+        launch(scene: "current")
+        XCTAssertEqual(app.state, .runningForeground)
+
+        remote.press(.menu)
+
+        let appLeftForeground = NSPredicate(
+            format: "state != %d",
+            XCUIApplication.State.runningForeground.rawValue
+        )
+        let expectation = XCTNSPredicateExpectation(predicate: appLeftForeground, object: app)
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [expectation], timeout: 3),
+            .completed,
+            "主界面按返回键应交由 tvOS 返回系统桌面"
+        )
+    }
+
     func testDailyForecastSupportsRemoteSelectionAndDetail() throws {
         launch(scene: "daily")
         guard app.staticTexts["延展预报"].waitForExistence(timeout: 30) else {
@@ -166,6 +184,12 @@ final class RAYNUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["太阳"].exists)
         XCTAssertTrue(app.staticTexts["月相"].exists)
+        XCTAssertTrue(app.staticTexts["太阳位置"].exists)
+        XCTAssertTrue(app.staticTexts["太阳高度"].exists)
+        XCTAssertTrue(app.staticTexts["太阳方位角"].exists)
+        XCTAssertTrue(app.staticTexts["黄金时段"].exists)
+        XCTAssertTrue(app.staticTexts["月升"].exists)
+        XCTAssertTrue(app.staticTexts["月落"].exists)
         let marineSummary = app.staticTexts.matching(
             NSPredicate(format: "label BEGINSWITH %@", "海况 ·")
         ).firstMatch
