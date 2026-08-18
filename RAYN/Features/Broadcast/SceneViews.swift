@@ -2000,7 +2000,7 @@ private struct SolarConditionCard: View {
                     timezone: snapshot.timezoneIdentifier,
                     compact: compact
                 )
-                .frame(height: (compact ? 112 : 160) * layoutScale)
+                .frame(height: (compact ? 120 : 190) * layoutScale)
 
                 HStack(spacing: 12 * layoutScale) {
                     AstronomyMetric(
@@ -2022,9 +2022,6 @@ private struct SolarConditionCard: View {
                     timezone: snapshot.timezoneIdentifier,
                     compact: compact
                 )
-
-                SunlightForecastStrip(daily: snapshot.daily, timezone: snapshot.timezoneIdentifier)
-                    .frame(height: (compact ? 76 : 96) * layoutScale)
             }
         }
     }
@@ -2194,76 +2191,6 @@ private struct AstronomyMetric: View {
     }
 }
 
-private struct SunlightForecastStrip: View {
-    let daily: [DailyForecastPoint]
-    let timezone: String
-    @Environment(\.raynLayoutScale) private var layoutScale
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8 * layoutScale) {
-            Text("10-Day Daylight Trend")
-                .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.58))
-            HStack(spacing: 8 * layoutScale) {
-                ForEach(Array(daily.prefix(10).enumerated()), id: \.element.id) { index, point in
-                    VStack(alignment: .leading, spacing: 6 * layoutScale) {
-                        Text(index == 0 ? String(localized: "Today") : point.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
-                            .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.76))
-                        Text(point.date.formatted(.monthDay, timezoneIdentifier: timezone))
-                            .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.42))
-                        SunlightDayBar(point: point, timezone: timezone)
-                            .frame(height: 24 * layoutScale)
-                        HStack {
-                            Text(point.sunrise?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
-                            Spacer()
-                            Text(point.sunset?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
-                        }
-                        .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.white.opacity(0.48))
-                    }
-                    .padding(.horizontal, 8 * layoutScale)
-                    .padding(.vertical, 7 * layoutScale)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.white.opacity(index == 0 ? 0.12 : 0.06), in: RoundedRectangle(cornerRadius: 12 * layoutScale, style: .continuous))
-                }
-            }
-        }
-    }
-}
-
-private struct SunlightDayBar: View {
-    let point: DailyForecastPoint
-    let timezone: String
-    @Environment(\.raynLayoutScale) private var layoutScale
-
-    var body: some View {
-        GeometryReader { geometry in
-            let metrics = metrics(width: geometry.size.width)
-            ZStack(alignment: .leading) {
-                Capsule().fill(.white.opacity(0.10)).frame(height: 6 * layoutScale)
-                Capsule()
-                    .fill(LinearGradient(colors: [.orange.opacity(0.72), .yellow, .cyan.opacity(0.72)], startPoint: .leading, endPoint: .trailing))
-                    .frame(width: metrics.width, height: 6 * layoutScale)
-                    .offset(x: metrics.start)
-            }
-            .frame(maxHeight: .infinity)
-        }
-    }
-
-    private func metrics(width: CGFloat) -> (start: CGFloat, width: CGFloat) {
-        guard let sunrise = point.sunrise, let sunset = point.sunset, sunset > sunrise else { return (0, 0) }
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: timezone) ?? .current
-        let startOfDay = calendar.startOfDay(for: point.date)
-        let start = min(max(sunrise.timeIntervalSince(startOfDay) / 86_400, 0), 1)
-        let end = min(max(sunset.timeIntervalSince(startOfDay) / 86_400, start), 1)
-        return (width * CGFloat(start), width * CGFloat(end - start))
-    }
-}
-
 private struct MoonPhaseCard: View {
     let info: MoonPhaseInfo
     let daily: [DailyForecastPoint]
@@ -2387,36 +2314,53 @@ private struct MoonDiskView: View {
                         )
                     )
 
-                MoonSurfaceTexture()
-                    .opacity(0.82)
+                Image("MoonSurface")
+                    .resizable()
+                    .scaledToFit()
+                    .colorMultiply(Color(hex: 0x77838A))
+                    .opacity(0.42)
                     .mask(Circle().fill(.white))
+
+                Image("MoonSurface")
+                    .resizable()
+                    .scaledToFit()
+                    .colorMultiply(Color(hex: 0xD8DAD5))
+                    .opacity(info.illumination > 0.01 ? 0.92 : 0)
+                    .blur(radius: diameter * 0.002)
+                    .mask(MoonIlluminationShape(age: info.age).fill(.white))
 
                 MoonIlluminationShape(age: info.age)
                     .fill(
                         RadialGradient(
                             colors: [
-                                Color(hex: 0xFFFDF0),
-                                Color(hex: 0xD6DEE0).opacity(0.97),
-                                Color(hex: 0x9BA9AC).opacity(0.92)
+                                .white.opacity(0.20),
+                                Color(hex: 0xDDE2E0).opacity(0.10),
+                                .clear
                             ],
                             center: lightCenter,
                             startRadius: 0,
-                            endRadius: diameter * 0.66
+                            endRadius: diameter * 0.70
                         )
                     )
 
-                MoonSurfaceTexture()
-                    .opacity(info.illumination > 0.01 ? 0.90 : 0)
-                    .mask(MoonIlluminationShape(age: info.age).fill(.white))
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [.clear, .black.opacity(0.42)],
+                            center: lightCenter,
+                            startRadius: diameter * 0.20,
+                            endRadius: diameter * 0.76
+                        )
+                    )
 
                 MoonIlluminationShape(age: info.age)
-                    .fill(.white.opacity(0.17))
-                    .blur(radius: diameter * 0.035)
+                    .fill(.white.opacity(0.14))
+                    .blur(radius: diameter * 0.022)
 
                 Circle()
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.56), .white.opacity(0.16)],
+                            colors: [.white.opacity(0.52), .white.opacity(0.10)],
                             startPoint: lightCenter,
                             endPoint: UnitPoint(x: waxing ? 0.05 : 0.95, y: 0.72)
                         ),
@@ -2467,80 +2411,6 @@ private struct MoonIlluminationShape: Shape {
         }
         path.closeSubpath()
         return path
-    }
-}
-
-private struct MoonSurfaceTexture: View {
-    var body: some View {
-        Canvas { context, size in
-            let diameter = min(size.width, size.height)
-            let origin = CGPoint(
-                x: (size.width - diameter) / 2,
-                y: (size.height - diameter) / 2
-            )
-            let craters: [(x: CGFloat, y: CGFloat, radius: CGFloat, depth: Double, angle: CGFloat)] = [
-                (0.28, 0.25, 0.10, 0.20, -0.20),
-                (0.56, 0.21, 0.06, 0.16, 0.34),
-                (0.69, 0.38, 0.13, 0.18, -0.42),
-                (0.38, 0.48, 0.075, 0.15, 0.16),
-                (0.61, 0.60, 0.085, 0.19, -0.30),
-                (0.25, 0.70, 0.055, 0.14, 0.28),
-                (0.50, 0.79, 0.12, 0.16, -0.12),
-                (0.78, 0.68, 0.047, 0.12, 0.44)
-            ]
-
-            for crater in craters {
-                let center = CGPoint(
-                    x: origin.x + diameter * crater.x,
-                    y: origin.y + diameter * crater.y
-                )
-                let width = diameter * crater.radius * 2.0
-                let height = width * (0.58 + abs(sin(crater.angle)) * 0.24)
-                let craterRect = CGRect(
-                    x: center.x - width / 2,
-                    y: center.y - height / 2,
-                    width: width,
-                    height: height
-                )
-                var craterPath = Path(ellipseIn: craterRect)
-                craterPath = craterPath.applying(
-                    CGAffineTransform(translationX: 0, y: diameter * 0.006)
-                )
-                context.fill(
-                    craterPath,
-                    with: .color(Color(hex: 0x5B666A).opacity(crater.depth))
-                )
-                context.stroke(
-                    Path(ellipseIn: craterRect),
-                    with: .color(.white.opacity(crater.depth * 0.20)),
-                    lineWidth: max(0.7, diameter * 0.006)
-                )
-                let innerRect = craterRect.insetBy(dx: width * 0.21, dy: height * 0.21)
-                context.fill(
-                    Path(ellipseIn: innerRect),
-                    with: .color(Color(hex: 0x687477).opacity(crater.depth * 0.28))
-                )
-            }
-
-            let maria: [(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, opacity: Double)] = [
-                (0.40, 0.30, 0.25, 0.11, 0.09),
-                (0.58, 0.44, 0.30, 0.14, 0.08),
-                (0.35, 0.64, 0.21, 0.16, 0.07)
-            ]
-            for sea in maria {
-                let rect = CGRect(
-                    x: origin.x + diameter * (sea.x - sea.width / 2),
-                    y: origin.y + diameter * (sea.y - sea.height / 2),
-                    width: diameter * sea.width,
-                    height: diameter * sea.height
-                )
-                context.fill(
-                    Path(ellipseIn: rect),
-                    with: .color(Color(hex: 0x566267).opacity(sea.opacity))
-                )
-            }
-        }
-        .allowsHitTesting(false)
     }
 }
 
@@ -2733,23 +2603,31 @@ private struct SunlightTimeline: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            VStack(alignment: .leading, spacing: (compact ? 7 : 8) * layoutScale) {
-                HStack(alignment: .firstTextBaseline, spacing: 16 * layoutScale) {
-                    VStack(alignment: .leading, spacing: 1 * layoutScale) {
-                        Text(nextEventTitle(at: context.date))
-                            .font(.system(size: (compact ? 17 : 20) * layoutScale, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.68))
-                        Text(nextEventDate(at: context.date)?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
-                            .font(.system(size: (compact ? 30 : 36) * layoutScale, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                    }
-                    Spacer(minLength: 12 * layoutScale)
+            VStack(alignment: .leading, spacing: (compact ? 6 : 8) * layoutScale) {
+                HStack(spacing: 8 * layoutScale) {
                     Image(systemName: nextEventSymbol(at: context.date))
-                        .font(.system(size: (compact ? 23 : 27) * layoutScale, weight: .medium))
+                        .font(.system(size: (compact ? 18 : 21) * layoutScale, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(nextEventAccent(at: context.date))
+                    Text(nextEventTitle(at: context.date))
+                        .font(.system(size: (compact ? 18 : 21) * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.78))
                 }
+                .frame(maxWidth: .infinity, alignment: .center)
+
+                Text(nextEventDate(at: context.date)?.formatted(.time, timezoneIdentifier: timezone) ?? "--:--")
+                    .font(.system(size: (compact ? 30 : 38) * layoutScale, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+
+                HStack(spacing: 7 * layoutScale) {
+                    Text("Daylight Remaining")
+                        .foregroundStyle(.white.opacity(0.55))
+                    Text(remainingDaylight(at: context.date))
+                        .foregroundStyle(.white.opacity(0.68))
+                        .monospacedDigit()
+                }
+                .font(.system(size: (compact ? 13 : 16) * layoutScale, weight: .semibold, design: .rounded))
 
                 SunArcGraph(
                     sunrise: sunrise,
@@ -2757,7 +2635,7 @@ private struct SunlightTimeline: View {
                     date: context.date,
                     timezone: timezone
                 )
-                .frame(height: (compact ? 46 : 62) * layoutScale)
+                .frame(height: (compact ? 68 : 96) * layoutScale)
 
                 HStack(alignment: .top, spacing: 16 * layoutScale) {
                     solarEventLabel(
@@ -2817,6 +2695,14 @@ private struct SunlightTimeline: View {
     private func nextEventAccent(at date: Date) -> Color {
         nextEventTitle(at: date) == String(localized: "Sunset") ? .orange : .yellow
     }
+
+    private func remainingDaylight(at date: Date) -> String {
+        guard let sunrise, let sunset, sunset > sunrise else { return "--" }
+        let start = max(date, sunrise)
+        let seconds = max(0, sunset.timeIntervalSince(start))
+        let minutes = Int((seconds / 60).rounded())
+        return String(localized: "\(minutes / 60) hr \(minutes % 60) min")
+    }
 }
 
 private struct SunArcGraph: View {
@@ -2830,43 +2716,118 @@ private struct SunArcGraph: View {
         GeometryReader { geometry in
             let metrics = pathMetrics(width: geometry.size.width, height: geometry.size.height)
             if metrics.isValid {
-                let area = arcAreaPath(start: metrics.start, end: metrics.end, baseline: metrics.baseline, peak: metrics.peak)
-                let line = arcLinePath(start: metrics.start, end: metrics.end, baseline: metrics.baseline, peak: metrics.peak)
-                ZStack {
-                    area
+                let line = sunCurvePath(width: geometry.size.width, height: geometry.size.height, metrics: metrics)
+                let area = sunCurveAreaPath(width: geometry.size.width, height: geometry.size.height, metrics: metrics)
+                ZStack(alignment: .bottom) {
+                    RoundedRectangle(cornerRadius: 14 * layoutScale, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [.yellow.opacity(0.14), .orange.opacity(0.04), .clear],
+                                colors: [
+                                    Color(hex: 0x4E88C9).opacity(0.74),
+                                    Color(hex: 0x1263B0).opacity(0.88)
+                                ],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
                         )
+
+                    gridPath(width: geometry.size.width, height: geometry.size.height)
+                        .stroke(.white.opacity(0.16), lineWidth: 1 * layoutScale)
+
+                    area
+                        .fill(
+                            LinearGradient(
+                                colors: [.white.opacity(0.16), .cyan.opacity(0.06), .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+
+                    line
+                        .stroke(.white.opacity(0.30), style: StrokeStyle(lineWidth: 9 * layoutScale, lineCap: .round, lineJoin: .round))
+                        .blur(radius: 6 * layoutScale)
                     line
                         .stroke(
                             LinearGradient(
-                                colors: [.orange.opacity(0.58), .yellow.opacity(0.88), .cyan.opacity(0.62)],
+                                colors: [.white.opacity(0.92), .white.opacity(0.88), .cyan.opacity(0.66)],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             ),
-                            style: StrokeStyle(lineWidth: 2.2 * layoutScale, lineCap: .round)
+                            style: StrokeStyle(lineWidth: 3.2 * layoutScale, lineCap: .round, lineJoin: .round)
                         )
+
                     Path { path in
-                        path.move(to: CGPoint(x: metrics.start, y: metrics.baseline))
-                        path.addLine(to: CGPoint(x: metrics.end, y: metrics.baseline))
+                        path.move(to: CGPoint(x: 0, y: metrics.baseline))
+                        path.addLine(to: CGPoint(x: geometry.size.width, y: metrics.baseline))
                     }
-                    .stroke(.white.opacity(0.12), style: StrokeStyle(lineWidth: 1 * layoutScale, dash: [4 * layoutScale, 6 * layoutScale]))
+                    .stroke(.black.opacity(0.34), lineWidth: 2.2 * layoutScale)
+
+                    ForEach(1...3, id: \.self) { index in
+                        Circle()
+                            .fill(.white.opacity(0.54))
+                            .frame(width: 7 * layoutScale, height: 7 * layoutScale)
+                            .position(
+                                point(
+                                    at: metrics.sunriseFraction - CGFloat(index) * 0.018,
+                                    width: geometry.size.width,
+                                    height: geometry.size.height,
+                                    metrics: metrics
+                                )
+                            )
+                    }
+                    ForEach(1...3, id: \.self) { index in
+                        Circle()
+                            .fill(.white.opacity(0.54))
+                            .frame(width: 7 * layoutScale, height: 7 * layoutScale)
+                            .position(
+                                point(
+                                    at: metrics.sunsetFraction + CGFloat(index) * 0.018,
+                                    width: geometry.size.width,
+                                    height: geometry.size.height,
+                                    metrics: metrics
+                                )
+                            )
+                    }
 
                     Circle()
-                        .fill(.white.opacity(0.22))
-                        .frame(width: 26 * layoutScale, height: 26 * layoutScale)
-                        .blur(radius: 8 * layoutScale)
+                        .fill(.white.opacity(0.78))
+                        .frame(width: 7 * layoutScale, height: 7 * layoutScale)
+                        .position(metrics.sunrisePoint)
+                    Circle()
+                        .fill(.white.opacity(0.78))
+                        .frame(width: 7 * layoutScale, height: 7 * layoutScale)
+                        .position(metrics.sunsetPoint)
+
+                    Circle()
+                        .fill(.white.opacity(0.28))
+                        .frame(width: 42 * layoutScale, height: 42 * layoutScale)
+                        .blur(radius: 12 * layoutScale)
                         .position(metrics.currentPoint)
                     Circle()
                         .fill(.white)
-                        .frame(width: 10 * layoutScale, height: 10 * layoutScale)
-                        .shadow(color: .white.opacity(0.42), radius: 6 * layoutScale)
+                        .frame(width: 20 * layoutScale, height: 20 * layoutScale)
+                        .shadow(color: .white.opacity(0.55), radius: 9 * layoutScale)
                         .position(metrics.currentPoint)
+
+                    HStack {
+                        Text("0")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("6")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("12")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("18")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("24")
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white.opacity(0.74))
+                    .padding(.horizontal, 10 * layoutScale)
+                    .padding(.bottom, 7 * layoutScale)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 14 * layoutScale, style: .continuous))
             } else {
                 Image(systemName: "sun.max.fill")
                     .font(.system(size: 24 * layoutScale, weight: .medium))
@@ -2877,10 +2838,13 @@ private struct SunArcGraph: View {
     }
 
     private struct PathMetrics {
-        var start: CGFloat
-        var end: CGFloat
+        var sunriseFraction: CGFloat
+        var sunsetFraction: CGFloat
+        var currentFraction: CGFloat
         var baseline: CGFloat
         var peak: CGFloat
+        var sunrisePoint: CGPoint
+        var sunsetPoint: CGPoint
         var currentPoint: CGPoint
         var isValid: Bool
     }
@@ -2888,10 +2852,13 @@ private struct SunArcGraph: View {
     private func pathMetrics(width: CGFloat, height: CGFloat) -> PathMetrics {
         guard let sunrise, let sunset, sunset > sunrise else {
             return PathMetrics(
-                start: 0,
-                end: width,
+                sunriseFraction: 0.25,
+                sunsetFraction: 0.75,
+                currentFraction: 0.5,
                 baseline: height * 0.78,
                 peak: height * 0.14,
+                sunrisePoint: CGPoint(x: width * 0.25, y: height * 0.78),
+                sunsetPoint: CGPoint(x: width * 0.75, y: height * 0.78),
                 currentPoint: CGPoint(x: width / 2, y: height * 0.78),
                 isValid: false
             )
@@ -2900,38 +2867,115 @@ private struct SunArcGraph: View {
         calendar.timeZone = TimeZone(identifier: timezone) ?? .current
         let startOfDay = calendar.startOfDay(for: date)
         let daySeconds = 86_400.0
-        let start = width * CGFloat(min(max(sunrise.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
-        let end = width * CGFloat(min(max(sunset.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
-        let progress = min(max(date.timeIntervalSince(sunrise) / sunset.timeIntervalSince(sunrise), 0), 1)
-        let baseline = height * 0.78
-        let peak = height * 0.12
-        let pointX = start + (end - start) * CGFloat(progress)
-        let pointY = baseline - (baseline - peak) * CGFloat(sin(Double.pi * progress))
-        return PathMetrics(
-            start: start,
-            end: end,
+        let sunriseFraction = CGFloat(min(max(sunrise.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
+        let sunsetFraction = CGFloat(min(max(sunset.timeIntervalSince(startOfDay) / daySeconds, sunriseFraction), 1))
+        let currentFraction = CGFloat(min(max(date.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
+        let baseline = height * 0.60
+        let peak = height * 0.10
+        let metrics = PathMetrics(
+            sunriseFraction: sunriseFraction,
+            sunsetFraction: sunsetFraction,
+            currentFraction: currentFraction,
             baseline: baseline,
             peak: peak,
-            currentPoint: CGPoint(x: pointX, y: pointY),
+            sunrisePoint: .zero,
+            sunsetPoint: .zero,
+            currentPoint: .zero,
+            isValid: true
+        )
+        return PathMetrics(
+            sunriseFraction: sunriseFraction,
+            sunsetFraction: sunsetFraction,
+            currentFraction: currentFraction,
+            baseline: baseline,
+            peak: peak,
+            sunrisePoint: point(at: sunriseFraction, width: width, height: height, metrics: metrics),
+            sunsetPoint: point(at: sunsetFraction, width: width, height: height, metrics: metrics),
+            currentPoint: point(at: currentFraction, width: width, height: height, metrics: metrics),
             isValid: true
         )
     }
 
-    private func arcLinePath(start: CGFloat, end: CGFloat, baseline: CGFloat, peak: CGFloat) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: start, y: baseline))
-        path.addCurve(
-            to: CGPoint(x: end, y: baseline),
-            control1: CGPoint(x: start + (end - start) * 0.30, y: peak),
-            control2: CGPoint(x: start + (end - start) * 0.70, y: peak)
+    private func solarLift(at fraction: CGFloat, sunrise: CGFloat, sunset: CGFloat) -> CGFloat {
+        let daylightSpan = max(sunset - sunrise, 0.001)
+        if fraction < sunrise {
+            let progress = min(max(fraction / max(sunrise, 0.001), 0), 1)
+            let eased = progress * progress * (3 - 2 * progress)
+            return -0.24 * (1 - eased)
+        }
+        if fraction > sunset {
+            let progress = min(max((fraction - sunset) / max(1 - sunset, 0.001), 0), 1)
+            let eased = progress * progress * (3 - 2 * progress)
+            return -0.24 * eased
+        }
+        let progress = (fraction - sunrise) / daylightSpan
+        return CGFloat(sin(Double.pi * Double(progress)))
+    }
+
+    private func point(at fraction: CGFloat, width: CGFloat, height: CGFloat, metrics: PathMetrics) -> CGPoint {
+        let clampedFraction = min(max(fraction, 0), 1)
+        let lift = solarLift(
+            at: clampedFraction,
+            sunrise: metrics.sunriseFraction,
+            sunset: metrics.sunsetFraction
         )
+        return CGPoint(
+            x: width * clampedFraction,
+            y: metrics.baseline - (metrics.baseline - metrics.peak) * lift
+        )
+    }
+
+    private func sunCurvePath(width: CGFloat, height: CGFloat, metrics: PathMetrics) -> Path {
+        let sampleCount = 48
+        let points = (0...sampleCount).map { index in
+            point(
+                at: CGFloat(index) / CGFloat(sampleCount),
+                width: width,
+                height: height,
+                metrics: metrics
+            )
+        }
+
+        var path = Path()
+        path.move(to: points[0])
+        for index in 0..<(points.count - 1) {
+            let previous = index > 0 ? points[index - 1] : points[index]
+            let start = points[index]
+            let end = points[index + 1]
+            let next = index + 2 < points.count ? points[index + 2] : end
+            let control1 = CGPoint(
+                x: start.x + (end.x - previous.x) / 6,
+                y: start.y + (end.y - previous.y) / 6
+            )
+            let control2 = CGPoint(
+                x: end.x - (next.x - start.x) / 6,
+                y: end.y - (next.y - start.y) / 6
+            )
+            path.addCurve(to: end, control1: control1, control2: control2)
+        }
         return path
     }
 
-    private func arcAreaPath(start: CGFloat, end: CGFloat, baseline: CGFloat, peak: CGFloat) -> Path {
-        var path = arcLinePath(start: start, end: end, baseline: baseline, peak: peak)
-        path.addLine(to: CGPoint(x: end, y: baseline))
+    private func sunCurveAreaPath(width: CGFloat, height: CGFloat, metrics: PathMetrics) -> Path {
+        var path = sunCurvePath(width: width, height: height, metrics: metrics)
+        path.addLine(to: CGPoint(x: width, y: height))
+        path.addLine(to: CGPoint(x: 0, y: height))
         path.closeSubpath()
+        return path
+    }
+
+    private func gridPath(width: CGFloat, height: CGFloat) -> Path {
+        var path = Path()
+        for index in 0...4 {
+            let x = width * CGFloat(index) / 4
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: height))
+        }
+        for index in 1...3 {
+            let y = height * CGFloat(index) / 4
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: width, y: y))
+        }
         return path
     }
 }
