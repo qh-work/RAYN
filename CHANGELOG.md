@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Added an Apple Weather-inspired astronomy presentation with a procedural moon surface, earthshine, soft illumination terminator, and seven-day phase strip.
+- Added a sunrise/sunset event card with the next event time, curved solar path, live sun position, and explicit sunrise/sunset labels.
 - Added calculated solar elevation, azimuth, and golden-hour boundaries to the astronomy scene.
 - Added WeatherKit-backed moonrise and moonset fields while keeping them unavailable when the active provider does not supply them.
 - Added condition-aware weather notices for thunderstorms, hail, freezing precipitation, snow, low visibility, strong gusts, and high rain probability.
@@ -15,6 +17,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Rebalanced the astronomy header and card proportions for large displays so the title and right-side detail remain readable without overlap.
+- Tightened solar and lunar card spacing so all astronomy content stays above the persistent live-data ticker.
 - Added compact current-scene advisory cards that distinguish provider-supplied official alerts from condition-derived notices.
 - Added localized labels and detail copy for the new astronomy, advisory, and freshness fields across all nine supported interface locales.
 - Corrected the solar hour-angle conversion so sunrise-adjacent elevation and azimuth remain physically plausible.

@@ -61,13 +61,15 @@ struct PageHeader: View {
                     .font(.system(size: 48 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
+            Spacer(minLength: 28 * layoutScale)
             if let detail {
                 Text(L10n.string(detail))
                     .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: 520 * layoutScale, alignment: .trailing)
                     .padding(.bottom, 6)
             }
-            Spacer()
         }
     }
 }
