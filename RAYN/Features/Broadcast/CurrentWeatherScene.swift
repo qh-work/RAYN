@@ -11,76 +11,127 @@ struct CurrentWeatherScene: View {
         let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
 
         VStack(alignment: .leading, spacing: 18 * layoutScale) {
-            HStack(alignment: .center, spacing: 46 * layoutScale) {
-                VStack(alignment: .center, spacing: 7 * layoutScale) {
-                    Text("Current Weather")
-                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
-                        .tracking(2.2 * layoutScale)
-                        .textCase(.uppercase)
-                        .foregroundStyle(.white.opacity(0.62))
+            HStack(alignment: .center, spacing: 18 * layoutScale) {
+                CurrentWeatherHeroCard(snapshot: snapshot)
+                    .frame(maxWidth: .infinity)
+                CurrentWeatherObservationsCard(snapshot: snapshot, advisory: advisories.first)
+                    .frame(maxWidth: .infinity)
+            }
+            .frame(height: (advisories.isEmpty ? 278 : 318) * layoutScale)
+            .accessibilityElement(children: .contain)
 
-                    HStack(alignment: .center, spacing: 18 * layoutScale) {
-                        TemperatureText(
-                            value: snapshot.current.temperature,
-                            unit: appState.settings.temperatureUnit,
-                            fontSize: 154
-                        )
-                        WeatherSymbol(
-                            code: snapshot.current.weatherCode,
-                            isDay: snapshot.current.isDay,
-                            size: 76
-                        )
+            HStack(alignment: .center, spacing: 18 * layoutScale) {
+                ClothingAdviceCard(advice: clothing)
+                    .frame(maxWidth: .infinity)
+                CurrentWeatherFactsCard(snapshot: snapshot)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.top, 20 * layoutScale)
+        .padding(.bottom, 16)
+    }
+}
+
+private struct CurrentWeatherHeroCard: View {
+    let snapshot: WeatherSnapshot
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        GlassCard(cornerRadius: 28) {
+            HStack(spacing: 24 * layoutScale) {
+                VStack(spacing: 8 * layoutScale) {
+                    Text("Temperature")
+                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                        .tracking(1.5 * layoutScale)
+                        .textCase(.uppercase)
+                        .foregroundStyle(.white.opacity(0.54))
+
+                    TemperatureText(
+                        value: snapshot.current.temperature,
+                        unit: appState.settings.temperatureUnit,
+                        fontSize: 136
+                    )
+
+                    HStack(spacing: 8 * layoutScale) {
+                        Text("Feels Like")
+                        Text(verbatim: "\(snapshot.current.feelsLike.formattedTemperature(unit: appState.settings.temperatureUnit))°")
+                            .foregroundStyle(.white)
                     }
+                    .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.58))
+                }
+                .frame(maxWidth: .infinity)
+
+                Rectangle()
+                    .fill(.white.opacity(0.12))
+                    .frame(width: 1, height: 176 * layoutScale)
+
+                VStack(spacing: 7 * layoutScale) {
+                    Text("Today")
+                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                        .tracking(1.5 * layoutScale)
+                        .textCase(.uppercase)
+                        .foregroundStyle(.white.opacity(0.54))
+
+                    WeatherSymbol(
+                        code: snapshot.current.weatherCode,
+                        isDay: snapshot.current.isDay,
+                        size: 84
+                    )
 
                     Text(WeatherCodeMapper.description(
                         for: snapshot.current.weatherCode,
                         isDay: snapshot.current.isDay,
                         visibility: snapshot.current.visibility
                     ))
-                    .font(.system(size: 34 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 31 * layoutScale, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.74)
 
-                    Text("Feels like \(snapshot.current.feelsLike.formattedTemperature(unit: appState.settings.temperatureUnit))°  ·  Today \(snapshot.current.low.formattedTemperature(unit: appState.settings.temperatureUnit))° / \(snapshot.current.high.formattedTemperature(unit: appState.settings.temperatureUnit))°")
-                        .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.68))
+                    Text(verbatim: "\(snapshot.current.low.formattedTemperature(unit: appState.settings.temperatureUnit))°  /  \(snapshot.current.high.formattedTemperature(unit: appState.settings.temperatureUnit))°")
+                        .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.62))
                 }
                 .frame(maxWidth: .infinity)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text(verbatim: "\(snapshot.location.name), \(WeatherCodeMapper.description(for: snapshot.current.weatherCode, isDay: snapshot.current.isDay, visibility: snapshot.current.visibility)), \(snapshot.current.temperature.formattedTemperature(unit: appState.settings.temperatureUnit)) degrees"))
-
-                VStack(spacing: 14 * layoutScale) {
-                    if let advisory = advisories.first {
-                        WeatherAdvisoryCard(advisory: advisory)
-                    }
-
-                    GlassCard(cornerRadius: 28) {
-                        VStack(alignment: .leading, spacing: 18 * layoutScale) {
-                            Text("Live Observations")
-                                .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.86))
-                            LazyVGrid(
-                                columns: [GridItem(.flexible()), GridItem(.flexible())],
-                                spacing: 20 * layoutScale
-                            ) {
-                                MetricTile(symbol: "humidity.fill", title: String(localized: "Humidity"), value: "\(Int(snapshot.current.relativeHumidity.rounded()))%", accent: .cyan)
-                                MetricTile(symbol: "wind", title: String(localized: "Wind Speed"), value: snapshot.current.windSpeed.formattedSpeed(system: appState.settings.measurementSystem), accent: .mint)
-                                MetricTile(symbol: "eye.fill", title: String(localized: "Visibility"), value: snapshot.current.visibility.formattedDistance(system: appState.settings.measurementSystem), accent: .orange)
-                                MetricTile(symbol: "drop.fill", title: String(localized: "Rain Chance"), value: "\(Int(snapshot.current.precipitationProbability.rounded()))%", accent: .cyan)
-                            }
-                        }
-                    }
-                }
-                .frame(width: 710 * layoutScale)
             }
-
-            HStack(alignment: .center, spacing: 18 * layoutScale) {
-                ClothingAdviceCard(advice: clothing)
-                    .frame(maxWidth: .infinity)
-                CurrentWeatherFactsCard(snapshot: snapshot)
-                    .frame(width: 780 * layoutScale)
-            }
+            .frame(maxHeight: .infinity)
         }
-        .padding(.top, 20 * layoutScale)
-        .padding(.bottom, 16)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(verbatim: "\(snapshot.location.name), \(WeatherCodeMapper.description(for: snapshot.current.weatherCode, isDay: snapshot.current.isDay, visibility: snapshot.current.visibility)), \(snapshot.current.temperature.formattedTemperature(unit: appState.settings.temperatureUnit)) degrees"))
+    }
+}
+
+private struct CurrentWeatherObservationsCard: View {
+    let snapshot: WeatherSnapshot
+    let advisory: WeatherAdvisory?
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        GlassCard(cornerRadius: 28) {
+            VStack(spacing: advisory == nil ? 20 * layoutScale : 12 * layoutScale) {
+                Text("Live Observations")
+                    .font(.system(size: 23 * layoutScale, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.86))
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                if let advisory {
+                    WeatherAdvisoryRow(advisory: advisory)
+                }
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible()), GridItem(.flexible())],
+                    spacing: advisory == nil ? 22 * layoutScale : 14 * layoutScale
+                ) {
+                    MetricTile(symbol: "humidity.fill", title: String(localized: "Humidity"), value: "\(Int(snapshot.current.relativeHumidity.rounded()))%", accent: .cyan)
+                    MetricTile(symbol: "wind", title: String(localized: "Wind Speed"), value: snapshot.current.windSpeed.formattedSpeed(system: appState.settings.measurementSystem), accent: .mint)
+                    MetricTile(symbol: "eye.fill", title: String(localized: "Visibility"), value: snapshot.current.visibility.formattedDistance(system: appState.settings.measurementSystem), accent: .orange)
+                    MetricTile(symbol: "drop.fill", title: String(localized: "Rain Chance"), value: "\(Int(snapshot.current.precipitationProbability.rounded()))%", accent: .cyan)
+                }
+            }
+            .frame(maxHeight: .infinity)
+        }
     }
 }
 
@@ -162,7 +213,7 @@ private struct ClothingAdviceCard: View {
     }
 }
 
-private struct WeatherAdvisoryCard: View {
+private struct WeatherAdvisoryRow: View {
     let advisory: WeatherAdvisory
     @Environment(\.raynLayoutScale) private var layoutScale
 
@@ -174,29 +225,36 @@ private struct WeatherAdvisoryCard: View {
     }
 
     var body: some View {
-        GlassCard(cornerRadius: 22, tint: tint) {
-            HStack(alignment: .top, spacing: 14 * layoutScale) {
-                Image(systemName: advisory.symbolName)
-                    .font(.system(size: 28 * layoutScale, weight: .semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 42 * layoutScale, height: 42 * layoutScale)
-                    .background(tint.opacity(0.14), in: Circle())
+        HStack(alignment: .center, spacing: 12 * layoutScale) {
+            Image(systemName: advisory.symbolName)
+                .font(.system(size: 23 * layoutScale, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 38 * layoutScale, height: 38 * layoutScale)
+                .background(tint.opacity(0.14), in: Circle())
 
-                VStack(alignment: .leading, spacing: 4 * layoutScale) {
+            VStack(alignment: .leading, spacing: 2 * layoutScale) {
+                HStack(spacing: 8 * layoutScale) {
                     Text(advisory.isOfficial ? String(localized: "Weather Alert") : String(localized: "Weather Notice"))
-                        .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 13 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(tint)
                     Text(advisory.title)
-                        .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 16 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
-                        .lineLimit(2)
-                    Text(advisory.detail)
-                        .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.64))
-                        .lineLimit(3)
+                        .lineLimit(1)
                 }
-                Spacer(minLength: 0)
+                Text(advisory.detail)
+                    .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.62))
+                    .lineLimit(1)
             }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12 * layoutScale)
+        .padding(.vertical, 8 * layoutScale)
+        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 16 * layoutScale, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16 * layoutScale, style: .continuous)
+                .stroke(tint.opacity(0.16), lineWidth: 1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)

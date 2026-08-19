@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- Rebalanced the current-weather page into evenly spaced temperature, condition, and live-observation zones, with matching lower-card widths for a calmer large-screen composition.
+
 ## [1.2.0] - 2026-08-19
 
 ### Added
