@@ -227,25 +227,16 @@ struct ForecastProgressBar: View {
     }
 }
 
-struct TickerText: View {
+struct TickerClock: View {
     @EnvironmentObject private var appState: AppState
-    let snapshot: WeatherSnapshot
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            HStack(spacing: 12) {
-                Text(timeString(context.date))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-                Text("·")
-                    .foregroundStyle(.white.opacity(0.38))
-                Text(snapshot.current.temperature.formattedTemperature(unit: appState.settings.temperatureUnit) + (appState.settings.temperatureUnit == .celsius ? "℃" : "℉"))
-                    .foregroundStyle(.white)
-                Text(WeatherCodeMapper.description(for: snapshot.current.weatherCode, isDay: snapshot.current.isDay, visibility: snapshot.current.visibility))
-                    .foregroundStyle(.white.opacity(0.72))
-            }
-            .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
+            Text(timeString(context.date))
+                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
         }
     }
 
@@ -255,6 +246,38 @@ struct TickerText: View {
             template: appState.settings.clockFormat == .twentyFourHour ? "Hm" : "hm",
             timezone: appState.localTimeZone
         )
+    }
+}
+
+struct TickerWeatherSummary: View {
+    @EnvironmentObject private var appState: AppState
+    let snapshot: WeatherSnapshot
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        HStack(spacing: 10 * layoutScale) {
+            Image(systemName: WeatherCodeMapper.symbol(
+                for: snapshot.current.weatherCode,
+                isDay: snapshot.current.isDay
+            ))
+                .font(.system(size: 20 * layoutScale, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+
+            Text(snapshot.current.temperature.formattedTemperature(unit: appState.settings.temperatureUnit) + (appState.settings.temperatureUnit == .celsius ? "℃" : "℉"))
+                .monospacedDigit()
+
+            Text(WeatherCodeMapper.description(
+                for: snapshot.current.weatherCode,
+                isDay: snapshot.current.isDay,
+                visibility: snapshot.current.visibility
+            ))
+                .foregroundStyle(.white.opacity(0.68))
+        }
+        .font(.system(size: 19 * layoutScale, weight: .semibold, design: .rounded))
+        .foregroundStyle(.white)
+        .lineLimit(1)
+        .minimumScaleFactor(0.78)
+        .accessibilityElement(children: .combine)
     }
 }
 

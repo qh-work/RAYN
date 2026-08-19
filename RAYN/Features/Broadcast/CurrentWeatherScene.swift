@@ -10,8 +10,8 @@ struct CurrentWeatherScene: View {
         let clothing = ClothingAdviceBuilder.make(from: snapshot.current)
         let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
 
-        VStack(alignment: .leading, spacing: 18 * layoutScale) {
-            HStack(alignment: .center, spacing: 18 * layoutScale) {
+        VStack(alignment: .leading, spacing: 24 * layoutScale) {
+            HStack(alignment: .center, spacing: 24 * layoutScale) {
                 CurrentWeatherHeroCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
                 CurrentWeatherObservationsCard(snapshot: snapshot, advisory: advisories.first)
@@ -20,14 +20,15 @@ struct CurrentWeatherScene: View {
             .frame(height: (advisories.isEmpty ? 278 : 318) * layoutScale)
             .accessibilityElement(children: .contain)
 
-            HStack(alignment: .center, spacing: 18 * layoutScale) {
+            HStack(alignment: .center, spacing: 24 * layoutScale) {
                 ClothingAdviceCard(advice: clothing)
                     .frame(maxWidth: .infinity)
                 CurrentWeatherFactsCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
             }
+            .frame(height: 154 * layoutScale)
         }
-        .padding(.top, 20 * layoutScale)
+        .padding(.top, 36 * layoutScale)
         .padding(.bottom, 16)
     }
 }
@@ -147,7 +148,9 @@ private struct CurrentWeatherFactsCard: View {
                 fact(symbol: "sun.max.fill", title: String(localized: "UV Index"), value: snapshot.current.uvIndex.formattedNumber(decimals: 1), tint: .yellow)
                 fact(symbol: "gauge.with.dots.needle.33percent", title: String(localized: "Pressure"), value: "\(Int(snapshot.current.pressure.rounded())) hPa", tint: .mint)
             }
+            .frame(maxHeight: .infinity)
         }
+        .frame(maxHeight: .infinity)
     }
 
     private func fact(symbol: String, title: String, value: String, tint: Color) -> some View {
@@ -185,31 +188,54 @@ private struct ClothingAdviceCard: View {
 
     var body: some View {
         GlassCard(cornerRadius: 24, tint: tint) {
-            HStack(spacing: 18 * layoutScale) {
-                Image(systemName: advice.index.symbolName)
-                    .font(.system(size: 34 * layoutScale, weight: .semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 54 * layoutScale, height: 54 * layoutScale)
-                    .background(tint.opacity(0.16), in: Circle())
-                VStack(alignment: .leading, spacing: 5 * layoutScale) {
-                    HStack(spacing: 12 * layoutScale) {
+            HStack(spacing: 26 * layoutScale) {
+                HStack(spacing: 16 * layoutScale) {
+                    Image(systemName: advice.index.symbolName)
+                        .font(.system(size: 32 * layoutScale, weight: .semibold))
+                        .foregroundStyle(tint)
+                        .frame(width: 52 * layoutScale, height: 52 * layoutScale)
+                        .background(tint.opacity(0.16), in: Circle())
+
+                    VStack(alignment: .leading, spacing: 5 * layoutScale) {
                         Text("Clothing Index")
-                            .font(.system(size: 21 * layoutScale, weight: .bold, design: .rounded))
-                        Text(advice.index.title)
                             .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.58))
+                        Text(advice.index.title)
+                            .font(.system(size: 25 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(tint)
                     }
-                    Text(advice.outfit)
-                        .font(.system(size: 26 * layoutScale, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text(advice.detail)
-                        .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.60))
-                        .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
                 }
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Rectangle()
+                    .fill(.white.opacity(0.12))
+                    .frame(width: 1, height: 84 * layoutScale)
+
+                VStack(alignment: .leading, spacing: 5 * layoutScale) {
+                    Text("Today")
+                        .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                        .tracking(1.2 * layoutScale)
+                        .textCase(.uppercase)
+                        .foregroundStyle(.white.opacity(0.52))
+                    Text(advice.outfit)
+                        .font(.system(size: 22 * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
+                    Text(advice.detail)
+                        .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.60))
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.82)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .frame(maxHeight: .infinity)
         }
+        .frame(maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
     }
 }
 

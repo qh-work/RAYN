@@ -238,26 +238,37 @@ struct BroadcastView: View {
     }
 
     private func bottomTicker(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
-        HStack(spacing: 24 * layoutScale) {
-            LiveIndicator()
-            Rectangle().fill(.white.opacity(0.22)).frame(width: 1, height: 24 * layoutScale)
-            TickerText(snapshot: snapshot)
-            Spacer()
-            if appState.isPaused {
-                Label("Paused", systemImage: "pause.fill")
-                    .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
-                    .foregroundStyle(.yellow)
+        HStack(spacing: 0) {
+            HStack(spacing: 16 * layoutScale) {
+                LiveIndicator()
+                Rectangle()
+                    .fill(.white.opacity(0.20))
+                    .frame(width: 1, height: 24 * layoutScale)
+                TickerClock()
             }
-            DataFreshnessLabel(
-                updatedAt: snapshot.updatedAt,
-                fetchedAt: snapshot.fetchedAt,
-                timezoneIdentifier: snapshot.timezoneIdentifier
-            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            TickerWeatherSummary(snapshot: snapshot)
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            HStack(spacing: 18 * layoutScale) {
+                if appState.isPaused {
+                    Label("Paused", systemImage: "pause.fill")
+                        .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(.yellow)
+                }
+                DataFreshnessLabel(
+                    updatedAt: snapshot.updatedAt,
+                    fetchedAt: snapshot.fetchedAt,
+                    timezoneIdentifier: snapshot.timezoneIdentifier
+                )
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(.horizontal, 22 * layoutScale)
-        .frame(height: 54 * layoutScale)
+        .padding(.horizontal, 28 * layoutScale)
+        .frame(height: 60 * layoutScale)
         .background(.regularMaterial, in: Capsule())
-        .padding(.top, 12 * layoutScale)
+        .padding(.top, 18 * layoutScale)
     }
 
     private func liveDataPlaceholder(layoutScale: CGFloat) -> some View {
