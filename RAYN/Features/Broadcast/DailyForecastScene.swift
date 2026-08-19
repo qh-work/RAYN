@@ -89,7 +89,11 @@ struct DailyForecastScene: View {
                 // Preserve a small focus-effect overscan while clipping rows
                 // that have actually scrolled beyond the list viewport.
                 .clipShape(Rectangle().inset(by: -20 * layoutScale))
-                .frame(height: 520 * layoutScale)
+            // Keep the live ticker inside the 16:9 safe area when the
+            // television typography scale is increased. The list remains
+            // fully navigable with the remote, so a shorter viewport is a
+            // better tradeoff than shrinking the forecast text.
+            .frame(height: 450 * layoutScale)
                 .onChange(of: focusedDayID) { _, nextID in
                     guard let nextID else { return }
                     lastFocusedDayID = nextID
@@ -99,7 +103,7 @@ struct DailyForecastScene: View {
             .focusSection()
 
             Text("Swipe up or down through all dates. Press Select to open a forecast, and Menu to return to the list.")
-                .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.58))
         }
         .padding(.top, 30 * layoutScale)
@@ -159,7 +163,7 @@ private struct DailyForecastRow: View {
                 Text(ordinal == 0 ? String(localized: "Today") : point.date.formatted(.weekday, timezoneIdentifier: timezone))
                     .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
                 Text(point.date.formatted(.monthDay, timezoneIdentifier: timezone))
-                    .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
             }
             .frame(width: 220 * layoutScale, alignment: .leading)
@@ -173,12 +177,12 @@ private struct DailyForecastRow: View {
             .frame(width: 300 * layoutScale, alignment: .leading)
 
             Label("\(Int(point.precipitationProbability.rounded()))%", systemImage: "drop.fill")
-                .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.cyan)
                 .frame(width: 130 * layoutScale, alignment: .leading)
 
             Label(point.windSpeed.formattedSpeed(system: measurementSystem), systemImage: "wind")
-                .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.mint.opacity(0.88))
                 .frame(width: 180 * layoutScale, alignment: .leading)
 
@@ -202,7 +206,7 @@ private struct DailyForecastRow: View {
                 .frame(width: 66 * layoutScale, alignment: .leading)
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 16 * layoutScale, weight: .bold))
+                .font(.system(size: 18 * layoutScale, weight: .bold))
                 .foregroundStyle(.white.opacity(0.38))
         }
         .padding(.horizontal, 22 * layoutScale)
@@ -296,7 +300,7 @@ private struct DailyDetailCard: View {
                     Spacer()
                     Button(action: onClose) {
                         Label("Collapse", systemImage: "chevron.down")
-                            .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
                             .padding(.horizontal, 16 * layoutScale)
                             .padding(.vertical, 10 * layoutScale)
                             .foregroundStyle(focusedControl == .close ? Color(hex: 0x082A3D) : .white)
@@ -348,7 +352,7 @@ private struct DailyDetailCard: View {
                     }
                     Spacer()
                     Text("Press Menu to close details")
-                        .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
+                        .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.48))
                 }
             }
@@ -379,7 +383,7 @@ private struct DailyDetailCard: View {
                 .font(.system(size: 22 * layoutScale, weight: .semibold))
                 .foregroundStyle(tint)
             Text(L10n.string(title))
-                .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.55))
             Text(value)
                 .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
@@ -394,7 +398,7 @@ private struct DailyDetailCard: View {
                 .foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 3 * layoutScale) {
                 Text(L10n.string(title))
-                    .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
                 Text(value)
                     .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))

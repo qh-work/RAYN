@@ -16,7 +16,7 @@ enum RAYNLayout {
         let widthScale = size.width / 1920
         let heightScale = size.height / 1080
         let canvasScale = min(max(min(widthScale, heightScale), 0.92), 1.08)
-        return min(max(canvasScale * viewingDistance.scale, 0.86), 1.22)
+        return min(max(canvasScale * viewingDistance.scale, 0.92), 1.28)
     }
 }
 
@@ -65,7 +65,7 @@ struct PageHeader: View {
         HStack(alignment: .bottom, spacing: 18) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(L10n.string(eyebrow).uppercased(with: .autoupdatingCurrent))
-                    .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                     .tracking(2.2)
                     .foregroundStyle(.white.opacity(0.68))
                 Text(L10n.string(title))
@@ -75,7 +75,7 @@ struct PageHeader: View {
             Spacer(minLength: 28 * layoutScale)
             if let detail {
                 Text(L10n.string(detail))
-                    .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 25 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: 520 * layoutScale, alignment: .trailing)
@@ -93,20 +93,21 @@ struct DataFreshnessLabel: View {
     let fetchedAt: Date?
     let timezoneIdentifier: String
     var alignment: HorizontalAlignment = .trailing
+    var fontSize: CGFloat = 18
 
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        VStack(alignment: alignment, spacing: 2 * layoutScale) {
+        VStack(alignment: alignment, spacing: 3 * layoutScale) {
             Text("Updated \(updatedAt.formatted(.time, timezoneIdentifier: timezoneIdentifier))")
             if let fetchedAt {
                 Text("Checked \(fetchedAt.formatted(.time, timezoneIdentifier: timezoneIdentifier))")
-                    .foregroundStyle(.white.opacity(0.34))
+                    .foregroundStyle(.white.opacity(0.44))
             }
         }
-        .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
+        .font(.system(size: fontSize * layoutScale, weight: .medium, design: .rounded))
         .monospacedDigit()
-        .foregroundStyle(.white.opacity(0.48))
+        .foregroundStyle(.white.opacity(0.62))
         .lineLimit(1)
     }
 }
@@ -141,10 +142,10 @@ struct MetricTile: View {
                 .frame(width: 30 * layoutScale)
             VStack(alignment: .leading, spacing: 3 * layoutScale) {
                 Text(L10n.string(title))
-                    .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
                 Text(value)
-                    .font(.system(size: 27 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 29 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .minimumScaleFactor(0.75)
             }
@@ -234,7 +235,7 @@ struct TickerClock: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             Text(timeString(context.date))
-                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 24 * layoutScale, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
         }
@@ -255,12 +256,12 @@ struct TickerWeatherSummary: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        HStack(spacing: 10 * layoutScale) {
+        HStack(spacing: 12 * layoutScale) {
             Image(systemName: WeatherCodeMapper.symbol(
                 for: snapshot.current.weatherCode,
                 isDay: snapshot.current.isDay
             ))
-                .font(.system(size: 20 * layoutScale, weight: .semibold))
+                .font(.system(size: 25 * layoutScale, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
 
             Text(snapshot.current.temperature.formattedTemperature(unit: appState.settings.temperatureUnit) + (appState.settings.temperatureUnit == .celsius ? "℃" : "℉"))
@@ -273,7 +274,7 @@ struct TickerWeatherSummary: View {
             ))
                 .foregroundStyle(.white.opacity(0.68))
         }
-        .font(.system(size: 19 * layoutScale, weight: .semibold, design: .rounded))
+        .font(.system(size: 23 * layoutScale, weight: .semibold, design: .rounded))
         .foregroundStyle(.white)
         .lineLimit(1)
         .minimumScaleFactor(0.78)
@@ -282,12 +283,16 @@ struct TickerWeatherSummary: View {
 }
 
 struct LiveIndicator: View {
+    @Environment(\.raynLayoutScale) private var layoutScale
+
     var body: some View {
-        HStack(spacing: 8) {
-            Circle().fill(.green).frame(width: 9, height: 9)
+        HStack(spacing: 10 * layoutScale) {
+            Circle()
+                .fill(.green)
+                .frame(width: 11 * layoutScale, height: 11 * layoutScale)
             Text("Live")
-                .font(.system(size: 16, weight: .black, design: .rounded))
-                .tracking(1)
+                .font(.system(size: 19 * layoutScale, weight: .black, design: .rounded))
+                .tracking(1.1 * layoutScale)
         }
         .foregroundStyle(.white.opacity(0.85))
     }

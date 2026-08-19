@@ -283,14 +283,14 @@ private struct SunDaylightForecast: View {
                     ForEach(Array(days.enumerated()), id: \.element.id) { index, day in
                         VStack(spacing: 5 * layoutScale) {
                             Text(daylightValue(day).formattedNumber(decimals: 1))
-                                .font(.system(size: 13 * layoutScale, weight: .bold, design: .rounded))
+                                .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
                                 .monospacedDigit()
                                 .foregroundStyle(.white.opacity(0.68))
                             Capsule()
                                 .fill(LinearGradient(colors: [.orange, .yellow], startPoint: .bottom, endPoint: .top))
                                 .frame(height: barHeight(for: day))
                             Text(index == 0 ? String(localized: "Today") : day.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
-                                .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
+                                .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.54))
                         }
                         .frame(maxWidth: .infinity)
@@ -452,12 +452,12 @@ private struct MoonPhaseCalendar: View {
                             } label: {
                                 VStack(spacing: 5 * layoutScale) {
                                     Text(date.formatted(.shortWeekday, timezoneIdentifier: timezone))
-                                        .font(.system(size: 13 * layoutScale, weight: .bold, design: .rounded))
+                                        .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
                                         .foregroundStyle(.white.opacity(0.58))
                                     MoonDiskView(info: info)
                                         .frame(width: 48 * layoutScale, height: 48 * layoutScale)
                                     Text(date.formatted(.monthDay, timezoneIdentifier: timezone))
-                                        .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                        .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                                         .foregroundStyle(.white.opacity(0.54))
                                 }
                                 .frame(width: 102 * layoutScale)
@@ -506,7 +506,7 @@ private struct SolarConditionCard: View {
                         .foregroundStyle(.white.opacity(0.88))
                     Spacer()
                     Text(solarState)
-                        .font(.system(size: 16 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(isCurrentlyDaylight ? .yellow : .indigo.opacity(0.95))
                 }
 
@@ -603,7 +603,7 @@ private struct SolarPositionPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: (compact ? 6 : 8) * layoutScale) {
             Text("Solar Position")
-                .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.52))
 
             HStack(spacing: 9 * layoutScale) {
@@ -613,15 +613,15 @@ private struct SolarPositionPanel: View {
 
             HStack(alignment: .top, spacing: 10 * layoutScale) {
                 Image(systemName: "sunrise.fill")
-                    .font(.system(size: 16 * layoutScale, weight: .semibold))
+                    .font(.system(size: 18 * layoutScale, weight: .semibold))
                     .foregroundStyle(.orange)
                     .frame(width: 22 * layoutScale)
                 VStack(alignment: .leading, spacing: 2 * layoutScale) {
                     Text("Golden Hour")
-                        .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.48))
                     Text(goldenHourText)
-                        .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                        .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.78))
                         .lineLimit(2)
                         .minimumScaleFactor(0.72)
@@ -636,14 +636,14 @@ private struct SolarPositionPanel: View {
     private func solarMetric(symbol: String, title: String, value: String, accent: Color) -> some View {
         HStack(spacing: 6 * layoutScale) {
             Image(systemName: symbol)
-                .font(.system(size: 15 * layoutScale, weight: .semibold))
+                .font(.system(size: 17 * layoutScale, weight: .semibold))
                 .foregroundStyle(accent)
             VStack(alignment: .leading, spacing: 1 * layoutScale) {
                 Text(title)
-                    .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.46))
                 Text(value)
-                    .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
             }
@@ -693,10 +693,10 @@ private struct AstronomyMetric: View {
                 .foregroundStyle(accent)
             VStack(alignment: .leading, spacing: 2 * layoutScale) {
                 Text(L10n.string(title))
-                    .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.50))
                 Text(value)
-                    .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
@@ -728,7 +728,7 @@ private struct MoonPhaseCard: View {
                         .foregroundStyle(.white.opacity(0.88))
                     Spacer()
                     Text("Moon age \(info.age.formattedNumber(decimals: 1)) days")
-                        .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.50))
                 }
 
@@ -742,7 +742,7 @@ private struct MoonPhaseCard: View {
                         .font(.system(size: (compact ? 27 : 32) * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                     Text("Illumination \(Int((info.illumination * 100).rounded()))%")
-                        .font(.system(size: (compact ? 16 : 19) * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: (compact ? 18 : 21) * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.62))
                 }
                 .frame(maxWidth: .infinity)
@@ -753,10 +753,10 @@ private struct MoonPhaseCard: View {
                         .foregroundStyle(.yellow.opacity(0.85))
                     VStack(alignment: .leading, spacing: 2 * layoutScale) {
                         Text("Next Major Phase")
-                            .font(.system(size: 13 * layoutScale, weight: .medium, design: .rounded))
+                            .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.48))
                         Text("\(info.nextPhaseTitle) · \(info.nextPhaseDate.formatted(.monthDay, timezoneIdentifier: timezone))")
-                            .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                            .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                     }
                 }
@@ -780,7 +780,7 @@ private struct MoonPhaseCard: View {
                 }
 
                 Text("7-Day Moon Phases")
-                    .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.54))
 
                 HStack(spacing: 5 * layoutScale) {
@@ -788,12 +788,12 @@ private struct MoonPhaseCard: View {
                         let dayInfo = MoonPhaseCalculator.info(at: point.date)
                         VStack(spacing: 5 * layoutScale) {
                             Text(index == 0 ? String(localized: "Today") : point.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
-                                .font(.system(size: 12 * layoutScale, weight: .bold, design: .rounded))
+                                .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.58))
                             MoonDiskView(info: dayInfo)
                                 .frame(width: (compact ? 36 : 40) * layoutScale, height: (compact ? 36 : 40) * layoutScale)
                             Text("\(Int((dayInfo.illumination * 100).rounded()))")
-                                .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                                 .monospacedDigit()
                                 .foregroundStyle(.white.opacity(0.48))
                         }
@@ -948,7 +948,7 @@ private struct MarineConditionCard: View {
                         .foregroundStyle(.cyan)
                     VStack(alignment: .leading, spacing: 1 * layoutScale) {
                         Text("Marine Conditions · \(waveState(marine.waveHeight))")
-                            .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                            .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.60))
                         Text("\(marine.waveHeight.formattedNumber(decimals: 1)) m")
                             .font(.system(size: 35 * layoutScale, weight: .bold, design: .rounded))
@@ -957,9 +957,9 @@ private struct MarineConditionCard: View {
                             updatedAt: marine.updatedAt,
                             fetchedAt: marine.fetchedAt,
                             timezoneIdentifier: timezone,
-                            alignment: .leading
+                            alignment: .leading,
+                            fontSize: 16
                         )
-                        .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.42))
                     }
                 }
@@ -971,7 +971,7 @@ private struct MarineConditionCard: View {
 
                 VStack(alignment: .leading, spacing: 4 * layoutScale) {
                     Text("24-Hour Wave Height")
-                        .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.52))
                     MarineForecastStrip(points: forecastPoints(for: marine), timezone: timezone)
                         .frame(height: 82 * layoutScale)
@@ -1048,7 +1048,7 @@ private struct MarineForecastStrip: View {
                 Image(systemName: "clock.badge.questionmark")
                 Text("Short-Term Trend Is Updating")
             }
-            .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
+            .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
             .foregroundStyle(.white.opacity(0.50))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 16 * layoutScale, style: .continuous))
@@ -1057,7 +1057,7 @@ private struct MarineForecastStrip: View {
                 ForEach(points) { point in
                     VStack(spacing: 2 * layoutScale) {
                         Text(point.waveHeight.formattedNumber(decimals: 1))
-                            .font(.system(size: 11 * layoutScale, weight: .bold, design: .rounded))
+                            .font(.system(size: 13 * layoutScale, weight: .bold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white.opacity(0.74))
                         ZStack(alignment: .bottom) {
@@ -1068,7 +1068,7 @@ private struct MarineForecastStrip: View {
                         }
                         .frame(height: 38 * layoutScale)
                         Text(point.time.formatted(.hour, timezoneIdentifier: timezone))
-                            .font(.system(size: 10 * layoutScale, weight: .semibold, design: .rounded))
+                            .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white.opacity(0.42))
                     }
@@ -1094,14 +1094,14 @@ private struct MarineCompactMetric: View {
         VStack(alignment: .leading, spacing: 3 * layoutScale) {
             HStack(spacing: 5 * layoutScale) {
                 Image(systemName: symbol)
-                    .font(.system(size: 11 * layoutScale, weight: .semibold))
+                    .font(.system(size: 13 * layoutScale, weight: .semibold))
                     .foregroundStyle(accent)
                 Text(L10n.string(title))
-                    .font(.system(size: 11 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 13 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.48))
             }
             Text(value)
-                .font(.system(size: 14 * layoutScale, weight: .bold, design: .rounded))
+                .font(.system(size: 16 * layoutScale, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
@@ -1147,7 +1147,7 @@ private struct SunlightTimeline: View {
                         .foregroundStyle(.white.opacity(0.68))
                         .monospacedDigit()
                 }
-                .font(.system(size: (compact ? 13 : 16) * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: (compact ? 15 : 18) * layoutScale, weight: .semibold, design: .rounded))
 
                 SunArcGraph(
                     sunrise: sunrise,
@@ -1184,13 +1184,13 @@ private struct SunlightTimeline: View {
     ) -> some View {
         HStack(spacing: 7 * layoutScale) {
             Image(systemName: symbol)
-                .font(.system(size: (compact ? 13 : 15) * layoutScale, weight: .semibold))
+                .font(.system(size: (compact ? 15 : 17) * layoutScale, weight: .semibold))
                 .foregroundStyle(tint.opacity(0.82))
             Text(title)
-                .font(.system(size: (compact ? 13 : 15) * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: (compact ? 15 : 17) * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.50))
             Text(value)
-                .font(.system(size: (compact ? 17 : 19) * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: (compact ? 19 : 21) * layoutScale, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(tint)
         }
@@ -1341,7 +1341,7 @@ private struct SunArcGraph: View {
                         Text(verbatim: "24")
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     }
-                    .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white.opacity(0.74))
                     .padding(.horizontal, 10 * layoutScale)

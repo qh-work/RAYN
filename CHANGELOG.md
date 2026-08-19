@@ -9,6 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Rebalanced the current-weather page into evenly spaced temperature, condition, and live-observation zones; split clothing guidance across both sides of its card; distributed the live ticker into clock, weather, and freshness zones; and increased spacing between navigation and content.
+- Increased the television typography baseline across broadcast scenes and enlarged the current-weather labels, navigation, and live-data ticker for comfortable viewing at living-room distances.
 
 ## [1.2.0] - 2026-08-19
 

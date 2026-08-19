@@ -29,7 +29,7 @@ struct SettingsView: View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Settings").font(.system(size: 44, weight: .bold, design: .rounded)).foregroundStyle(.white)
-                Text("Manage data, rotation, visual effects, and saved locations").font(.system(size: 21, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.62))
+                Text("Manage data, rotation, visual effects, and saved locations").font(.system(size: 23, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.62))
             }
             Spacer()
             HStack(spacing: 14) {
@@ -40,7 +40,7 @@ struct SettingsView: View {
                         appState.isRefreshing ? String(localized: "Updating…") : String(localized: "Refresh Now"),
                         systemImage: "arrow.clockwise"
                     )
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
                         .background(.white.opacity(0.12), in: Capsule())
@@ -50,7 +50,7 @@ struct SettingsView: View {
 
                 Button(action: { dismiss() }) {
                     Label("Done", systemImage: "checkmark")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
                         .background(.cyan.opacity(0.22), in: Capsule())
@@ -65,11 +65,11 @@ struct SettingsView: View {
         settingsCard(title: String(localized: "Cities & Location"), symbol: "location.fill") {
             VStack(alignment: .leading, spacing: 18) {
                 Toggle("Use Current Location", isOn: Binding(get: { appState.settings.useCurrentLocation }, set: { value in updateSettings { $0.useCurrentLocation = value } }))
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
                 Text("At launch, use the current location first. When disabled, use the location selected below. A saved location is used only if positioning fails.")
-                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .font(.system(size: 19, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
-                Text("Saved Locations").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                Text("Saved Locations").font(.system(size: 20, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 220, maximum: 420), spacing: 12)], alignment: .leading, spacing: 12) {
                     ForEach(appState.savedLocations) { location in
                         Button {
@@ -79,10 +79,10 @@ struct SettingsView: View {
                                 Image(systemName: location.id == appState.selectedLocation.id ? "checkmark.circle.fill" : "mappin.circle")
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(location.name)
-                                    Text(location.administrativeArea).font(.system(size: 15, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.55))
+                                    Text(location.administrativeArea).font(.system(size: 17, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.55))
                                 }
                             }
-                            .font(.system(size: 19, weight: .semibold, design: .rounded))
+                            .font(.system(size: 21, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 18)
                             .padding(.vertical, 13)
                             .background(location.id == appState.selectedLocation.id ? .cyan.opacity(0.22) : .white.opacity(0.09), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -93,7 +93,7 @@ struct SettingsView: View {
                 }
                 HStack(spacing: 12) {
                     TextField("Search cities, for example Paris or Tokyo", text: $searchText)
-                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .font(.system(size: 22, weight: .medium, design: .rounded))
                         .textFieldStyle(.plain)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
@@ -102,7 +102,7 @@ struct SettingsView: View {
                         appState.searchLocations(query: searchText)
                     } label: {
                         Label("Search", systemImage: "magnifyingglass")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                             .padding(.horizontal, 18)
                             .padding(.vertical, 12)
                             .background(.cyan.opacity(0.24), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -112,11 +112,11 @@ struct SettingsView: View {
                 }
                 if appState.isSearching {
                     ProgressView("Searching…")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .font(.system(size: 20, weight: .medium, design: .rounded))
                 }
                 if !appState.searchResults.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Search Results").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
+                        Text("Search Results").font(.system(size: 20, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
                         ForEach(appState.searchResults) { location in
                             Button {
                                 appState.chooseLocation(location)
@@ -128,7 +128,7 @@ struct SettingsView: View {
                                     Spacer()
                                     Image(systemName: "arrow.right")
                                 }
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .font(.system(size: 22, weight: .semibold, design: .rounded))
                                 .padding(.vertical, 10)
                             }
                             .buttonStyle(FocusButtonStyle())
@@ -144,12 +144,12 @@ struct SettingsView: View {
         settingsCard(title: String(localized: "Scene Rotation"), symbol: "play.rectangle.fill") {
             VStack(alignment: .leading, spacing: 20) {
                 Toggle("Automatically Rotate Weather Scenes", isOn: Binding(get: { appState.settings.automaticRotation }, set: { value in updateSettings { $0.automaticRotation = value } }))
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Time per Scene").font(.system(size: 20, weight: .semibold, design: .rounded))
+                        Text("Time per Scene").font(.system(size: 22, weight: .semibold, design: .rounded))
                         Spacer()
-                        Text("\(Int(appState.settings.rotationSeconds)) seconds").font(.system(size: 20, weight: .bold, design: .rounded)).foregroundStyle(.cyan)
+                        Text("\(Int(appState.settings.rotationSeconds)) seconds").font(.system(size: 22, weight: .bold, design: .rounded)).foregroundStyle(.cyan)
                     }
                     HStack(spacing: 14) {
                         Button {
@@ -161,7 +161,7 @@ struct SettingsView: View {
                         .buttonStyle(FocusButtonStyle())
                         .background(.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         Text("8–30 seconds")
-                            .font(.system(size: 18, weight: .medium, design: .rounded))
+                            .font(.system(size: 20, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.60))
                         Button {
                             appState.setRotationSeconds(appState.settings.rotationSeconds + 1)
@@ -172,15 +172,15 @@ struct SettingsView: View {
                         .buttonStyle(FocusButtonStyle())
                         .background(.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 }
                 HStack(alignment: .firstTextBaseline) {
                     Text("Enabled Scenes")
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
                     Spacer()
                     Text("Use the arrows to change the navigation order")
-                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .font(.system(size: 19, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.52))
                 }
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], alignment: .leading, spacing: 14) {
@@ -193,7 +193,7 @@ struct SettingsView: View {
                                 }
                             } label: {
                                 Label(scene.title, systemImage: enabled ? "checkmark.circle.fill" : "circle")
-                                    .font(.system(size: 19, weight: .semibold, design: .rounded))
+                                    .font(.system(size: 21, weight: .semibold, design: .rounded))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.horizontal, 14)
                                     .frame(height: 54)
@@ -259,7 +259,7 @@ struct SettingsView: View {
                 Toggle("Keep Screen Awake", isOn: Binding(get: { appState.settings.keepScreenAwake }, set: { value in updateSettings { $0.keepScreenAwake = value } }))
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
                 Text("Keeping the screen awake takes effect only when you enable it. Leaving Settings or turning it off restores the system default.")
-                    .font(.system(size: 17, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.52))
+                    .font(.system(size: 19, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.52))
             }
         }
     }
@@ -267,7 +267,7 @@ struct SettingsView: View {
     private var privacySection: some View {
         settingsCard(title: String(localized: "Privacy"), symbol: "lock.shield.fill") {
             Text("No account is required. This app contains no ads, analytics tracking, or background profiling. Location permission is requested only after Use Current Location is enabled. Weather requests send only the coordinates needed for the query and do not store location history. Saved locations and settings remain on this Apple TV.")
-                .font(.system(size: 19, weight: .medium, design: .rounded))
+                .font(.system(size: 21, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.70))
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -286,14 +286,14 @@ struct SettingsView: View {
                                 Text(attribution.detail)
                                     .foregroundStyle(.white.opacity(0.56))
                                 Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 13, weight: .bold))
+                                    .font(.system(size: 15, weight: .bold))
                             }
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
-            .font(.system(size: 18, weight: .medium, design: .rounded))
+            .font(.system(size: 20, weight: .medium, design: .rounded))
             .foregroundStyle(.white.opacity(0.66))
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -303,7 +303,7 @@ struct SettingsView: View {
         GlassCard(cornerRadius: 26) {
             VStack(alignment: .leading, spacing: 19) {
                 Label(L10n.string(title), systemImage: symbol)
-                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                    .font(.system(size: 27, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 content()
             }
@@ -328,7 +328,7 @@ struct SettingsView: View {
             }
         } label: {
             Image(systemName: symbol)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .frame(width: 44, height: 44)
                 .background(.white.opacity(disabled ? 0.04 : 0.10), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
         }

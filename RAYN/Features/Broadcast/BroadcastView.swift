@@ -110,7 +110,7 @@ struct BroadcastView: View {
         VStack(alignment: .leading, spacing: 12 * layoutScale) {
             HStack(spacing: 22 * layoutScale) {
                 Text(snapshot.location.name)
-                    .font(.system(size: 30 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: 34 * layoutScale, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 Spacer()
                 Button {
@@ -118,7 +118,7 @@ struct BroadcastView: View {
                     appState.revealControls()
                 } label: {
                     Image(systemName: "gearshape.fill")
-                        .font(.system(size: 24 * layoutScale, weight: .semibold))
+                        .font(.system(size: 26 * layoutScale, weight: .semibold))
                         .frame(width: 50 * layoutScale, height: 50 * layoutScale)
                 }
                 .buttonStyle(.glass)
@@ -137,7 +137,9 @@ struct BroadcastView: View {
                             appState.select(scene: scene)
                         } label: {
                             Label(navigationTitle(for: scene, snapshot: snapshot), systemImage: scene.symbolName)
-                                .font(.system(size: 17 * layoutScale, weight: .semibold, design: .rounded))
+                                .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))
+                                .lineLimit(1)
+                                .fixedSize(horizontal: true, vertical: false)
                                 .padding(.horizontal, 14 * layoutScale)
                                 .padding(.vertical, 9 * layoutScale)
                         }
@@ -239,11 +241,11 @@ struct BroadcastView: View {
 
     private func bottomTicker(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
         HStack(spacing: 0) {
-            HStack(spacing: 16 * layoutScale) {
+            HStack(spacing: 18 * layoutScale) {
                 LiveIndicator()
                 Rectangle()
                     .fill(.white.opacity(0.20))
-                    .frame(width: 1, height: 24 * layoutScale)
+                    .frame(width: 1, height: 30 * layoutScale)
                 TickerClock()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -254,21 +256,22 @@ struct BroadcastView: View {
             HStack(spacing: 18 * layoutScale) {
                 if appState.isPaused {
                     Label("Paused", systemImage: "pause.fill")
-                        .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.yellow)
                 }
                 DataFreshnessLabel(
                     updatedAt: snapshot.updatedAt,
                     fetchedAt: snapshot.fetchedAt,
-                    timezoneIdentifier: snapshot.timezoneIdentifier
+                    timezoneIdentifier: snapshot.timezoneIdentifier,
+                    fontSize: 19
                 )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(.horizontal, 28 * layoutScale)
-        .frame(height: 60 * layoutScale)
+        .padding(.horizontal, 32 * layoutScale)
+        .frame(height: 72 * layoutScale)
         .background(.regularMaterial, in: Capsule())
-        .padding(.top, 18 * layoutScale)
+        .padding(.top, 20 * layoutScale)
     }
 
     private func liveDataPlaceholder(layoutScale: CGFloat) -> some View {

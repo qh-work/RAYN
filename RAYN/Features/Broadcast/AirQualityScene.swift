@@ -75,7 +75,7 @@ private struct AirQualityHero: View {
                         .foregroundStyle(.white)
                     VStack(alignment: .leading, spacing: 2 * layoutScale) {
                         Text("European AQI")
-                            .font(.system(size: 17 * layoutScale, weight: .semibold, design: .rounded))
+                            .font(.system(size: 19 * layoutScale, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.54))
                         Text(air.level)
                             .font(.system(size: 32 * layoutScale, weight: .bold, design: .rounded))
@@ -91,7 +91,7 @@ private struct AirQualityHero: View {
                 AQIGradientScale(value: air.europeanAQI, showsLabels: true)
 
                 Text(air.advice)
-                    .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.70))
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -141,7 +141,7 @@ private struct PollutantTile: View {
                     .fill(pollutantColor(pollutant))
                     .frame(width: 8 * layoutScale, height: 8 * layoutScale)
                 Text(pollutant.title)
-                    .font(.system(size: 17 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 19 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
             }
             Text(pollutant.value.formattedNumber(decimals: pollutant.value < 10 ? 1 : 0))
@@ -149,7 +149,7 @@ private struct PollutantTile: View {
                 .monospacedDigit()
                 .foregroundStyle(.white)
             Text(pollutant.unit)
-                .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.42))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -172,12 +172,12 @@ private struct AQIHourlyTrend: View {
                         .font(.system(size: 23 * layoutScale, weight: .bold, design: .rounded))
                     Spacer()
                     Text("AQI")
-                        .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.48))
                 }
                 if values.isEmpty {
                     Text("No hourly data is available")
-                        .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
+                        .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.55))
                         .frame(maxWidth: .infinity, minHeight: 112 * layoutScale)
                 } else {
@@ -189,7 +189,7 @@ private struct AQIHourlyTrend: View {
                                 .annotation(position: .top, spacing: 3 * layoutScale) {
                                     if index.isMultiple(of: 3) {
                                         Text(value.formattedNumber(decimals: 0))
-                                            .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                                             .monospacedDigit()
                                             .foregroundStyle(.white.opacity(0.64))
                                     }
@@ -204,7 +204,7 @@ private struct AQIHourlyTrend: View {
                             AxisValueLabel {
                                 if let aqi = value.as(Double.self) {
                                     Text(aqi.formattedNumber(decimals: 0))
-                                        .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
+                                        .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
                                         .monospacedDigit()
                                         .foregroundStyle(.white.opacity(0.42))
                                 }
@@ -218,7 +218,7 @@ private struct AQIHourlyTrend: View {
                             AxisValueLabel {
                                 if let index = value.as(Int.self) {
                                     Text(hourLabel(index))
-                                        .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                                        .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                                         .foregroundStyle(.white.opacity(0.48))
                                 }
                             }
@@ -283,7 +283,7 @@ private struct AQIGradientScale: View {
                     Spacer()
                     Text(verbatim: "100+")
                 }
-                .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white.opacity(0.48))
             }

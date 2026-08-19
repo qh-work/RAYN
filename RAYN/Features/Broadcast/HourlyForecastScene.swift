@@ -25,7 +25,7 @@ struct HourlyForecastScene: View {
                                 .annotation(position: .top, spacing: 3 * layoutScale) {
                                     if index.isMultiple(of: 3) {
                                         Text("\(point.temperature.formattedTemperature(unit: appState.settings.temperatureUnit))° / \(point.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))°")
-                                            .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
                                             .foregroundStyle(.white.opacity(0.78))
                                     }
                                 }
@@ -37,7 +37,7 @@ struct HourlyForecastScene: View {
                                 .annotation(position: .top, spacing: 2 * layoutScale) {
                                     if index.isMultiple(of: 3) {
                                         Text("\(Int(point.precipitationProbability.rounded()))%")
-                                            .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                                             .foregroundStyle(.blue.opacity(0.92))
                                     }
                                 }
@@ -63,7 +63,7 @@ struct HourlyForecastScene: View {
                         ChartLegendItem(title: String(localized: "Wind Speed"), color: .mint, style: .bar)
                         Spacer()
                         Text("Blue bars = rain chance · Teal bars = wind speed")
-                            .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                            .font(.system(size: 17 * layoutScale, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.46))
                     }
                 }
@@ -104,7 +104,7 @@ struct HourlyForecastScene: View {
             }
             if let selectedHour {
                 Text("Selected \(selectedHour.time.formatted(.monthDayTime, timezoneIdentifier: snapshot.timezoneIdentifier)) · Feels like \(selectedHour.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))° · Rain \(Int(selectedHour.precipitationProbability.rounded()))% · Wind Direction \(Int(selectedHour.windDirection.rounded()))°")
-                    .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.68))
                     .lineLimit(1)
             }
@@ -137,24 +137,24 @@ private struct HourlyCard: View {
     var body: some View {
         VStack(spacing: 9 * layoutScale) {
             Text(point.time.formatted(.time, timezoneIdentifier: timezone))
-                .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.70))
             WeatherSymbol(code: point.weatherCode, isDay: point.isDay, size: 29)
             Text(point.temperature.formattedTemperature(unit: unit) + (unit == .celsius ? "℃" : "℉"))
-                .font(.system(size: 25 * layoutScale, weight: .bold, design: .rounded))
+                .font(.system(size: 27 * layoutScale, weight: .bold, design: .rounded))
             HStack(spacing: 3 * layoutScale) {
-                Image(systemName: "drop.fill").font(.system(size: 12 * layoutScale))
+                Image(systemName: "drop.fill").font(.system(size: 14 * layoutScale))
                 Text("\(Int(point.precipitationProbability.rounded()))%")
             }
-            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
             .foregroundStyle(.cyan)
             HStack(spacing: 4 * layoutScale) {
                 Image(systemName: "location.north.fill")
-                    .font(.system(size: 11 * layoutScale, weight: .bold))
+                    .font(.system(size: 13 * layoutScale, weight: .bold))
                     .rotationEffect(.degrees(point.windDirection))
                 Text(point.windSpeed.formattedSpeed(system: measurementSystem))
             }
-            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
             .foregroundStyle(.mint.opacity(0.88))
         }
         .frame(width: 166 * layoutScale)
@@ -174,6 +174,7 @@ private struct ChartLegendItem: View {
     let title: String
     let color: Color
     let style: LineStyle
+    @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
         HStack(spacing: 7) {
@@ -193,7 +194,7 @@ private struct ChartLegendItem: View {
                 RoundedRectangle(cornerRadius: 2).fill(color.opacity(0.72)).frame(width: 10, height: 12)
             }
             Text(L10n.string(title))
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.68))
         }
     }
@@ -207,7 +208,7 @@ private struct WindSpeedChart: View {
     var body: some View {
         HStack(spacing: 10 * layoutScale) {
             Label("Wind Speed", systemImage: "wind")
-                .font(.system(size: 16 * layoutScale, weight: .semibold, design: .rounded))
+                .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
                 .foregroundStyle(.mint.opacity(0.86))
                 .frame(width: 90 * layoutScale, alignment: .leading)
 
@@ -221,7 +222,7 @@ private struct WindSpeedChart: View {
                     .annotation(position: .top, spacing: 2) {
                         if index.isMultiple(of: 3) {
                             Text(displayedSpeed(point.windSpeed).formattedNumber(decimals: 0))
-                                .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.mint.opacity(0.9))
                         }
                     }
@@ -233,7 +234,7 @@ private struct WindSpeedChart: View {
             .frame(height: 58 * layoutScale)
 
             Text(system == .metric ? "km/h" : "mph")
-                .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.48))
                 .frame(width: 48 * layoutScale, alignment: .trailing)
         }

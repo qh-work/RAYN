@@ -95,9 +95,9 @@ enum ViewingDistance: String, Codable, CaseIterable {
 
     var scale: Double {
         switch self {
-        case .near: return 0.90
-        case .standard: return 1.00
-        case .far: return 1.16
+        case .near: return 0.98
+        case .standard: return 1.10
+        case .far: return 1.22
         }
     }
 }

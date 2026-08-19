@@ -92,7 +92,7 @@ struct RadarScene: View {
                 VStack(alignment: .leading, spacing: 9) {
                     HStack(spacing: 10) {
                         Text(frameDate?.formatted(.time, timezoneIdentifier: snapshot.timezoneIdentifier) ?? "--:--")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
                         if requestedIndex != presentedIndex {
                             ProgressView()
                                 .controlSize(.small)
@@ -104,7 +104,7 @@ struct RadarScene: View {
                             ? String(localized: "Nowcast · Nearby Weather Systems")
                             : String(localized: "Past Two Hours · Nearby Weather Systems")
                     )
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.66))
                 }
                 .padding(24)
@@ -120,7 +120,7 @@ struct RadarScene: View {
             .shadow(color: .black.opacity(0.14), radius: 8, y: 4)
 
             VStack(alignment: .leading, spacing: 18) {
-                Text("Animation Controls").font(.system(size: 24, weight: .bold, design: .rounded))
+                Text("Animation Controls").font(.system(size: 26, weight: .bold, design: .rounded))
                 Button {
                     isPlaying.toggle()
                 } label: {
@@ -128,7 +128,7 @@ struct RadarScene: View {
                         isPlaying ? String(localized: "Pause Radar") : String(localized: "Play Radar"),
                         systemImage: isPlaying ? "pause.fill" : "play.fill"
                     )
-                        .font(.system(size: 23, weight: .bold, design: .rounded))
+                        .font(.system(size: 25, weight: .bold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
                         .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -146,7 +146,7 @@ struct RadarScene: View {
                     .buttonStyle(FocusButtonStyle())
                     .background(.white.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     Text("Frame \(snapshot.radar.frames.isEmpty ? 0 : presentedIndex + 1) of \(snapshot.radar.frames.count)")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(size: 20, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.72))
                         .frame(maxWidth: .infinity)
                     Button {
@@ -165,14 +165,14 @@ struct RadarScene: View {
                     Spacer()
                     Text("Later").foregroundStyle(.white.opacity(0.55))
                 }
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(.system(size: 19, weight: .medium, design: .rounded))
                 RadarLegend()
                 Text("Coverage reflects available radar data")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
             }
             .padding(16)
-            .frame(width: 280)
+            .frame(width: 304)
         }
     }
 
@@ -267,7 +267,7 @@ private struct RadarMap: View {
                 Image(systemName: "map.fill")
                 Text("Precipitation Playback")
             }
-            .font(.system(size: 15, weight: .bold, design: .rounded))
+            .font(.system(size: 17, weight: .bold, design: .rounded))
             .foregroundStyle(.white.opacity(0.82))
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -302,13 +302,13 @@ private struct RadarSimulatorUnavailableView: View {
                     .font(.system(size: 42, weight: .semibold))
                     .foregroundStyle(.cyan)
                 Text("Live radar maps appear on Apple TV hardware")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
                 Text(
                     frame == nil
                         ? String(localized: "No radar frame is currently available")
                         : String(localized: "The simulator does not render live map tiles")
                 )
-                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .font(.system(size: 19, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
             }
             .multilineTextAlignment(.center)
@@ -329,9 +329,9 @@ private struct RadarMapPreparingView: View {
                     .controlSize(.large)
                     .tint(.cyan)
                 Text("Preparing Live Radar")
-                    .font(.system(size: 21, weight: .bold, design: .rounded))
+                    .font(.system(size: 23, weight: .bold, design: .rounded))
                 Text("Weather is ready. The map will load next.")
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .font(.system(size: 18, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
             }
         }
@@ -347,9 +347,9 @@ private struct RadarTileUnavailableView: View {
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundStyle(.cyan)
                 Text("No map tiles are available for this radar frame")
-                    .font(.system(size: 21, weight: .bold, design: .rounded))
+                    .font(.system(size: 23, weight: .bold, design: .rounded))
                 Text("The real timestamp is preserved without substitute echoes")
-                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                    .font(.system(size: 19, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
             }
             .multilineTextAlignment(.center)
@@ -824,7 +824,7 @@ private final class RadarTileOverlay: MKTileOverlay {
 private struct RadarLegend: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Precipitation Intensity").font(.system(size: 18, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.68))
+            Text("Precipitation Intensity").font(.system(size: 20, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.68))
             HStack(spacing: 0) {
                 ForEach([Color.blue, Color.cyan, Color.green, Color.yellow, Color.orange, Color.red], id: \.self) { color in
                     Rectangle().fill(color).frame(maxWidth: .infinity).frame(height: 10)
@@ -835,7 +835,7 @@ private struct RadarLegend: View {
                 Spacer()
                 Text("Heavy").foregroundStyle(.white.opacity(0.55))
             }
-            .font(.system(size: 15, weight: .medium, design: .rounded))
+            .font(.system(size: 17, weight: .medium, design: .rounded))
         }
     }
 }

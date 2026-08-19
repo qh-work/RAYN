@@ -43,7 +43,7 @@ private struct CurrentWeatherHeroCard: View {
             HStack(spacing: 24 * layoutScale) {
                 VStack(spacing: 8 * layoutScale) {
                     Text("Temperature")
-                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
                         .tracking(1.5 * layoutScale)
                         .textCase(.uppercase)
                         .foregroundStyle(.white.opacity(0.54))
@@ -59,7 +59,7 @@ private struct CurrentWeatherHeroCard: View {
                         Text(verbatim: "\(snapshot.current.feelsLike.formattedTemperature(unit: appState.settings.temperatureUnit))°")
                             .foregroundStyle(.white)
                     }
-                    .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 25 * layoutScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
                 }
                 .frame(maxWidth: .infinity)
@@ -70,7 +70,7 @@ private struct CurrentWeatherHeroCard: View {
 
                 VStack(spacing: 7 * layoutScale) {
                     Text("Today")
-                        .font(.system(size: 18 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
                         .tracking(1.5 * layoutScale)
                         .textCase(.uppercase)
                         .foregroundStyle(.white.opacity(0.54))
@@ -86,12 +86,12 @@ private struct CurrentWeatherHeroCard: View {
                         isDay: snapshot.current.isDay,
                         visibility: snapshot.current.visibility
                     ))
-                    .font(.system(size: 31 * layoutScale, weight: .semibold, design: .rounded))
+                    .font(.system(size: 33 * layoutScale, weight: .semibold, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.74)
 
                     Text(verbatim: "\(snapshot.current.low.formattedTemperature(unit: appState.settings.temperatureUnit))°  /  \(snapshot.current.high.formattedTemperature(unit: appState.settings.temperatureUnit))°")
-                        .font(.system(size: 21 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 25 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.62))
                 }
                 .frame(maxWidth: .infinity)
@@ -113,7 +113,7 @@ private struct CurrentWeatherObservationsCard: View {
         GlassCard(cornerRadius: 28) {
             VStack(spacing: advisory == nil ? 20 * layoutScale : 12 * layoutScale) {
                 Text("Live Observations")
-                    .font(.system(size: 23 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: 26 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.86))
                     .frame(maxWidth: .infinity, alignment: .center)
 
@@ -156,13 +156,13 @@ private struct CurrentWeatherFactsCard: View {
     private func fact(symbol: String, title: String, value: String, tint: Color) -> some View {
         VStack(spacing: 5 * layoutScale) {
             Image(systemName: symbol)
-                .font(.system(size: 23 * layoutScale, weight: .semibold))
+                .font(.system(size: 25 * layoutScale, weight: .semibold))
                 .foregroundStyle(tint)
             Text(title)
-                .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.52))
             Text(value)
-                .font(.system(size: 21 * layoutScale, weight: .bold, design: .rounded))
+                .font(.system(size: 23 * layoutScale, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
                 .lineLimit(1)
@@ -191,17 +191,17 @@ private struct ClothingAdviceCard: View {
             HStack(spacing: 26 * layoutScale) {
                 HStack(spacing: 16 * layoutScale) {
                     Image(systemName: advice.index.symbolName)
-                        .font(.system(size: 32 * layoutScale, weight: .semibold))
+                        .font(.system(size: 34 * layoutScale, weight: .semibold))
                         .foregroundStyle(tint)
                         .frame(width: 52 * layoutScale, height: 52 * layoutScale)
                         .background(tint.opacity(0.16), in: Circle())
 
                     VStack(alignment: .leading, spacing: 5 * layoutScale) {
                         Text("Clothing Index")
-                            .font(.system(size: 17 * layoutScale, weight: .bold, design: .rounded))
+                            .font(.system(size: 21 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.58))
                         Text(advice.index.title)
-                            .font(.system(size: 25 * layoutScale, weight: .bold, design: .rounded))
+                            .font(.system(size: 29 * layoutScale, weight: .bold, design: .rounded))
                             .foregroundStyle(tint)
                     }
                     .lineLimit(1)
@@ -215,17 +215,17 @@ private struct ClothingAdviceCard: View {
 
                 VStack(alignment: .leading, spacing: 5 * layoutScale) {
                     Text("Today")
-                        .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                         .tracking(1.2 * layoutScale)
                         .textCase(.uppercase)
                         .foregroundStyle(.white.opacity(0.52))
                     Text(advice.outfit)
-                        .font(.system(size: 22 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 26 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
                     Text(advice.detail)
-                        .font(.system(size: 15 * layoutScale, weight: .medium, design: .rounded))
+                        .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.60))
                         .lineLimit(3)
                         .minimumScaleFactor(0.82)
@@ -253,7 +253,7 @@ private struct WeatherAdvisoryRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12 * layoutScale) {
             Image(systemName: advisory.symbolName)
-                .font(.system(size: 23 * layoutScale, weight: .semibold))
+                .font(.system(size: 25 * layoutScale, weight: .semibold))
                 .foregroundStyle(tint)
                 .frame(width: 38 * layoutScale, height: 38 * layoutScale)
                 .background(tint.opacity(0.14), in: Circle())
@@ -261,15 +261,15 @@ private struct WeatherAdvisoryRow: View {
             VStack(alignment: .leading, spacing: 2 * layoutScale) {
                 HStack(spacing: 8 * layoutScale) {
                     Text(advisory.isOfficial ? String(localized: "Weather Alert") : String(localized: "Weather Notice"))
-                        .font(.system(size: 13 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(tint)
                     Text(advisory.title)
-                        .font(.system(size: 16 * layoutScale, weight: .bold, design: .rounded))
+                        .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                 }
                 Text(advisory.detail)
-                    .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
                     .lineLimit(1)
             }
