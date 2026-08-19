@@ -27,17 +27,28 @@ struct GlassCard<Content: View>: View {
     var shadowOffset: CGFloat = 5
     @ViewBuilder var content: Content
     @Environment(\.raynLayoutScale) private var layoutScale
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius * layoutScale, style: .continuous)
         content
             .padding(22 * layoutScale)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: cornerRadius * layoutScale, style: .continuous))
+            .background {
+                if reduceTransparency {
+                    shape.fill(Color(hex: 0x142C45).opacity(0.98))
+                } else {
+                    shape.fill(.regularMaterial)
+                }
+            }
             .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius * layoutScale, style: .continuous)
-                    .stroke(tint.opacity(0.10), lineWidth: 1)
+                shape.stroke(
+                    tint.opacity(colorSchemeContrast == .increased ? 0.28 : 0.12),
+                    lineWidth: colorSchemeContrast == .increased ? 2 : 1
+                )
             }
             .shadow(
-                color: .black.opacity(0.14),
+                color: .black.opacity(reduceTransparency ? 0.24 : 0.14),
                 radius: shadowRadius * layoutScale,
                 y: shadowOffset * layoutScale
             )
@@ -239,13 +250,11 @@ struct TickerText: View {
     }
 
     private func timeString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = .autoupdatingCurrent
-        formatter.timeZone = appState.localTimeZone
-        formatter.setLocalizedDateFormatFromTemplate(
-            appState.settings.clockFormat == .twentyFourHour ? "Hm" : "hm"
+        WeatherDateFormatterCache.string(
+            from: date,
+            template: appState.settings.clockFormat == .twentyFourHour ? "Hm" : "hm",
+            timezone: appState.localTimeZone
         )
-        return formatter.string(from: date)
     }
 }
 
@@ -310,10 +319,11 @@ extension Date {
         timezoneIdentifier: String,
         locale: Locale = .autoupdatingCurrent
     ) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = locale
-        formatter.timeZone = TimeZone(identifier: timezoneIdentifier)
-        formatter.setLocalizedDateFormatFromTemplate(template.formatTemplate)
-        return formatter.string(from: self)
+        WeatherDateFormatterCache.string(
+            from: self,
+            template: template.formatTemplate,
+            timezone: TimeZone(identifier: timezoneIdentifier) ?? .autoupdatingCurrent,
+            locale: locale
+        )
     }
 }

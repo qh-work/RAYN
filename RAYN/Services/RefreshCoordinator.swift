@@ -86,6 +86,8 @@ final class RefreshCoordinator {
     location: SavedLocation, fallback: WeatherSnapshot? = nil, force: Bool = false,
     now: Date = Date()
   ) async -> RefreshResult {
+    let performanceInterval = RAYNPerformance.beginRefresh(force: force)
+    defer { RAYNPerformance.endRefresh(performanceInterval) }
     var snapshot = fallback
     snapshot?.location = location
     snapshot?.timezoneIdentifier = location.timezoneIdentifier

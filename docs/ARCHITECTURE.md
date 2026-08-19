@@ -14,8 +14,9 @@
 6. `Services/ProviderConfiguration.swift`：五类数据服务的唯一切换点。
 7. `App/AppState.swift`：启动、当前位置优先级、设置持久化、刷新和遥控器场景切换。
 8. `Features/Broadcast/BroadcastView.swift`：大屏壳层、动态背景、场景导航和底部状态条。
-9. `Features/Broadcast/SceneViews.swift`：各个天气场景，以及未来 10 天的焦点和详情交互。
-10. `VisualEffects/WeatherTheme.swift` 与 `DynamicSkyView.swift`：天气码到视觉情境的映射。
+9. `Features/Broadcast/*Scene.swift`：当前、逐小时、10 日、雷达、空气质量、日照月相各自独立；只阅读正在修改的场景。
+10. `Shared/Components.swift`、`DateFormatting.swift` 与 `PerformanceMonitor.swift`：大屏材质、日期格式缓存和性能标记。
+11. `VisualEffects/WeatherTheme.swift` 与 `DynamicSkyView.swift`：天气码到视觉情境的映射。
 
 ## 2. 唯一数据流
 
@@ -55,6 +56,8 @@ View 不直接访问 URL、JSON 字段或某个供应商的类型。更换服务
 - 场景导航由 `BroadcastView` 处理。
 - 未来 10 天卡片由 `DailyForecastScene` 自己管理 `@FocusState`。
 - 每张日卡都是独立 `Button`：方向键移动焦点，按确认键打开同一天的 `DailyDetailCard`，返回键收起详情并恢复焦点。
+- 日照月相的太阳卡与月相卡也是独立 `Button`；详情先消费返回键关闭自己，概览页再把返回交还主场景和 tvOS。
+- `AppSettings.sceneOrder` 决定导航顺序，读取旧设置时必须经过 `normalizeSceneOrder()`，确保去重并补入新场景。
 - 新增可操作控件时必须提供 `accessibilityLabel` 或 `accessibilityHint`，并在实体 Apple TV 上验证焦点路径。
 - 不要用一个大按钮覆盖整个页面来模拟焦点；大屏交互需要让焦点落在用户实际要选择的对象上。
 
@@ -80,6 +83,8 @@ WeatherKit 适配器已经独立在 `WeatherKitForecastProvider.swift`。启用�
 2. 搜索目标类型的所有引用，确认改动会影响哪些场景和测试。
 3. 先改统一模型或 Provider 边界，再改 View；不要在页面里临时拼数据。
 4. 完成后运行单元测试、`git diff --check`（若仓库已初始化）并构建 tvOS 27 模拟器；涉及焦点或地图时再检查实体 Apple TV。
+
+性能改动应使用 `PerformanceMonitor` 的匿名标记观察转场和雷达时序，不要在日志中写地点、天气值或用户设置。日期显示统一走 `WeatherDateFormatterCache`，避免在 SwiftUI `body`、时间线或滚动卡片中重复分配格式化器。
 
 禁止事项：
 

@@ -175,23 +175,50 @@ struct SettingsView: View {
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 }
-                Text("Enabled Scenes").font(.system(size: 18, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.58))
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 210, maximum: 360), spacing: 12)], alignment: .leading, spacing: 12) {
-                    ForEach(BroadcastScene.allCases) { scene in
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Enabled Scenes")
+                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    Spacer()
+                    Text("Use the arrows to change the navigation order")
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.52))
+                }
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], alignment: .leading, spacing: 14) {
+                    ForEach(Array(appState.settings.orderedScenes.enumerated()), id: \.element) { index, scene in
                         let enabled = !appState.settings.hiddenScenes.contains(scene)
-                        Button {
-                            updateSettings { settings in
-                                if enabled { settings.hiddenScenes.insert(scene) } else { settings.hiddenScenes.remove(scene) }
+                        HStack(spacing: 10) {
+                            Button {
+                                updateSettings { settings in
+                                    if enabled { settings.hiddenScenes.insert(scene) } else { settings.hiddenScenes.remove(scene) }
+                                }
+                            } label: {
+                                Label(scene.title, systemImage: enabled ? "checkmark.circle.fill" : "circle")
+                                    .font(.system(size: 19, weight: .semibold, design: .rounded))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 14)
+                                    .frame(height: 54)
+                                    .background(enabled ? .white.opacity(0.14) : .white.opacity(0.05), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                             }
-                        } label: {
-                            Label(scene.title, systemImage: enabled ? "checkmark.circle.fill" : "circle")
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(enabled ? .white.opacity(0.14) : .white.opacity(0.05), in: Capsule())
+                            .buttonStyle(FocusButtonStyle())
+                            .foregroundStyle(enabled ? .white : .white.opacity(0.48))
+
+                            sceneOrderButton(
+                                scene: scene,
+                                direction: -1,
+                                symbol: "arrow.up",
+                                label: String(localized: "Earlier"),
+                                disabled: index == 0
+                            )
+                            sceneOrderButton(
+                                scene: scene,
+                                direction: 1,
+                                symbol: "arrow.down",
+                                label: String(localized: "Later"),
+                                disabled: index == appState.settings.orderedScenes.count - 1
+                            )
                         }
-                        .buttonStyle(FocusButtonStyle())
-                        .foregroundStyle(enabled ? .white : .white.opacity(0.42))
+                        .padding(8)
+                        .background(.white.opacity(0.055), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     }
                 }
             }
@@ -281,6 +308,34 @@ struct SettingsView: View {
                 content()
             }
         }
+    }
+
+    private func sceneOrderButton(
+        scene: BroadcastScene,
+        direction: Int,
+        symbol: String,
+        label: String,
+        disabled: Bool
+    ) -> some View {
+        Button {
+            updateSettings { settings in
+                var order = settings.orderedScenes
+                guard let currentIndex = order.firstIndex(of: scene) else { return }
+                let destination = currentIndex + direction
+                guard order.indices.contains(destination) else { return }
+                order.swapAt(currentIndex, destination)
+                settings.sceneOrder = order
+            }
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 18, weight: .bold))
+                .frame(width: 44, height: 44)
+                .background(.white.opacity(disabled ? 0.04 : 0.10), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+        }
+        .buttonStyle(FocusButtonStyle())
+        .foregroundStyle(.white.opacity(disabled ? 0.25 : 0.82))
+        .disabled(disabled)
+        .accessibilityLabel(Text(verbatim: "\(label): \(scene.title)"))
     }
 
     private func updateSettings(_ change: (inout AppSettings) -> Void) {

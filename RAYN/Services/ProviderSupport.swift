@@ -1,19 +1,30 @@
 import Foundation
 
 enum WeatherDateParser {
+  private static let isoLock = NSLock()
+  private static let fractionalISOFormatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return formatter
+  }()
+  private static let standardISOFormatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime]
+    return formatter
+  }()
+
   static func date(from string: String?, timezone: TimeZone? = nil) -> Date? {
     guard let string, !string.isEmpty else { return nil }
-    let isoFormatter = ISO8601DateFormatter()
-    isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let value = isoFormatter.date(from: string) { return value }
-    isoFormatter.formatOptions = [.withInternetDateTime]
-    if let value = isoFormatter.date(from: string) { return value }
+    isoLock.lock()
+    let isoValue = fractionalISOFormatter.date(from: string) ?? standardISOFormatter.date(from: string)
+    isoLock.unlock()
+    if let isoValue { return isoValue }
 
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.timeZone = timezone ?? TimeZone(secondsFromGMT: 0)
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
-    return formatter.date(from: string)
+    return WeatherDateFormatterCache.date(
+      from: string,
+      format: "yyyy-MM-dd'T'HH:mm",
+      timezone: timezone ?? TimeZone(secondsFromGMT: 0)!
+    )
   }
 }
 

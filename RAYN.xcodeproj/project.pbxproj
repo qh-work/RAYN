@@ -23,7 +23,14 @@
 		B00006 /* WeatherTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00006 /* WeatherTheme.swift */; };
 		B00007 /* DynamicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00007 /* DynamicSkyView.swift */; };
 		B00008 /* BroadcastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00008 /* BroadcastView.swift */; };
-		B00009 /* SceneViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00009 /* SceneViews.swift */; };
+		B00032 /* CurrentWeatherScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00032 /* CurrentWeatherScene.swift */; };
+		B00033 /* HourlyForecastScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00033 /* HourlyForecastScene.swift */; };
+		B00034 /* DailyForecastScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00034 /* DailyForecastScene.swift */; };
+		B00035 /* RadarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00035 /* RadarScene.swift */; };
+		B00036 /* AirQualityScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00036 /* AirQualityScene.swift */; };
+		B00037 /* AstronomyScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00037 /* AstronomyScene.swift */; };
+		B00038 /* PerformanceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00038 /* PerformanceMonitor.swift */; };
+		B00039 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00039 /* DateFormatting.swift */; };
 		B00010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00010 /* SettingsView.swift */; };
 		B00011 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00011 /* Components.swift */; };
 		B00012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F00012 /* Assets.xcassets */; };
@@ -74,7 +81,14 @@
 		F00006 /* WeatherTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherTheme.swift; sourceTree = "<group>"; };
 		F00007 /* DynamicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicSkyView.swift; sourceTree = "<group>"; };
 		F00008 /* BroadcastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastView.swift; sourceTree = "<group>"; };
-		F00009 /* SceneViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneViews.swift; sourceTree = "<group>"; };
+		F00032 /* CurrentWeatherScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherScene.swift; sourceTree = "<group>"; };
+		F00033 /* HourlyForecastScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecastScene.swift; sourceTree = "<group>"; };
+		F00034 /* DailyForecastScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyForecastScene.swift; sourceTree = "<group>"; };
+		F00035 /* RadarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarScene.swift; sourceTree = "<group>"; };
+		F00036 /* AirQualityScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirQualityScene.swift; sourceTree = "<group>"; };
+		F00037 /* AstronomyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstronomyScene.swift; sourceTree = "<group>"; };
+		F00038 /* PerformanceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceMonitor.swift; sourceTree = "<group>"; };
+		F00039 /* DateFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatting.swift; sourceTree = "<group>"; };
 		F00010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F00011 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		F00012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -186,6 +200,8 @@
 			children = (
 				F00030 /* Localization.swift */,
 				F00011 /* Components.swift */,
+				F00039 /* DateFormatting.swift */,
+				F00038 /* PerformanceMonitor.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -223,7 +239,12 @@
 			isa = PBXGroup;
 			children = (
 				F00008 /* BroadcastView.swift */,
-				F00009 /* SceneViews.swift */,
+				F00032 /* CurrentWeatherScene.swift */,
+				F00033 /* HourlyForecastScene.swift */,
+				F00034 /* DailyForecastScene.swift */,
+				F00035 /* RadarScene.swift */,
+				F00036 /* AirQualityScene.swift */,
+				F00037 /* AstronomyScene.swift */,
 			);
 			path = Broadcast;
 			sourceTree = "<group>";
@@ -416,7 +437,14 @@
 				B00006 /* WeatherTheme.swift in Sources */,
 				B00007 /* DynamicSkyView.swift in Sources */,
 				B00008 /* BroadcastView.swift in Sources */,
-				B00009 /* SceneViews.swift in Sources */,
+				B00032 /* CurrentWeatherScene.swift in Sources */,
+				B00033 /* HourlyForecastScene.swift in Sources */,
+				B00034 /* DailyForecastScene.swift in Sources */,
+				B00035 /* RadarScene.swift in Sources */,
+				B00036 /* AirQualityScene.swift in Sources */,
+				B00037 /* AstronomyScene.swift in Sources */,
+				B00038 /* PerformanceMonitor.swift in Sources */,
+				B00039 /* DateFormatting.swift in Sources */,
 				B00010 /* SettingsView.swift in Sources */,
 				B00030 /* Localization.swift in Sources */,
 				B00011 /* Components.swift in Sources */,
@@ -461,7 +489,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTABILITY = YES;
@@ -472,7 +500,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -491,7 +519,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -501,7 +529,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;

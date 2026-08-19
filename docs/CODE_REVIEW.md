@@ -4,6 +4,17 @@
 目标平台：tvOS 27  
 重点设备：Apple TV 4K（第二代，A12）
 
+## 2026-08-19 复审摘要
+
+- 原 `SceneViews.swift` 已删除，六类主场景分别进入独立文件；数据模型和 Provider 边界未因视觉重构而改变。
+- 新增场景转场、天气刷新、雷达地图就绪和雷达帧提交的系统性能标记，之后可以直接在 A12 真机的 Instruments 中建立冷、热切换基线。
+- 每秒更新的底部时间栏、日期标签和服务时间解析改用加锁缓存的格式化器，不再在渲染路径反复创建 `DateFormatter`。
+- 当前天气、24 小时、空气质量和日照月相完成 4K 重新排版；所有 24 个小时可聚焦，太阳和月亮可进入详情。
+- 设置新增页面排序；旧版本设置解码后会去重并自动补入新页面，不破坏已有开关。
+- 玻璃卡片会响应“降低透明度”和“增强对比度”，新增文字保持九种语言完整。
+
+本轮没有降低动画帧率，也没有增加演示数据、启动天气缓存或伪造的月升月落。Open-Meteo 不提供的月升/月落继续明确显示缺失值。
+
 ## 结论
 
 本次严重卡顿不是 A12 性能不足，也不是动画帧率过高，而是场景生命周期和雷达图层交换方式错误：
@@ -61,9 +72,9 @@
 
 ## 仍需重构的代码问题
 
-### P1：场景文件过大
+### 已解决：单一场景文件过大
 
-`SceneViews.swift` 目前约 2,210 行，天气场景、详情页、雷达 MapKit 桥接和辅助控件混在同一文件。它增加了冲突概率，也让维护者难以确定性能修改的边界。
+原约 3,000 行的 `SceneViews.swift` 已拆成以下可独立定位的模块：
 
 建议按功能拆分：
 
@@ -72,15 +83,12 @@ Features/Broadcast/
 ├── CurrentWeatherScene.swift
 ├── HourlyForecastScene.swift
 ├── DailyForecastScene.swift
-├── Radar/
-│   ├── RadarScene.swift
-│   ├── RadarMapView.swift
-│   └── RadarTileOverlay.swift
+├── RadarScene.swift
 ├── AirQualityScene.swift
 └── AstronomyScene.swift
 ```
 
-拆分只移动类型，不应同时改视觉和业务逻辑；每次移动后运行完整测试，降低重构风险。
+首轮拆分先保留同一场景内部的紧密实现，避免为了文件数量制造跨文件私有状态。`AstronomyScene.swift` 和 `RadarScene.swift` 仍是下一轮候选，但只应在太阳、月相或地图桥接形成可独立测试边界时继续拆分。
 
 ### P1：缺少真机性能门限自动化
 
@@ -92,11 +100,9 @@ Features/Broadcast/
 
 建议在 `AppleWeatherKitProvider` 前增加可注入的 WeatherKit 客户端协议。单元测试使用明确返回错误的客户端；只有单独的集成测试才访问系统 WeatherKit。
 
-### P2：格式化器仍在渲染路径创建
+### 已解决：格式化器在渲染路径创建
 
-模型和共享组件中仍有多处 `DateFormatter()`。在高频刷新或焦点变化时会产生不必要的分配。
-
-建议优先使用缓存的 `Date.FormatStyle`，必须使用 `DateFormatter` 时提供按时区缓存的静态工厂；不要在 `body` 或每秒时间线上重新创建。
+`WeatherDateFormatterCache` 现在按语言、时区和格式模板复用实例，并在同一把锁内完成格式化。Provider 的 ISO 时间解析同样复用格式化器。后续新增日期显示应继续走该入口，不在 `body` 或每秒时间线上直接创建格式化器。
 
 ### P2：`AppState` 职责偏多
 

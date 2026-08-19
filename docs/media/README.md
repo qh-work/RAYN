@@ -24,7 +24,13 @@ The walkthrough was recorded from the tvOS 27 simulator at 1920 × 1080. The rad
 | --- | --- |
 | ![Air quality in Beijing](screenshots/05-air-quality.png) | ![Sun and moon detail in Beijing](screenshots/06-sun-and-moon.png) |
 
+| Solar path detail | Lunar phase detail |
+| --- | --- |
+| ![High 24-hour solar path and ten-day daylight trend in Beijing](screenshots/07-sun-detail.png) | ![Realistic lunar illumination and fourteen-day phase calendar in Beijing](screenshots/08-moon-detail.png) |
+
 The Debug-only `RAYN_CAPTURE_LOCATION` hook accepts `beijing`, `shanghai`, `new-york`, `shenzhen`, `london`, or `vancouver`. It changes coordinates for reproducible capture but continues to request live weather. Release builds ignore the hook, and normal startup remains current-location first.
+
+The Debug-only `RAYN_ASTRONOMY_DETAIL` value can be `sun` or `moon` when maintainers need deterministic detail-view screenshots. It changes only the initially visible panel and never changes weather values or release behavior.
 
 For simulator video capture, `RAYN_SIMULATOR_RADAR=1` opts the Debug build into the same live radar tile renderer used on Apple TV hardware. The simulator continues to show its deterministic unavailable state by default.
 

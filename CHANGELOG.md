@@ -6,14 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-19
+
 ### Added
 
 - Added an Apple Weather-inspired astronomy presentation with a high-detail lunar surface asset, earthshine, soft illumination terminator, and seven-day phase strip.
 - Added a sunrise/sunset event card with a 24-hour grid, high solar arc, twilight tails, live sun position, and explicit sunrise/sunset labels.
+- Added selectable Sun and Moon detail views with a 10-day daylight trend and a focusable 14-day lunar calendar.
 - Added calculated solar elevation, azimuth, and golden-hour boundaries to the astronomy scene.
 - Added WeatherKit-backed moonrise and moonset fields while keeping them unavailable when the active provider does not supply them.
 - Added condition-aware weather notices for thunderstorms, hail, freezing precipitation, snow, low visibility, strong gusts, and high rain probability.
 - Added separate source-update and app-check timestamps for forecast, air-quality, marine, and WeatherKit responses.
+- Added user-configurable scene ordering with backward-compatible settings migration.
+- Added privacy-safe performance signposts for scene transitions, refreshes, radar-map readiness, and radar-frame presentation.
+- Added high-contrast and Reduce Transparency adaptations for glass cards.
 
 ### Changed
 
@@ -23,11 +29,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Added compact current-scene advisory cards that distinguish provider-supplied official alerts from condition-derived notices.
 - Added localized labels and detail copy for the new astronomy, advisory, and freshness fields across all nine supported interface locales.
 - Corrected the solar hour-angle conversion so sunrise-adjacent elevation and azimuth remain physically plausible.
+- Rebalanced the current-weather page, made all 24 hourly values remotely selectable, and replaced the oversized air-quality ring with a readable European AQI scale.
+- Split the former all-in-one scene file into independent current, hourly, daily, radar, air-quality, and astronomy modules.
+- Reused cached date formatters in the once-per-second ticker and provider parsing paths instead of allocating formatters during rendering.
 
 ### Verification
 
 - Added unit coverage for solar geometry, advisory classification, timestamp preservation, and Open-Meteo source-time mapping.
-- The tvOS 27 build and targeted test commands are recorded in `docs/CHANGE_RECORDS/2026-08-17-astronomy-advisories-freshness.md`.
+- Added settings-migration and scene-order normalization coverage.
+- Verified 39 unit tests and the targeted astronomy plus hourly-to-daily-to-radar UI paths on the tvOS 27 simulator.
+- The release checks and visual evidence are recorded in `docs/CHANGE_RECORDS/2026-08-19-macos-weather-polish.md`.
 
 ## [1.1.0] - 2026-08-17
 
@@ -68,7 +79,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/qh-work/RAYN/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/qh-work/RAYN/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/qh-work/RAYN/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/qh-work/RAYN/releases/tag/v1.0.0

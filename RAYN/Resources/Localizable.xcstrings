@@ -17261,6 +17261,175 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "天氣提示" } }
       }
     },
+    "%lld hr %lld min remaining" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %1$lld Std. %2$lld Min" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%1$lld hr %2$lld min remaining" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Quedan %1$lld h %2$lld min" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Encore %1$lld h %2$lld min" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Restano %1$lld h %2$lld min" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "残り%1$lld時間%2$lld分" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%1$lld시간 %2$lld분 남음" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "剩余 %1$lld 小时 %2$lld 分钟" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "剩餘 %1$lld 小時 %2$lld 分鐘" } }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Schließen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cerrar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fermer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Chiudi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "閉じる" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "닫기" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關閉" } }
+      }
+    },
+    "European AQI" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Europäischer Luftqualitätsindex" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "European AQI" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "ICA europeo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Indice européen de qualité de l’air" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "IQA europeo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "欧州大気質指数" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "유럽 대기질 지수" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "欧洲空气质量指数" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "歐洲空氣品質指數" } }
+      }
+    },
+    "Illumination" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beleuchteter Anteil" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Illumination" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Iluminación" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Illumination" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Illuminazione" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "輝面比" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "밝은 면 비율" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月面照亮比例" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "月面照亮比例" } }
+      }
+    },
+    "Moon Age" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mondalter" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moon Age" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Edad lunar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Âge de la Lune" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Età lunare" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "月齢" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "월령" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月龄" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "月齡" } }
+      }
+    },
+    "Moon details" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Monddetails" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Moon details" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Detalles de la Luna" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Détails de la Lune" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Dettagli sulla Luna" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "月の詳細" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "달 상세 정보" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月亮详情" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "月亮詳情" } }
+      }
+    },
+    "Next 14 Days" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächste 14 Tage" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Next 14 Days" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Próximos 14 días" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "14 prochains jours" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Prossimi 14 giorni" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今後14日間" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "향후 14일" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未来 14 天" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "未來 14 天" } }
+      }
+    },
+    "Press Select to keep this hour highlighted" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Drücken Sie „Auswählen“, um diese Stunde hervorzuheben" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Press Select to keep this hour highlighted" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Pulsa Seleccionar para mantener esta hora resaltada" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appuyez sur Sélectionner pour conserver cette heure en surbrillance" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Premi Seleziona per mantenere evidenziata quest’ora" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "選択ボタンを押してこの時間を強調表示します" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "선택 버튼을 눌러 이 시간을 강조 표시합니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按选择键保持高亮这个小时" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "按選擇鍵保持醒目提示這個小時" } }
+      }
+    },
+    "Press Select to view the lunar calendar" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Drücken Sie „Auswählen“, um den Mondkalender anzuzeigen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Press Select to view the lunar calendar" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Pulsa Seleccionar para ver el calendario lunar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appuyez sur Sélectionner pour afficher le calendrier lunaire" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Premi Seleziona per visualizzare il calendario lunare" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "選択ボタンを押して月齢カレンダーを表示します" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "선택 버튼을 눌러 음력 달력을 봅니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按选择键查看月相日历" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "按選擇鍵查看月相日曆" } }
+      }
+    },
+    "Press Select to view the solar path and daylight details" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Drücken Sie „Auswählen“, um Sonnenbahn und Tageslichtdetails anzuzeigen" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Press Select to view the solar path and daylight details" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Pulsa Seleccionar para ver la trayectoria solar y las horas de luz" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Appuyez sur Sélectionner pour afficher la trajectoire du soleil et la durée du jour" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Premi Seleziona per vedere il percorso solare e le ore di luce" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "選択ボタンを押して太陽の軌道と日照時間を表示します" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "선택 버튼을 눌러 태양 경로와 일조 상세 정보를 봅니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按选择键查看太阳轨迹与日照详情" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "按選擇鍵查看太陽軌跡與日照詳細資訊" } }
+      }
+    },
+    "Solar path and daylight" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonnenbahn und Tageslicht" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Solar path and daylight" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Trayectoria solar y horas de luz" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Trajectoire du soleil et durée du jour" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Percorso solare e ore di luce" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "太陽の軌道と日照時間" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "태양 경로와 일조 시간" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "太阳轨迹与日照" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "太陽軌跡與日照" } }
+      }
+    },
+    "Sun details" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonnendetails" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sun details" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Detalles del Sol" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Détails du Soleil" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Dettagli sul Sole" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "太陽の詳細" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "태양 상세 정보" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "太阳详情" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "太陽詳情" } }
+      }
+    },
+    "Use the arrows to change the navigation order" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ändern Sie mit den Pfeilen die Navigationsreihenfolge" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use the arrows to change the navigation order" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Usa las flechas para cambiar el orden de navegación" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Utilisez les flèches pour modifier l’ordre de navigation" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Usa le frecce per cambiare l’ordine di navigazione" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "矢印でナビゲーションの順序を変更します" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "화살표로 탐색 순서를 변경합니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "使用箭头调整导航顺序" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "使用箭頭調整導覽順序" } }
+      }
+    },
     "Official Alert" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Offizielle Warnung" } },

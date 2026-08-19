@@ -56,7 +56,7 @@ Run from the repository root:
 
 ```text
 jq empty RAYN/Resources/Localizable.xcstrings
-ruby Scripts/validate-localizations.rb
+ruby scripts/validate-localizations.rb
 DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcodebuild -project RAYN.xcodeproj -scheme RAYN -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=27.0' CODE_SIGNING_ALLOWED=NO test
 ```
 
@@ -64,7 +64,7 @@ The initial full regression passed on 2026-08-17 with Xcode 27.0 (`27A5237l`) an
 
 After visual review found an incorrect solar elevation near sunrise, the solar hour-angle conversion was corrected: right ascension is already stored in degrees and must not be multiplied by 15 a second time. The strengthened regression then passed with 37 unit tests and the targeted astronomy UI test (1 test), all with 0 failures. The UI attachment showed Beijing at 05:30 with source sunrise at 05:28, solar elevation `-0.2°`, azimuth `72°`, and golden-hour windows `05:10–06:04` and `18:31–19:26`.
 
-The full regression passed with 43 tests and 0 failures (37 unit tests plus 6 UI tests), with no runtime warnings. The result bundle is recorded at `/Users/zhangyue/Library/Developer/Xcode/DerivedData/RAYN-dvaibqgtuyusbpgfffjywvhbuhla/Logs/Test/Test-RAYN-2026.08.17_05-32-09-+0800.xcresult`. A final cleanup-only unit run after the marine fallback and formatting touch-ups passed all 37 unit tests; its result bundle is `/Users/zhangyue/Library/Developer/Xcode/DerivedData/RAYN-dvaibqgtuyusbpgfffjywvhbuhla/Logs/Test/Test-RAYN-2026.08.17_05-37-59-+0800.xcresult`.
+The full regression passed with 43 tests and 0 failures (37 unit tests plus 6 UI tests), with no runtime warnings. A final cleanup-only unit run after the marine fallback and formatting touch-ups also passed all 37 unit tests. Result bundles were retained locally during the release check and are intentionally not referenced by a maintainer-specific filesystem path.
 
 One test-only compilation failure occurred during the first targeted pass because an `async` provider call was placed inside `XCTUnwrap`'s synchronous autoclosure. The result was awaited before unwrapping, and the corrected test passed.
 

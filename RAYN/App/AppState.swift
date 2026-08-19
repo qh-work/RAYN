@@ -118,7 +118,7 @@ final class AppState: ObservableObject {
     }
 
     var visibleScenes: [BroadcastScene] {
-        BroadcastScene.allCases.filter { !settings.hiddenScenes.contains($0) }
+        settings.orderedScenes.filter { !settings.hiddenScenes.contains($0) }
     }
 
     var localTimeZone: TimeZone {
@@ -256,7 +256,9 @@ final class AppState: ObservableObject {
     func applySettings(_ newSettings: AppSettings) {
         let shouldRequestLocation = newSettings.useCurrentLocation && !settings.useCurrentLocation
         let shouldReturnToSavedLocation = !newSettings.useCurrentLocation && settings.useCurrentLocation
-        settings = newSettings
+        var normalizedSettings = newSettings
+        normalizedSettings.normalizeSceneOrder()
+        settings = normalizedSettings
         persistSettings()
         applyScreenAwakeSetting()
         if settings.hiddenScenes.contains(currentScene) {

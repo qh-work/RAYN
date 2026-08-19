@@ -27,7 +27,9 @@ More live captures and a tvOS 27 walkthrough are available in the [media gallery
 - Remote-friendly hourly and 10-day forecasts with focusable values and per-day detail views.
 - Radar playback with lazy map creation, bounded tile caching, and transition safeguards for Apple TV 4K (2nd generation, A12).
 - Air quality, sun, moon phase, and optional marine conditions without fake fallback values.
+- Selectable Sun and Moon details with a high 24-hour solar arc, 10-day daylight trend, realistic lunar illumination, and 14-day phase calendar.
 - Location-first startup, saved-place fallback, and no default city baked into the production path.
+- User-configurable scene order plus large-screen layouts that respond to viewing-distance, contrast, transparency, and motion settings.
 - Provider-neutral architecture so forecast, air quality, radar, marine, and location-search services can be replaced independently.
 - Automatic system-language support for English, French, German, Spanish, Italian, Japanese, Korean, Simplified Chinese, and Traditional Chinese.
 - No advertising, analytics SDK, account system, or third-party Swift package dependency.
@@ -42,7 +44,7 @@ RAYN Weather follows the Apple TV system language automatically. The complete in
 
 Other system languages fall back to English. Location-search requests use the matching supported language when the provider offers it, while saved provider data remains independent from the interface language.
 
-Translations live in Xcode String Catalogs under `RAYN/Resources`. Run `ruby Scripts/validate-localizations.rb` after adding or changing user-facing text; the validator rejects missing locales, stale entries, and unsafe format placeholders.
+Translations live in Xcode String Catalogs under `RAYN/Resources`. Run `ruby scripts/validate-localizations.rb` after adding or changing user-facing text; the validator rejects missing locales, stale entries, and unsafe format placeholders.
 
 ## Requirements
 
@@ -116,6 +118,7 @@ For the product story, current limitations, and public-facing introduction, see 
 - Unit tests cover weather-code mapping, themes, model conversion, provider configuration, source attribution, and failure isolation.
 - Localization tests verify that all nine language bundles are packaged and that Simplified and Traditional Chinese stay distinct.
 - UI tests cover hourly-to-daily-to-radar handoff, all 10 daily detail selections, settings navigation, scene traversal, and focus restoration.
+- Privacy-safe performance signposts cover scene handoff, refresh, radar-map readiness, and radar-frame presentation for Instruments checks on A12 hardware.
 - CI builds with the public Xcode 27 runner and executes deterministic unit tests.
 - MapKit composition and remote focus are checked on physical Apple TV hardware before each release.
 

@@ -429,6 +429,23 @@ final class RAYNTests: XCTestCase {
       BroadcastScene.allCases, [.current, .hourly, .daily, .radar, .airQuality, .astronomy])
   }
 
+  func testSettingsDecodeFromOlderReleaseAddsSceneOrder() throws {
+    let legacyJSON = Data(#"{"automaticRotation":false,"hiddenScenes":["radar"]}"#.utf8)
+    let settings = try JSONDecoder().decode(AppSettings.self, from: legacyJSON)
+
+    XCTAssertEqual(settings.orderedScenes, BroadcastScene.allCases)
+    XCTAssertEqual(settings.hiddenScenes, [.radar])
+    XCTAssertFalse(settings.automaticRotation)
+  }
+
+  func testSceneOrderRemovesDuplicatesAndAppendsNewScenes() {
+    let proposed: [BroadcastScene] = [.daily, .current, .daily, .hourly]
+    XCTAssertEqual(
+      AppSettings.sanitizedSceneOrder(proposed),
+      [.daily, .current, .hourly, .radar, .airQuality, .astronomy]
+    )
+  }
+
   func testClothingAdviceIsCompactAndWeatherAware() {
     var current = WeatherSnapshot.testFixture.current
     current.feelsLike = 27

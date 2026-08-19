@@ -207,7 +207,13 @@ struct BroadcastView: View {
             return
         }
 
+        let previousScene = presentedScene
         sceneTransitionTask = Task { @MainActor in
+            let performanceInterval = RAYNPerformance.beginSceneTransition(
+                from: previousScene,
+                to: nextScene
+            )
+            defer { RAYNPerformance.endSceneTransition(performanceInterval) }
             withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeOutDuration)) {
                 sceneOpacity = 0
             }

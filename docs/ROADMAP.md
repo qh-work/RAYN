@@ -10,7 +10,9 @@ RAYN Weather aims to become a dependable, provider-neutral weather experience fo
 - Weather-driven animated scenes for clear, cloudy, rainy, snowy, foggy, hazy, icy, and storm conditions.
 - Precipitation radar playback with deferred MapKit creation, cancellation, bounded in-memory tile caching, and frame handoff safeguards.
 - Air-quality, sunlight, moon-phase, and conditional marine views.
+- Selectable Sun and Moon details with a 24-hour solar path, 10-day daylight trend, realistic lunar illumination, and a 14-day lunar calendar.
 - Current-location-first startup, saved locations, scene visibility controls, reduced motion, and opt-in automatic rotation.
+- Remote-configurable scene order plus high-contrast and Reduce Transparency material adaptations.
 - Independent forecast, air-quality, radar, marine, and location-search provider boundaries.
 - Unit tests, remote-navigation UI tests, privacy documentation, provider attribution, and a public CI workflow.
 
@@ -25,14 +27,29 @@ The following near-term items are now implemented and covered by the change reco
 
 The implementation deliberately does not infer moonrise/moonset for Open-Meteo, does not call condition-derived notices official warnings, and does not turn an app check time into a claim that the source data itself is current. See [`docs/CHANGE_RECORDS/2026-08-17-astronomy-advisories-freshness.md`](CHANGE_RECORDS/2026-08-17-astronomy-advisories-freshness.md).
 
+## Delivery record — 2026-08-19
+
+The 1.2 visual and maintainability pass delivered several items ahead of their original roadmap position:
+
+- [x] Split the former all-in-one scene implementation into six focused feature modules.
+- [x] Added privacy-safe signposts for scene transitions, refreshes, radar-map readiness, and frame presentation; physical A12 baselines remain a release check.
+- [x] Added scene ordering in Settings with migration for existing installations.
+- [x] Added interactive Sun and Moon details, a 10-day daylight trend, and a focusable 14-day phase calendar.
+- [x] Reworked current weather, hourly forecast, and air quality for balanced 4K composition and remote focus.
+- [x] Added Reduce Transparency and increased-contrast material behavior.
+- [x] Preserved localization parity across all nine supported interface locales.
+- [x] Published refreshed 1920 × 1080 screenshots using public Beijing coordinates and live provider responses.
+
+See [`docs/CHANGE_RECORDS/2026-08-19-macos-weather-polish.md`](CHANGE_RECORDS/2026-08-19-macos-weather-polish.md) for verification evidence and remaining limits.
+
 ## Near term — solidify the 1.x foundation
 
 ### Performance and reliability
 
-- Add signposts and repeatable performance baselines for scene transition time, main-thread stalls, memory pressure, radar tile latency, and dropped frames on A12 hardware.
+- Establish repeatable physical-A12 baselines for scene transition time, main-thread stalls, memory pressure, radar tile latency, and dropped frames using the signposts now in the app.
 - Expand cancellation and request-coalescing tests for slow or rapidly changing radar connections.
 - Add graceful retry controls and clearer no-coverage states without presenting cached or invented weather as current data.
-- Split the large scene implementation into focused feature modules while preserving the provider-neutral model boundary.
+- Continue splitting the largest astronomy and radar implementation details only where the resulting boundary is independently testable.
 
 ### Interaction and accessibility
 
@@ -61,7 +78,7 @@ The implementation deliberately does not infer moonrise/moonset for Open-Meteo, 
 - Add alternative, properly licensed radar adapters, with regional coverage and update-frequency metadata exposed through the common radar contract.
 - Add official weather-alert support when a configured provider supplies authoritative alerts for the selected region.
 - Support multiple saved places with a deliberate remote-control flow and per-place refresh status.
-- Allow users to choose scene order and a small set of legibility-tested visual modes without disconnecting visuals from real weather conditions.
+- Add a small set of legibility-tested visual modes without disconnecting visuals from real weather conditions. Scene ordering shipped in 1.2.
 - Introduce provider comparison diagnostics for maintainers. RAYN Weather will not silently blend conflicting sources or label estimates as observations.
 
 ## Longer-term exploration

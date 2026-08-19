@@ -112,12 +112,86 @@ struct AppSettings: Codable, Equatable {
     var automaticRotation = false
     var rotationSeconds = 15.0
     var hiddenScenes: Set<BroadcastScene> = []
+    /// User-defined navigation order. New scenes are appended automatically
+    /// so settings saved by an older release remain forward-compatible.
+    var sceneOrder: [BroadcastScene] = BroadcastScene.allCases
     var dynamicIntensity: DynamicIntensity = .medium
     var viewingDistance: ViewingDistance = .standard
     var lightningEnabled = true
     var nightDimMode = false
     var keepScreenAwake = false
     var reduceMotion = false
+
+    init() {}
+
+    var orderedScenes: [BroadcastScene] {
+        Self.sanitizedSceneOrder(sceneOrder)
+    }
+
+    mutating func normalizeSceneOrder() {
+        sceneOrder = orderedScenes
+    }
+
+    static func sanitizedSceneOrder(_ proposedOrder: [BroadcastScene]) -> [BroadcastScene] {
+        var seen = Set<BroadcastScene>()
+        let validOrder = proposedOrder.filter { seen.insert($0).inserted }
+        return validOrder + BroadcastScene.allCases.filter { !seen.contains($0) }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case useCurrentLocation
+        case temperatureUnit
+        case measurementSystem
+        case clockFormat
+        case automaticRotation
+        case rotationSeconds
+        case hiddenScenes
+        case sceneOrder
+        case dynamicIntensity
+        case viewingDistance
+        case lightningEnabled
+        case nightDimMode
+        case keepScreenAwake
+        case reduceMotion
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        useCurrentLocation = try container.decodeIfPresent(Bool.self, forKey: .useCurrentLocation) ?? true
+        temperatureUnit = try container.decodeIfPresent(TemperatureUnit.self, forKey: .temperatureUnit) ?? .celsius
+        measurementSystem = try container.decodeIfPresent(MeasurementSystem.self, forKey: .measurementSystem) ?? .metric
+        clockFormat = try container.decodeIfPresent(ClockFormat.self, forKey: .clockFormat) ?? .twentyFourHour
+        automaticRotation = try container.decodeIfPresent(Bool.self, forKey: .automaticRotation) ?? false
+        rotationSeconds = try container.decodeIfPresent(Double.self, forKey: .rotationSeconds) ?? 15
+        hiddenScenes = try container.decodeIfPresent(Set<BroadcastScene>.self, forKey: .hiddenScenes) ?? []
+        sceneOrder = Self.sanitizedSceneOrder(
+            try container.decodeIfPresent([BroadcastScene].self, forKey: .sceneOrder) ?? []
+        )
+        dynamicIntensity = try container.decodeIfPresent(DynamicIntensity.self, forKey: .dynamicIntensity) ?? .medium
+        viewingDistance = try container.decodeIfPresent(ViewingDistance.self, forKey: .viewingDistance) ?? .standard
+        lightningEnabled = try container.decodeIfPresent(Bool.self, forKey: .lightningEnabled) ?? true
+        nightDimMode = try container.decodeIfPresent(Bool.self, forKey: .nightDimMode) ?? false
+        keepScreenAwake = try container.decodeIfPresent(Bool.self, forKey: .keepScreenAwake) ?? false
+        reduceMotion = try container.decodeIfPresent(Bool.self, forKey: .reduceMotion) ?? false
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(useCurrentLocation, forKey: .useCurrentLocation)
+        try container.encode(temperatureUnit, forKey: .temperatureUnit)
+        try container.encode(measurementSystem, forKey: .measurementSystem)
+        try container.encode(clockFormat, forKey: .clockFormat)
+        try container.encode(automaticRotation, forKey: .automaticRotation)
+        try container.encode(rotationSeconds, forKey: .rotationSeconds)
+        try container.encode(hiddenScenes, forKey: .hiddenScenes)
+        try container.encode(orderedScenes, forKey: .sceneOrder)
+        try container.encode(dynamicIntensity, forKey: .dynamicIntensity)
+        try container.encode(viewingDistance, forKey: .viewingDistance)
+        try container.encode(lightningEnabled, forKey: .lightningEnabled)
+        try container.encode(nightDimMode, forKey: .nightDimMode)
+        try container.encode(keepScreenAwake, forKey: .keepScreenAwake)
+        try container.encode(reduceMotion, forKey: .reduceMotion)
+    }
 }
 
 struct SavedLocation: Codable, Identifiable, Equatable, Hashable {
@@ -885,11 +959,11 @@ enum WeatherSummaryBuilder {
     }
 
     private static func formatHour(_ date: Date, timezone: String) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = .autoupdatingCurrent
-        formatter.timeZone = TimeZone(identifier: timezone)
-        formatter.setLocalizedDateFormatFromTemplate("j")
-        return formatter.string(from: date)
+        WeatherDateFormatterCache.string(
+            from: date,
+            template: "j",
+            timezone: TimeZone(identifier: timezone) ?? .autoupdatingCurrent
+        )
     }
 }
 
