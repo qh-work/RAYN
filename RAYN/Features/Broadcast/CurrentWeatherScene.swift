@@ -10,7 +10,7 @@ struct CurrentWeatherScene: View {
         let clothing = ClothingAdviceBuilder.make(from: snapshot.current)
         let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
 
-        VStack(alignment: .leading, spacing: 24 * layoutScale) {
+        VStack(alignment: .center, spacing: 24 * layoutScale) {
             HStack(alignment: .center, spacing: 24 * layoutScale) {
                 CurrentWeatherHeroCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
@@ -26,9 +26,9 @@ struct CurrentWeatherScene: View {
                 CurrentWeatherFactsCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
             }
-            .frame(height: 154 * layoutScale)
+            .frame(height: 164 * layoutScale)
         }
-        .padding(.top, 36 * layoutScale)
+        .padding(.top, 18 * layoutScale)
         .padding(.bottom, 16)
     }
 }
@@ -39,8 +39,8 @@ private struct CurrentWeatherHeroCard: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        GlassCard(cornerRadius: 28) {
-            HStack(spacing: 24 * layoutScale) {
+        GlassCard(cornerRadius: RAYNDesign.Radius.heroCard) {
+            HStack(spacing: 64 * layoutScale) {
                 VStack(spacing: 8 * layoutScale) {
                     Text("Temperature")
                         .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
@@ -63,10 +63,6 @@ private struct CurrentWeatherHeroCard: View {
                     .foregroundStyle(.white.opacity(0.58))
                 }
                 .frame(maxWidth: .infinity)
-
-                Rectangle()
-                    .fill(.white.opacity(0.12))
-                    .frame(width: 1, height: 176 * layoutScale)
 
                 VStack(spacing: 7 * layoutScale) {
                     Text("Today")
@@ -110,7 +106,7 @@ private struct CurrentWeatherObservationsCard: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        GlassCard(cornerRadius: 28) {
+        GlassCard(cornerRadius: RAYNDesign.Radius.heroCard) {
             VStack(spacing: advisory == nil ? 20 * layoutScale : 12 * layoutScale) {
                 Text("Live Observations")
                     .font(.system(size: 26 * layoutScale, weight: .bold, design: .rounded))
@@ -188,32 +184,27 @@ private struct ClothingAdviceCard: View {
 
     var body: some View {
         GlassCard(cornerRadius: 24, tint: tint) {
-            HStack(spacing: 26 * layoutScale) {
-                HStack(spacing: 16 * layoutScale) {
+            HStack(spacing: 44 * layoutScale) {
+                VStack(alignment: .center, spacing: 6 * layoutScale) {
                     Image(systemName: advice.index.symbolName)
-                        .font(.system(size: 34 * layoutScale, weight: .semibold))
+                        .font(.system(size: 37 * layoutScale, weight: .semibold))
                         .foregroundStyle(tint)
-                        .frame(width: 52 * layoutScale, height: 52 * layoutScale)
+                        .frame(width: 62 * layoutScale, height: 62 * layoutScale)
                         .background(tint.opacity(0.16), in: Circle())
 
-                    VStack(alignment: .leading, spacing: 5 * layoutScale) {
-                        Text("Clothing Index")
-                            .font(.system(size: 21 * layoutScale, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.58))
-                        Text(advice.index.title)
-                            .font(.system(size: 29 * layoutScale, weight: .bold, design: .rounded))
-                            .foregroundStyle(tint)
-                    }
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
+                    Text("Clothing Index")
+                        .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.58))
+                    Text(advice.index.title)
+                        .font(.system(size: 29 * layoutScale, weight: .bold, design: .rounded))
+                        .foregroundStyle(tint)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .center)
 
-                Rectangle()
-                    .fill(.white.opacity(0.12))
-                    .frame(width: 1, height: 84 * layoutScale)
-
-                VStack(alignment: .leading, spacing: 5 * layoutScale) {
+                VStack(alignment: .center, spacing: 6 * layoutScale) {
                     Text("Today")
                         .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
                         .tracking(1.2 * layoutScale)
@@ -227,10 +218,11 @@ private struct ClothingAdviceCard: View {
                     Text(advice.detail)
                         .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.60))
-                        .lineLimit(3)
+                        .lineLimit(2)
                         .minimumScaleFactor(0.82)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
             .frame(maxHeight: .infinity)
         }

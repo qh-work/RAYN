@@ -109,7 +109,7 @@ RAYN/
 └── Resources/       app icon and privacy manifest
 ```
 
-Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) before changing a provider or scene. The A12 performance investigation and remaining refactoring priorities are documented in [`docs/CODE_REVIEW.md`](docs/CODE_REVIEW.md).
+Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) before changing a provider or scene, and follow [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) when adding or revising broadcast UI. The A12 performance investigation and remaining refactoring priorities are documented in [`docs/CODE_REVIEW.md`](docs/CODE_REVIEW.md).
 
 For the product story, current limitations, and public-facing introduction, see [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md). Planned work is tracked separately in [`docs/ROADMAP.md`](docs/ROADMAP.md), so future ideas are not confused with shipped behavior.
 

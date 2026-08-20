@@ -107,25 +107,35 @@ struct BroadcastView: View {
     }
 
     private func topNavigation(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 12 * layoutScale) {
-            HStack(spacing: 22 * layoutScale) {
+        VStack(alignment: .center, spacing: 12 * layoutScale) {
+            ZStack {
                 Text(snapshot.location.name)
-                    .font(.system(size: 34 * layoutScale, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                Spacer()
-                Button {
-                    appState.showSettings = true
-                    appState.revealControls()
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 26 * layoutScale, weight: .semibold))
-                        .frame(width: 50 * layoutScale, height: 50 * layoutScale)
+                    .font(.system(size: RAYNDesign.Typography.locationTitle * layoutScale, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.62)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 920 * layoutScale)
+                    .shadow(color: .black.opacity(0.16), radius: 10 * layoutScale, y: 4 * layoutScale)
+                    .accessibilityAddTraits(.isHeader)
+
+                HStack {
+                    Spacer(minLength: 0)
+                    Button {
+                        appState.showSettings = true
+                        appState.revealControls()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 27 * layoutScale, weight: .semibold))
+                            .frame(width: 52 * layoutScale, height: 52 * layoutScale)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .focusAdaptiveGlassForeground()
+                    .accessibilityLabel("Settings")
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .focusAdaptiveGlassForeground()
-                .accessibilityLabel("Settings")
             }
+            .frame(maxWidth: .infinity)
             // The full header acts as a directional focus guide to the gear.
             // Otherwise the small top-right target is unreachable from most
             // tab positions on a 16:9 television layout.
@@ -165,12 +175,13 @@ struct BroadcastView: View {
             // Scroll views clip to their bounds by default, which visibly cut
             // the native tvOS focus halo above and below the navigation row.
             .scrollClipDisabled()
+            .defaultScrollAnchor(.center)
             // Allow only the focus halo overscan; do not let scrolled content
             // paint across the rest of the header.
             .clipShape(Rectangle().inset(by: -20 * layoutScale))
             .focusSection()
         }
-        .frame(height: 118 * layoutScale)
+        .frame(height: 142 * layoutScale)
     }
 
     private func navigationTitle(for scene: BroadcastScene, snapshot: WeatherSnapshot) -> String {

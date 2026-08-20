@@ -20,8 +20,27 @@ enum RAYNLayout {
     }
 }
 
+/// Shared visual roles for the broadcast interface. Weather status and other
+/// single-purpose information are centered; leading alignment is reserved for
+/// prose, lists, and controls where a stable reading edge is useful.
+enum RAYNDesign {
+    enum Typography {
+        static let locationTitle: CGFloat = 58
+        static let pageEyebrow: CGFloat = 19
+        static let pageTitle: CGFloat = 48
+        static let pageDetail: CGFloat = 25
+        static let metricTitle: CGFloat = 20
+        static let metricValue: CGFloat = 29
+    }
+
+    enum Radius {
+        static let card: CGFloat = 24
+        static let heroCard: CGFloat = 28
+    }
+}
+
 struct GlassCard<Content: View>: View {
-    var cornerRadius: CGFloat = 24
+    var cornerRadius: CGFloat = RAYNDesign.Radius.card
     var tint: Color = .white
     var shadowRadius: CGFloat = 12
     var shadowOffset: CGFloat = 5
@@ -62,26 +81,34 @@ struct PageHeader: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 18) {
-            VStack(alignment: .leading, spacing: 6) {
+        ZStack(alignment: .bottomTrailing) {
+            VStack(alignment: .center, spacing: 6 * layoutScale) {
                 Text(L10n.string(eyebrow).uppercased(with: .autoupdatingCurrent))
-                    .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: RAYNDesign.Typography.pageEyebrow * layoutScale, weight: .bold, design: .rounded))
                     .tracking(2.2)
                     .foregroundStyle(.white.opacity(0.68))
                 Text(L10n.string(title))
-                    .font(.system(size: 48 * layoutScale, weight: .bold, design: .rounded))
+                    .font(.system(size: RAYNDesign.Typography.pageTitle * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
             }
-            Spacer(minLength: 28 * layoutScale)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: 880 * layoutScale)
+            .frame(maxWidth: .infinity, alignment: .center)
+
             if let detail {
                 Text(L10n.string(detail))
-                    .font(.system(size: 25 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: RAYNDesign.Typography.pageDetail * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: 520 * layoutScale, alignment: .trailing)
-                    .padding(.bottom, 6)
+                    .padding(.bottom, 6 * layoutScale)
             }
         }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
     }
 }
 
@@ -135,22 +162,28 @@ struct MetricTile: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        HStack(spacing: 14 * layoutScale) {
-            Image(systemName: symbol)
-                .font(.system(size: 23 * layoutScale, weight: .semibold))
-                .foregroundStyle(accent)
-                .frame(width: 30 * layoutScale)
-            VStack(alignment: .leading, spacing: 3 * layoutScale) {
+        VStack(alignment: .center, spacing: 6 * layoutScale) {
+            HStack(spacing: 9 * layoutScale) {
+                Image(systemName: symbol)
+                    .font(.system(size: 23 * layoutScale, weight: .semibold))
+                    .foregroundStyle(accent)
+                    .frame(width: 30 * layoutScale)
                 Text(L10n.string(title))
-                    .font(.system(size: 20 * layoutScale, weight: .medium, design: .rounded))
+                    .font(.system(size: RAYNDesign.Typography.metricTitle * layoutScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
-                Text(value)
-                    .font(.system(size: 29 * layoutScale, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.75)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
             }
-            Spacer(minLength: 0)
+
+            Text(value)
+                .font(.system(size: RAYNDesign.Typography.metricValue * layoutScale, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .accessibilityElement(children: .combine)
     }
 }
 
