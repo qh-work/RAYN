@@ -20,12 +20,13 @@ enum RAYNLayout {
     }
 }
 
-/// Shared visual roles for the broadcast interface. Weather status and other
-/// single-purpose information are centered; leading alignment is reserved for
+/// Shared visual roles for the broadcast interface. Page identity receives
+/// its own prominent space; weather status and other single-purpose
+/// information are centered; leading alignment is otherwise reserved for
 /// prose, lists, and controls where a stable reading edge is useful.
 enum RAYNDesign {
     enum Typography {
-        static let locationTitle: CGFloat = 58
+        static let locationTitle: CGFloat = 82
         static let pageEyebrow: CGFloat = 19
         static let pageTitle: CGFloat = 48
         static let pageDetail: CGFloat = 25

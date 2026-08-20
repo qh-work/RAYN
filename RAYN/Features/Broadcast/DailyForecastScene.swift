@@ -93,7 +93,7 @@ struct DailyForecastScene: View {
             // television typography scale is increased. The list remains
             // fully navigable with the remote, so a shorter viewport is a
             // better tradeoff than shrinking the forecast text.
-            .frame(height: 450 * layoutScale)
+            .frame(height: 426 * layoutScale)
                 .onChange(of: focusedDayID) { _, nextID in
                     guard let nextID else { return }
                     lastFocusedDayID = nextID

@@ -8,7 +8,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
-- Promoted the active location to a large centered page identity, replaced dashboard-style leading alignment with centered weather hierarchies, and codified shared native-glass typography, radius, and alignment roles.
+- Promoted the active location to a large, isolated upper-left page identity and direct city-switching control; current location and saved cities can now be selected without entering Settings.
+- Prevented in-flight weather or location responses from replacing a city selected more recently.
+- Replaced dashboard-style leading alignment with balanced weather hierarchies and codified shared native-glass typography, radius, and alignment roles.
 - Rebalanced the current-weather page into evenly spaced temperature, condition, and live-observation zones; split clothing guidance across both sides of its card; distributed the live ticker into clock, weather, and freshness zones; and increased spacing between navigation and content.
 - Increased the television typography baseline across broadcast scenes and enlarged the current-weather labels, navigation, and live-data ticker for comfortable viewing at living-room distances.
 

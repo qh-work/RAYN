@@ -28,7 +28,13 @@ The walkthrough was recorded from the tvOS 27 simulator at 1920 × 1080. The rad
 | --- | --- |
 | ![High 24-hour solar path and ten-day daylight trend in Beijing](screenshots/07-sun-detail.png) | ![Realistic lunar illumination and fourteen-day phase calendar in Beijing](screenshots/08-moon-detail.png) |
 
+| Direct city switcher |
+| --- |
+| ![Current location and saved-city switcher](screenshots/09-city-switcher.png) |
+
 The Debug-only `RAYN_CAPTURE_LOCATION` hook accepts `beijing`, `shanghai`, `new-york`, `shenzhen`, `london`, or `vancouver`. It changes coordinates for reproducible capture but continues to request live weather. Release builds ignore the hook, and normal startup remains current-location first.
+
+The Debug-only `RAYN_CAPTURE_FAVORITES` hook accepts a comma-separated list of the same public city names. It prepares a deterministic city-switcher capture without changing the live provider path. Release builds ignore it.
 
 The Debug-only `RAYN_ASTRONOMY_DETAIL` value can be `sun` or `moon` when maintainers need deterministic detail-view screenshots. It changes only the initially visible panel and never changes weather values or release behavior.
 

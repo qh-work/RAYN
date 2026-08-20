@@ -61,7 +61,7 @@ final class AppState: ObservableObject {
         self.locationSearchProvider = locationSearchProvider
         let defaults = UserDefaults.standard
         var storedSettings = (try? defaults.data(forKey: Keys.settings).flatMap { try JSONDecoder().decode(AppSettings.self, from: $0) }) ?? AppConfiguration.defaultSettings
-        let storedLocations = (try? defaults.data(forKey: Keys.locations).flatMap { try JSONDecoder().decode([SavedLocation].self, from: $0) }) ?? AppConfiguration.defaultFavorites
+        var storedLocations = (try? defaults.data(forKey: Keys.locations).flatMap { try JSONDecoder().decode([SavedLocation].self, from: $0) }) ?? AppConfiguration.defaultFavorites
         if !defaults.bool(forKey: Keys.locationPriorityMigration) {
             storedSettings.useCurrentLocation = true
             defaults.set(true, forKey: Keys.locationPriorityMigration)
@@ -84,6 +84,12 @@ final class AppState: ObservableObject {
         captureLocation = AppConfiguration.captureLocation(
             named: ProcessInfo.processInfo.environment["RAYN_CAPTURE_LOCATION"]
         )
+        let captureFavorites = AppConfiguration.captureLocations(
+            namedList: ProcessInfo.processInfo.environment["RAYN_CAPTURE_FAVORITES"]
+        )
+        if !captureFavorites.isEmpty {
+            storedLocations = captureFavorites
+        }
         if captureLocation != nil {
             storedSettings.useCurrentLocation = false
         }
@@ -168,6 +174,14 @@ final class AppState: ObservableObject {
         Task { @MainActor [weak self] in
             guard let self else { return }
             let result = await refreshCoordinator.refresh(location: location, fallback: snapshot, force: force)
+            // A city may be changed while the previous request is in flight.
+            // Never publish the old city's response under the new title; start
+            // one fresh request for the latest selection instead.
+            guard selectedLocation.id == location.id else {
+                isRefreshing = false
+                refresh(force: true)
+                return
+            }
             if result.forecastAttempted {
                 snapshot = result.snapshot
                 dataState = result.snapshot == nil ? .unavailable : .live
@@ -267,6 +281,8 @@ final class AppState: ObservableObject {
         restartRotationTask()
         revealControls()
         if shouldRequestLocation {
+            selectedLocation = .currentPlaceholder
+            snapshot = nil
             dataState = .locating
             updateCurrentLocation()
         } else if shouldReturnToSavedLocation {
@@ -291,6 +307,13 @@ final class AppState: ObservableObject {
 
     func chooseLocation(_ location: SavedLocation) {
         setLocation(location, usingCurrentLocation: false)
+    }
+
+    func chooseCurrentLocation() {
+        guard !settings.useCurrentLocation else { return }
+        var updatedSettings = settings
+        updatedSettings.useCurrentLocation = true
+        applySettings(updatedSettings)
     }
 
     private func setLocation(_ location: SavedLocation, usingCurrentLocation: Bool) {
@@ -439,7 +462,9 @@ final class AppState: ObservableObject {
             guard let self else { return }
             do {
                 let coordinate = try await locationService.requestCurrentLocation()
+                guard settings.useCurrentLocation else { return }
                 let mapItem = await reverseGeocode(coordinate)
+                guard settings.useCurrentLocation else { return }
                 let address = mapItem?.addressRepresentations
                 let locality = address?.cityName ?? mapItem?.name
                 let cityContext = address?.cityWithContext ?? ""
@@ -457,6 +482,7 @@ final class AppState: ObservableObject {
                 )
                 setLocation(location, usingCurrentLocation: true)
             } catch {
+                guard settings.useCurrentLocation else { return }
                 failedSources = Array(Set(failedSources + [AppFailureSource.currentLocation]))
                 if let savedLocation = savedLocations.first {
                     selectedLocation = savedLocation

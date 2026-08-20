@@ -1,5 +1,13 @@
 import SwiftUI
 
+private var shouldOpenLocationPickerForCapture: Bool {
+    #if DEBUG
+    CommandLine.arguments.contains("--rayn-location-picker")
+    #else
+    false
+    #endif
+}
+
 enum ScenePerformancePolicy {
     // Heavy SwiftUI scenes are handed over serially. The outgoing scene is
     // already invisible before the next scene builds, so Charts, material
@@ -18,6 +26,8 @@ struct BroadcastView: View {
     @State private var sceneTransitionTask: Task<Void, Never>?
     @State private var selectedDailyDayID: Date?
     @State private var hasAssignedInitialFocus = false
+    @State private var showLocationPicker = shouldOpenLocationPickerForCapture
+    @State private var openSettingsAfterLocationPicker = false
     @Namespace private var broadcastFocusScope
 
     var body: some View {
@@ -92,6 +102,17 @@ struct BroadcastView: View {
             SettingsView()
                 .environmentObject(appState)
         }
+        .fullScreenCover(isPresented: $showLocationPicker, onDismiss: {
+            guard openSettingsAfterLocationPicker else { return }
+            openSettingsAfterLocationPicker = false
+            appState.showSettings = true
+        }) {
+            LocationPickerView {
+                openSettingsAfterLocationPicker = true
+                showLocationPicker = false
+            }
+            .environmentObject(appState)
+        }
     }
 
     private var shouldInterceptExitCommand: Bool {
@@ -107,33 +128,43 @@ struct BroadcastView: View {
     }
 
     private func topNavigation(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
-        VStack(alignment: .center, spacing: 12 * layoutScale) {
-            ZStack {
-                Text(snapshot.location.name)
-                    .font(.system(size: RAYNDesign.Typography.locationTitle * layoutScale, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.62)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 920 * layoutScale)
-                    .shadow(color: .black.opacity(0.16), radius: 10 * layoutScale, y: 4 * layoutScale)
-                    .accessibilityAddTraits(.isHeader)
-
-                HStack {
-                    Spacer(minLength: 0)
-                    Button {
-                        appState.showSettings = true
-                        appState.revealControls()
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 27 * layoutScale, weight: .semibold))
-                            .frame(width: 52 * layoutScale, height: 52 * layoutScale)
+        VStack(alignment: .leading, spacing: 18 * layoutScale) {
+            HStack(spacing: 28 * layoutScale) {
+                Button {
+                    showLocationPicker = true
+                    appState.revealControls()
+                } label: {
+                    HStack(alignment: .center, spacing: 15 * layoutScale) {
+                        Text(snapshot.location.name)
+                            .font(.system(size: RAYNDesign.Typography.locationTitle * layoutScale, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.56)
+                            .layoutPriority(1)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 27 * layoutScale, weight: .bold))
+                            .opacity(0.62)
                     }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    .focusAdaptiveGlassForeground()
-                    .accessibilityLabel("Settings")
+                    .shadow(color: .black.opacity(0.16), radius: 10 * layoutScale, y: 4 * layoutScale)
                 }
+                .buttonStyle(FocusButtonStyle())
+                .foregroundStyle(.white)
+                .accessibilityLabel("Cities & Location")
+                .accessibilityIdentifier("location-switcher")
+
+                Spacer(minLength: 24 * layoutScale)
+
+                Button {
+                    appState.showSettings = true
+                    appState.revealControls()
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 27 * layoutScale, weight: .semibold))
+                        .frame(width: 52 * layoutScale, height: 52 * layoutScale)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .focusAdaptiveGlassForeground()
+                .accessibilityLabel("Settings")
             }
             .frame(maxWidth: .infinity)
             // The full header acts as a directional focus guide to the gear.
@@ -181,7 +212,7 @@ struct BroadcastView: View {
             .clipShape(Rectangle().inset(by: -20 * layoutScale))
             .focusSection()
         }
-        .frame(height: 142 * layoutScale)
+        .frame(height: 166 * layoutScale)
     }
 
     private func navigationTitle(for scene: BroadcastScene, snapshot: WeatherSnapshot) -> String {

@@ -65,5 +65,11 @@ enum AppConfiguration {
             return nil
         }
     }
+
+    static func captureLocations(namedList value: String?) -> [SavedLocation] {
+        value?
+            .split(separator: ",")
+            .compactMap { captureLocation(named: String($0)) } ?? []
+    }
     #endif
 }

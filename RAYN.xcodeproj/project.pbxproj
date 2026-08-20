@@ -23,6 +23,7 @@
 		B00006 /* WeatherTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00006 /* WeatherTheme.swift */; };
 		B00007 /* DynamicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00007 /* DynamicSkyView.swift */; };
 		B00008 /* BroadcastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00008 /* BroadcastView.swift */; };
+		B00040 /* LocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00040 /* LocationPickerView.swift */; };
 		B00032 /* CurrentWeatherScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00032 /* CurrentWeatherScene.swift */; };
 		B00033 /* HourlyForecastScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00033 /* HourlyForecastScene.swift */; };
 		B00034 /* DailyForecastScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00034 /* DailyForecastScene.swift */; };
@@ -81,6 +82,7 @@
 		F00006 /* WeatherTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherTheme.swift; sourceTree = "<group>"; };
 		F00007 /* DynamicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicSkyView.swift; sourceTree = "<group>"; };
 		F00008 /* BroadcastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastView.swift; sourceTree = "<group>"; };
+		F00040 /* LocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerView.swift; sourceTree = "<group>"; };
 		F00032 /* CurrentWeatherScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherScene.swift; sourceTree = "<group>"; };
 		F00033 /* HourlyForecastScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecastScene.swift; sourceTree = "<group>"; };
 		F00034 /* DailyForecastScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyForecastScene.swift; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 			isa = PBXGroup;
 			children = (
 				F00008 /* BroadcastView.swift */,
+				F00040 /* LocationPickerView.swift */,
 				F00032 /* CurrentWeatherScene.swift */,
 				F00033 /* HourlyForecastScene.swift */,
 				F00034 /* DailyForecastScene.swift */,
@@ -437,6 +440,7 @@
 				B00006 /* WeatherTheme.swift in Sources */,
 				B00007 /* DynamicSkyView.swift in Sources */,
 				B00008 /* BroadcastView.swift in Sources */,
+				B00040 /* LocationPickerView.swift in Sources */,
 				B00032 /* CurrentWeatherScene.swift in Sources */,
 				B00033 /* HourlyForecastScene.swift in Sources */,
 				B00034 /* DailyForecastScene.swift in Sources */,

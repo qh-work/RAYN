@@ -109,8 +109,9 @@ struct HourlyForecastScene: View {
                     .lineLimit(1)
             }
         }
-        .padding(.top, 26 * layoutScale)
-        .padding(.bottom, 16)
+        // Preserve the larger television type while keeping the persistent
+        // live ticker inside the safe area beneath the taller location header.
+        .padding(.top, 22 * layoutScale)
     }
 
     private var selectedHour: HourlyForecastPoint? {

@@ -46,7 +46,7 @@ struct AstronomyScene: View {
             )
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .bottom)
-            .padding(.bottom, 34 * layoutScale)
+            .padding(.bottom, 20 * layoutScale)
             GeometryReader { geometry in
                 let spacing = 20 * layoutScale
                 let hasMarine = snapshot.marine != nil
@@ -76,7 +76,11 @@ struct AstronomyScene: View {
                                 timezone: snapshot.timezoneIdentifier,
                                 moonrise: snapshot.current.moonrise,
                                 moonset: snapshot.current.moonset,
-                                compact: hasMarine
+                                // The overview keeps the moon composition
+                                // concise so its phase strip clears the live
+                                // ticker. The full-size moon remains available
+                                // in the selectable detail view.
+                                compact: true
                             )
                         }
                         .buttonStyle(FocusButtonStyle())
@@ -97,11 +101,11 @@ struct AstronomyScene: View {
             // prevents the lower cards from climbing into the title when the
             // tvOS window proposes a smaller height or a different viewing
             // distance is selected.
-            .frame(height: 512 * layoutScale)
+            .frame(height: 480 * layoutScale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 28 * layoutScale)
-        .padding(.bottom, 16 * layoutScale)
+        .padding(.bottom, 8 * layoutScale)
     }
 }
 

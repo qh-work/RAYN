@@ -4,12 +4,13 @@ RAYN uses native tvOS materials, SF Symbols, focus behavior, typography, and acc
 
 ## Visual hierarchy
 
-- The active location is the page identity. It is centered, prominent, and readable from a living-room distance.
+- The active location is the page identity. It is a large, isolated leading title in the upper-left broadcast header, readable from a living-room distance and visually separated from navigation and weather content.
+- The location title is also the direct city switcher. Its disclosure symbol communicates that current location and saved cities are available without opening Settings.
 - A single weather value or status is centered inside its card.
 - Peer values are distributed symmetrically with equal visual weight.
 - Compact navigation groups are centered when they fit and remain horizontally scrollable when localization makes them wider than the viewport.
 - Leading alignment is reserved for prose, alerts, lists, and settings where a stable reading edge improves comprehension.
-- Secondary metadata may align to an edge, but it must not compete with the centered page identity.
+- Secondary metadata may align to an edge, but it must not compete with the location identity.
 
 ## Type and distance
 
