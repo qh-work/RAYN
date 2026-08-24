@@ -391,6 +391,36 @@ final class RAYNTests: XCTestCase {
     XCTAssertEqual(RAYNProviderConfiguration.locationSearchSource, .openMeteo)
   }
 
+  func testInitialRefreshPlanDefersHeavySupplementarySources() {
+    XCTAssertEqual(RefreshPlan.initial, Set([RefreshSource.forecast, .airQuality]))
+    XCTAssertEqual(RefreshPlan.all, Set(RefreshSource.allCases))
+    XCTAssertFalse(RefreshPlan.initial.contains(.radar))
+    XCTAssertFalse(RefreshPlan.initial.contains(.marine))
+  }
+
+  @MainActor
+  func testSupplementaryRefreshMergesIntoExistingSnapshot() async {
+    let fallback = WeatherSnapshot.testFixture
+    let coordinator = RefreshCoordinator(
+      forecastProvider: FailingForecastProvider(),
+      airQualityProvider: FailingAirQualityProvider(),
+      radarProvider: FixtureRadarProvider(),
+      marineProvider: FailingMarineProvider()
+    )
+
+    let result = await coordinator.refresh(
+      location: .beijing,
+      fallback: fallback,
+      force: true,
+      sources: [.radar]
+    )
+
+    XCTAssertFalse(result.forecastAttempted)
+    XCTAssertEqual(result.snapshot?.current.temperature, fallback.current.temperature)
+    XCTAssertEqual(result.snapshot?.radar.frames.count, fallback.radar.frames.count)
+    XCTAssertTrue(result.failedSources.isEmpty)
+  }
+
   func testLocationProviderAcceptsInjectedTransport() async throws {
     let response = Data(
       #"{"results":[{"name":"测试城市","latitude":31.2,"longitude":121.5,"timezone":"Asia/Shanghai","country":"中国","admin1":"测试省"}]}"#
@@ -435,7 +465,8 @@ final class RAYNTests: XCTestCase {
     XCTAssertGreaterThan(mapActivationDelay, sceneHandoffDelay)
     XCTAssertLessThan(ScenePerformancePolicy.fadeOutDuration, ScenePerformancePolicy.fadeInDuration)
     XCTAssertLessThanOrEqual(RadarPerformancePolicy.tileMemoryLimit, 32 * 1_024 * 1_024)
-    XCTAssertEqual(RadarPerformancePolicy.tilePrefetchLimit, 34)
+    XCTAssertEqual(RadarPerformancePolicy.tilePrefetchLimit, 13)
+    XCTAssertEqual(RadarPerformancePolicy.tilePrefetchConcurrency, 4)
     XCTAssertLessThan(
       RadarPerformancePolicy.staleOverlayRemovalDelayNanoseconds,
       RadarPerformancePolicy.playbackIntervalNanoseconds
@@ -717,6 +748,12 @@ private struct FailingAirQualityProvider: AirQualityProvider {
 private struct FailingRadarProvider: RadarProvider {
   func fetchRadar(for location: SavedLocation) async throws -> RadarSnapshot {
     throw WeatherProviderError.unavailable("offline")
+  }
+}
+
+private struct FixtureRadarProvider: RadarProvider {
+  func fetchRadar(for location: SavedLocation) async throws -> RadarSnapshot {
+    WeatherSnapshot.testFixture.radar
   }
 }
 

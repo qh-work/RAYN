@@ -1,28 +1,31 @@
 import SwiftUI
 
-/// A single composited weather atmosphere keeps the animated backdrop from
-/// competing with tvOS focus and glass composition on A12 hardware. The
-/// weather state and native display cadence are unchanged; only the number of
-/// simultaneously animated SwiftUI subtrees is reduced.
-struct DynamicSkyView: View {
+/// The atmosphere keeps weather motion on the display-linked timeline while
+/// avoiding a full 4K redraw for static clouds, fog, haze, and stars. The
+/// animated pass is intentionally rendered into a smaller surface and
+/// upscaled: particles are soft atmospheric detail, so this lowers fill-rate
+/// without reducing their animation cadence.
+struct DynamicSkyView: View, Equatable {
     let theme: WeatherTheme
     let isDay: Bool
     let intensity: DynamicIntensity
     let reduceMotion: Bool
     let lightningEnabled: Bool
 
-    private var animatesAtmosphere: Bool {
-        !reduceMotion && (
-            theme == .clearNight ||
-            theme.cloudDensity > 0 ||
-            theme.hasRain ||
-            theme.hasSnow ||
-            theme.hasFog ||
-            theme.hasHaze ||
-            theme.hasHail ||
-            theme == .freezingRain ||
-            (theme == .storm && lightningEnabled)
-        )
+    private var hasAnimatedAtmosphere: Bool {
+        theme.hasRain ||
+        theme.hasSnow ||
+        theme.hasHail ||
+        theme == .freezingRain ||
+        (theme == .storm && lightningEnabled)
+    }
+
+    private var animatesParticles: Bool {
+        !reduceMotion && hasAnimatedAtmosphere
+    }
+
+    private var hasStaticAtmosphere: Bool {
+        theme == .clearNight || theme.cloudDensity > 0 || theme.hasFog || theme.hasHaze
     }
 
     var body: some View {
@@ -41,21 +44,33 @@ struct DynamicSkyView: View {
                     SunGlowLayer()
                 }
 
-                if animatesAtmosphere {
+                if hasStaticAtmosphere {
+                    WeatherAtmosphereCanvas(
+                        theme: theme,
+                        intensity: intensity,
+                        lightningEnabled: false,
+                        phase: 0,
+                        pass: .static
+                    )
+                }
+
+                if animatesParticles {
                     TimelineView(.animation) { context in
                         WeatherAtmosphereCanvas(
                             theme: theme,
                             intensity: intensity,
                             lightningEnabled: lightningEnabled,
-                            phase: context.date.timeIntervalSinceReferenceDate
+                            phase: context.date.timeIntervalSinceReferenceDate,
+                            pass: .animated
                         )
                     }
-                } else if reduceMotion {
+                } else if reduceMotion && hasAnimatedAtmosphere {
                     WeatherAtmosphereCanvas(
                         theme: theme,
                         intensity: intensity,
                         lightningEnabled: false,
-                        phase: 0
+                        phase: 0,
+                        pass: .animated
                     )
                 }
 
@@ -93,40 +108,66 @@ private struct SunGlowLayer: View {
 }
 
 private struct WeatherAtmosphereCanvas: View {
+    enum Pass: Equatable {
+        case `static`
+        case animated
+    }
+
     let theme: WeatherTheme
     let intensity: DynamicIntensity
     let lightningEnabled: Bool
     let phase: TimeInterval
+    let pass: Pass
+
+    private var renderScale: CGFloat {
+        // Static clouds and haze are rendered once at display resolution;
+        // only continuously moving particles trade a little edge sharpness
+        // for lower fill-rate.
+        pass == .animated ? 0.75 : 1
+    }
 
     var body: some View {
-        Canvas(rendersAsynchronously: true) { context, size in
-            if theme == .clearNight {
-                drawStars(&context, size: size)
+        GeometryReader { geometry in
+            Canvas(rendersAsynchronously: true) { context, size in
+                switch pass {
+                case .static:
+                    if theme == .clearNight {
+                        drawStars(&context, size: size)
+                    }
+                    if theme.cloudDensity > 0 {
+                        drawClouds(&context, size: size)
+                    }
+                    if theme.hasFog {
+                        drawFog(&context, size: size)
+                    }
+                    if theme.hasHaze {
+                        drawHaze(&context, size: size)
+                    }
+                case .animated:
+                    if theme.hasRain {
+                        drawRain(&context, size: size)
+                    }
+                    if theme.hasSnow {
+                        drawSnow(&context, size: size)
+                    }
+                    if theme.hasHail {
+                        drawHail(&context, size: size)
+                    }
+                    if theme == .freezingRain {
+                        drawIceSparkles(&context, size: size)
+                    }
+                    if theme == .storm && lightningEnabled {
+                        drawLightning(&context, size: size)
+                    }
+                }
             }
-            if theme.cloudDensity > 0 {
-                drawClouds(&context, size: size)
-            }
-            if theme.hasRain {
-                drawRain(&context, size: size)
-            }
-            if theme.hasSnow {
-                drawSnow(&context, size: size)
-            }
-            if theme.hasFog {
-                drawFog(&context, size: size)
-            }
-            if theme.hasHaze {
-                drawHaze(&context, size: size)
-            }
-            if theme.hasHail {
-                drawHail(&context, size: size)
-            }
-            if theme == .freezingRain {
-                drawIceSparkles(&context, size: size)
-            }
-            if theme == .storm && lightningEnabled {
-                drawLightning(&context, size: size)
-            }
+            .frame(
+                width: geometry.size.width * renderScale,
+                height: geometry.size.height * renderScale,
+                alignment: .topLeading
+            )
+            .scaleEffect(1 / renderScale, anchor: .topLeading)
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
         .allowsHitTesting(false)
     }

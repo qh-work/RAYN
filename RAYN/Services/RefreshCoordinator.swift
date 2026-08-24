@@ -16,6 +16,15 @@ enum RefreshSource: String, CaseIterable {
   }
 }
 
+enum RefreshPlan {
+  /// The first render only needs the forecast and the homepage air-quality
+  /// summary. Radar tiles and marine observations are loaded when their page
+  /// is actually opened, so launch and focus interaction do not compete with
+  /// four independent network pipelines.
+  static let initial: Set<RefreshSource> = [.forecast, .airQuality]
+  static let all: Set<RefreshSource> = Set(RefreshSource.allCases)
+}
+
 struct RetrySchedule: Equatable {
   static let delays: [TimeInterval] = [120, 300, 900]
 
@@ -84,7 +93,7 @@ final class RefreshCoordinator {
 
   func refresh(
     location: SavedLocation, fallback: WeatherSnapshot? = nil, force: Bool = false,
-    now: Date = Date()
+    now: Date = Date(), sources: Set<RefreshSource> = RefreshPlan.all
   ) async -> RefreshResult {
     let performanceInterval = RAYNPerformance.beginRefresh(force: force)
     defer { RAYNPerformance.endRefresh(performanceInterval) }
@@ -94,10 +103,14 @@ final class RefreshCoordinator {
     var failures: [String] = []
     var deferred: [String] = []
 
-    let forecastAllowed = shouldAttempt(.forecast, force: force, now: now)
-    let airQualityAllowed = shouldAttempt(.airQuality, force: force, now: now)
-    let radarAllowed = shouldAttempt(.radar, force: force, now: now)
-    let marineAllowed = shouldAttempt(.marine, force: force, now: now)
+    let forecastAllowed = sources.contains(.forecast)
+      && shouldAttempt(.forecast, force: force, now: now)
+    let airQualityAllowed = sources.contains(.airQuality)
+      && shouldAttempt(.airQuality, force: force, now: now)
+    let radarAllowed = sources.contains(.radar)
+      && shouldAttempt(.radar, force: force, now: now)
+    let marineAllowed = sources.contains(.marine)
+      && shouldAttempt(.marine, force: force, now: now)
 
     async let forecastTask = fetchResult(shouldFetch: forecastAllowed) {
       try await self.forecastProvider.fetchForecast(for: location)

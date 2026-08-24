@@ -54,8 +54,10 @@ enum RAYNDesign {
 struct GlassCard<Content: View>: View {
     var cornerRadius: CGFloat = RAYNDesign.Radius.card
     var tint: Color = .white
-    var shadowRadius: CGFloat = 8
-    var shadowOffset: CGFloat = 3
+    /// A zero default avoids a large offscreen blur for every 4K card. A
+    /// caller can opt in for a genuinely detached surface such as a modal.
+    var shadowRadius: CGFloat = 0
+    var shadowOffset: CGFloat = 0
     @ViewBuilder var content: Content
     @Environment(\.raynLayoutScale) private var layoutScale
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -69,7 +71,20 @@ struct GlassCard<Content: View>: View {
                 if reduceTransparency {
                     shape.fill(Color(hex: 0x142C45).opacity(0.98))
                 } else {
-                    shape.fill(.regularMaterial)
+                    // Backdrop materials sample and blur the full 4K scene.
+                    // A tinted static fill preserves the glass hierarchy while
+                    // keeping focus transitions on A12 out of an offscreen
+                    // material pass.
+                    shape.fill(
+                        LinearGradient(
+                            colors: [
+                                tint.opacity(0.16),
+                                Color.white.opacity(0.055)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                 }
             }
             .overlay {
@@ -78,11 +93,28 @@ struct GlassCard<Content: View>: View {
                     lineWidth: colorSchemeContrast == .increased ? 2 : 1
                 )
             }
-            .shadow(
-                color: .black.opacity(reduceTransparency ? 0.24 : 0.14),
-                radius: shadowRadius * layoutScale,
-                y: shadowOffset * layoutScale
+            .modifier(
+                ConditionalCardShadow(
+                    color: .black.opacity(reduceTransparency ? 0.24 : 0.14),
+                    radius: shadowRadius * layoutScale,
+                    offset: shadowOffset * layoutScale
+                )
             )
+    }
+}
+
+private struct ConditionalCardShadow: ViewModifier {
+    let color: Color
+    let radius: CGFloat
+    let offset: CGFloat
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if radius > 0 {
+            content.shadow(color: color, radius: radius, y: offset)
+        } else {
+            content
+        }
     }
 }
 

@@ -9,7 +9,7 @@
 1. `Models/WeatherModels.swift`：跨服务统一的数据模型和业务枚举。
 2. `Services/ProviderContracts.swift`：五类数据源协议、归因模型和 `WeatherProviderSuite`。
 3. `Services/HTTPClient.swift`：可注入的网络传输边界。
-4. `Services/RefreshCoordinator.swift`：并行刷新、失败隔离和退避调度。
+4. `Services/RefreshCoordinator.swift`：按刷新计划并行调度、失败隔离和退避调度；启动只取主页必需数据，雷达与海况按页面懒加载。
 5. `Services/*Provider.swift`：每个供应商、每类数据各自独立的请求、DTO 和映射。
 6. `Services/ProviderConfiguration.swift`：五类数据服务的唯一切换点。
 7. `App/AppState.swift`：启动、当前位置优先级、设置持久化、刷新和遥控器场景切换。
@@ -35,6 +35,7 @@ View 不直接访问 URL、JSON 字段或某个供应商的类型。更换服务
 ## 3. 真实数据不变量
 
 - 启动时如果开启当前位置，状态顺序是 `locating -> loading -> live`；定位失败才尝试已保存地址。
+- 启动刷新计划只请求天气和空气质量；进入雷达或日月海况页面后，才请求对应的真实服务数据，避免冷启动网络、解码和地图初始化争用焦点帧。
 - 天气服务返回当前观测和 10 个日预报点后才进入正式天气快照。必要字段缺失时返回错误，不用温度、降水或雷达回波猜数值。
 - 雷达没有帧、没有覆盖或没有地图瓦片时显示无覆盖状态。模拟器不生成程序雷达回波，实体 Apple TV 才显示服务提供的实时瓦片。
 - `RefreshCoordinator` 可以保留已有快照用于局部服务失败，但启动路径没有演示 JSON 和天气缓存兜底。

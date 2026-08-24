@@ -8,7 +8,11 @@ enum RadarPerformancePolicy {
     static let staleOverlayRemovalDelayNanoseconds: UInt64 = 80_000_000
     static let mapReadyFallbackDelayNanoseconds: UInt64 = 1_200_000_000
     static let tileMemoryLimit = 32 * 1_024 * 1_024
-    static let tilePrefetchLimit = 34
+    /// The map requests its visible tiles itself. Prefetch only the nearest
+    /// center tiles for the next frame; fetching the full 34-tile ring at
+    /// once made radar entry compete with MapKit and focus animation.
+    static let tilePrefetchLimit = 13
+    static let tilePrefetchConcurrency = 4
 }
 
 struct RadarScene: View {
@@ -117,7 +121,6 @@ struct RadarScene: View {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .stroke(.white.opacity(0.12), lineWidth: 1)
             }
-            .shadow(color: .black.opacity(0.14), radius: 8, y: 4)
 
             VStack(alignment: .leading, spacing: 18) {
                 Text("Animation Controls").font(.system(size: 26, weight: .bold, design: .rounded))
@@ -698,19 +701,31 @@ private final class RadarTileOverlay: MKTileOverlay {
 
     static func prefetch(urlTemplate: String, around location: SavedLocation) async -> Int {
         let urls = prefetchURLs(urlTemplate: urlTemplate, around: location)
-        return await withTaskGroup(of: Bool.self, returning: Int.self) { group in
-            for url in urls {
-                group.addTask {
-                    await fetchAndCache(url)
-                }
-            }
+        var loadedCount = 0
+        var batchStart = 0
 
-            var loadedCount = 0
-            for await didLoad in group where didLoad {
-                loadedCount += 1
+        // Keep peak URLSession, TLS, and image-cache pressure bounded. A
+        // cancelled frame stops before the next batch, so rapid focus/remote
+        // input cannot leave a fan-out of stale requests behind.
+        while batchStart < urls.count && !Task.isCancelled {
+            let batchEnd = min(batchStart + RadarPerformancePolicy.tilePrefetchConcurrency, urls.count)
+            let batch = urls[batchStart..<batchEnd]
+            loadedCount += await withTaskGroup(of: Bool.self, returning: Int.self) { group in
+                for url in batch {
+                    group.addTask {
+                        await fetchAndCache(url)
+                    }
+                }
+
+                var batchLoadedCount = 0
+                for await didLoad in group where didLoad {
+                    batchLoadedCount += 1
+                }
+                return batchLoadedCount
             }
-            return loadedCount
+            batchStart = batchEnd
         }
+        return loadedCount
     }
 
     func cancelPendingRequests() {

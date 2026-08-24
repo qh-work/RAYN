@@ -10,12 +10,12 @@ private var shouldOpenLocationPickerForCapture: Bool {
 
 enum ScenePerformancePolicy {
     // Heavy SwiftUI scenes are handed over serially. The outgoing scene is
-    // already invisible before the next scene builds, so Charts, material
-    // cards, and MapKit never compete for the same 4K frame.
-    static let fadeOutDuration = 0.08
-    static let sceneHandoffDelayNanoseconds: UInt64 = 90_000_000
-    static let sceneLayoutDelayNanoseconds: UInt64 = 45_000_000
-    static let fadeInDuration = 0.14
+    // fully faded before the next hierarchy is inserted, while the shorter
+    // handoff leaves less dead time between a remote press and new content.
+    static let fadeOutDuration = 0.06
+    static let sceneHandoffDelayNanoseconds: UInt64 = 70_000_000
+    static let sceneLayoutDelayNanoseconds: UInt64 = 24_000_000
+    static let fadeInDuration = 0.11
 }
 
 struct BroadcastView: View {
@@ -54,6 +54,7 @@ struct BroadcastView: View {
                     reduceMotion: effectiveReduceMotion,
                     lightningEnabled: appState.settings.lightningEnabled
                 )
+                .equatable()
 
                 if let snapshot = appState.snapshot {
                     VStack(spacing: 0) {
@@ -168,7 +169,6 @@ struct BroadcastView: View {
                             .font(.system(size: 27 * layoutScale, weight: .bold))
                             .opacity(0.62)
                     }
-                    .shadow(color: .black.opacity(0.12), radius: 5 * layoutScale, y: 2 * layoutScale)
                 }
                 .buttonStyle(FocusButtonStyle())
                 .foregroundStyle(.white)
@@ -317,7 +317,7 @@ struct BroadcastView: View {
 
             // Give the new hierarchy one render pass to lay itself out while
             // transparent. This prevents the first visible frame from paying
-            // the construction cost of Charts or MapKit.
+            // the construction cost of a large Canvas hierarchy or MapKit.
             try? await Task.sleep(nanoseconds: ScenePerformancePolicy.sceneLayoutDelayNanoseconds)
             guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeInDuration)) {
@@ -357,7 +357,19 @@ struct BroadcastView: View {
         }
         .padding(.horizontal, 32 * layoutScale)
         .frame(height: 72 * layoutScale)
-        .background(.regularMaterial, in: Capsule())
+        .background(
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: 0x07152C).opacity(0.94), Color(hex: 0x102A49).opacity(0.82)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+        )
+        .overlay {
+            Capsule().stroke(.white.opacity(0.08), lineWidth: 1)
+        }
         .padding(.top, 20 * layoutScale)
     }
 

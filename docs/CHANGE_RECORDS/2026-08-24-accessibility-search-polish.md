@@ -50,7 +50,7 @@ Physical build, install, launch:
 DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
 xcodebuild -project RAYN.xcodeproj -scheme RAYN -configuration Release \
 -destination 'platform=tvOS,id=YOUR_PAIRED_TV_DEVICE_ID' \
--derivedDataPath /tmp/RAYN-DerivedData DEVELOPMENT_TEAM=3VUKZK4LYF \
+-derivedDataPath /tmp/RAYN-DerivedData DEVELOPMENT_TEAM=<your-personal-team-id> \
 -allowProvisioningUpdates build
 
 xcrun devicectl device install app \

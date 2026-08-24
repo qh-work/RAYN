@@ -1,4 +1,3 @@
-import Charts
 import SwiftUI
 
 struct HourlyForecastScene: View {
@@ -15,43 +14,16 @@ struct HourlyForecastScene: View {
                 title: String(localized: "Next 24 Hours"),
                 detail: String(localized: "Temperature · Feels Like · Rain · Wind")
             )
-            GlassCard(cornerRadius: 28, shadowRadius: 8, shadowOffset: 4) {
+            GlassCard(cornerRadius: 28) {
                 VStack(alignment: .leading, spacing: 11 * layoutScale) {
-                    Chart {
-                        ForEach(Array(snapshot.hourly.prefix(24).enumerated()), id: \.offset) { index, point in
-                            PointMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Temperature"), point.temperature))
-                                .foregroundStyle(.white)
-                                .symbolSize(index.isMultiple(of: 3) ? 88 : 54)
-                                .annotation(position: .top, spacing: 3 * layoutScale) {
-                                    if index.isMultiple(of: 3) {
-                                        Text("\(point.temperature.formattedTemperature(unit: appState.settings.temperatureUnit))° / \(point.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))°")
-                                            .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
-                                            .foregroundStyle(.white.opacity(0.78))
-                                    }
-                                }
-                            PointMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Feels Like"), point.apparentTemperature))
-                                .foregroundStyle(.orange.opacity(0.86))
-                                .symbolSize(index.isMultiple(of: 3) ? 70 : 42)
-                            BarMark(x: .value(String(localized: "Time"), point.time), y: .value(String(localized: "Rain Chance"), point.precipitationProbability / 3.0))
-                                .foregroundStyle(.blue.opacity(0.42))
-                                .annotation(position: .top, spacing: 2 * layoutScale) {
-                                    if index.isMultiple(of: 3) {
-                                        Text("\(Int(point.precipitationProbability.rounded()))%")
-                                            .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
-                                            .foregroundStyle(.blue.opacity(0.92))
-                                    }
-                                }
-                        }
-                        if let selected = selectedHour {
-                            RuleMark(x: .value(String(localized: "Current Selection"), selected.time))
-                                .foregroundStyle(.yellow.opacity(0.80))
-                                .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 5]))
-                        }
-                    }
-                    .chartLegend(.hidden)
+                    HourlyWeatherCanvas(
+                        points: Array(snapshot.hourly.prefix(24)),
+                        unit: appState.settings.temperatureUnit,
+                        selectedPoint: selectedHour
+                    )
                     .frame(height: 162 * layoutScale)
 
-                    WindSpeedChart(
+                    WindSpeedBarsCanvas(
                         points: Array(snapshot.hourly.prefix(24)),
                         system: appState.settings.measurementSystem
                     )
@@ -114,8 +86,8 @@ struct HourlyForecastScene: View {
     }
 
     private var selectedHour: HourlyForecastPoint? {
-        let hourID = selectedHourID ?? snapshot.hourly.first?.id
-        return snapshot.hourly.first { $0.id == hourID }
+        guard let selectedHourID else { return nil }
+        return snapshot.hourly.first { $0.id == selectedHourID }
     }
 
     private func hourAccessibilityLabel(_ point: HourlyForecastPoint) -> String {
@@ -220,7 +192,109 @@ private struct ChartLegendItem: View {
     }
 }
 
-private struct WindSpeedChart: View {
+private struct HourlyWeatherCanvas: View {
+    let points: [HourlyForecastPoint]
+    let unit: TemperatureUnit
+    let selectedPoint: HourlyForecastPoint?
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        Canvas(rendersAsynchronously: true) { context, size in
+            guard !points.isEmpty else { return }
+            let top = 12 * layoutScale
+            let bottom = size.height - 24 * layoutScale
+            let temperatureValues = points.flatMap { [$0.temperature, $0.apparentTemperature] }
+            let minimum = (temperatureValues.min() ?? 0) - 1
+            let maximum = (temperatureValues.max() ?? 1) + 1
+            let span = max(maximum - minimum, 1)
+            let step = points.count == 1 ? size.width : size.width / CGFloat(points.count - 1)
+            let rainBarWidth = max(4 * layoutScale, min(16 * layoutScale, step * 0.34))
+
+            for fraction in stride(from: 0.0, through: 1.0, by: 0.5) {
+                let y = top + (bottom - top) * CGFloat(fraction)
+                var grid = Path()
+                grid.move(to: CGPoint(x: 0, y: y))
+                grid.addLine(to: CGPoint(x: size.width, y: y))
+                context.stroke(
+                    grid,
+                    with: .color(.white.opacity(0.12)),
+                    style: StrokeStyle(lineWidth: 1, dash: [4 * layoutScale, 6 * layoutScale])
+                )
+            }
+
+            for (index, point) in points.enumerated() {
+                let x = points.count == 1 ? size.width / 2 : CGFloat(index) * step
+                let rainFraction = min(max(point.precipitationProbability / 100, 0), 1)
+                let rainHeight = (bottom - top) * rainFraction * 0.36
+                let barRect = CGRect(
+                    x: x - rainBarWidth / 2,
+                    y: bottom - rainHeight,
+                    width: rainBarWidth,
+                    height: max(2 * layoutScale, rainHeight)
+                )
+                context.fill(
+                    Path(roundedRect: barRect, cornerRadius: 3 * layoutScale),
+                    with: .color(.blue.opacity(0.48))
+                )
+
+                let temperatureY = top + (maximum - point.temperature) / span * (bottom - top)
+                let apparentY = top + (maximum - point.apparentTemperature) / span * (bottom - top)
+                fillPoint(
+                    &context,
+                    at: CGPoint(x: x, y: temperatureY),
+                    radius: index.isMultiple(of: 3) ? 5 * layoutScale : 3.5 * layoutScale,
+                    color: .white
+                )
+                fillPoint(
+                    &context,
+                    at: CGPoint(x: x, y: apparentY),
+                    radius: index.isMultiple(of: 3) ? 4.5 * layoutScale : 3 * layoutScale,
+                    color: .orange.opacity(0.90)
+                )
+
+                guard index.isMultiple(of: 3) else { continue }
+                context.draw(
+                    Text("\(point.temperature.formattedTemperature(unit: unit))° / \(point.apparentTemperature.formattedTemperature(unit: unit))°")
+                        .font(.system(size: 13 * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.78)),
+                    at: CGPoint(x: x, y: max(8 * layoutScale, min(temperatureY, apparentY) - 13 * layoutScale))
+                )
+                context.draw(
+                    Text("\(Int(point.precipitationProbability.rounded()))%")
+                        .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.cyan.opacity(0.92)),
+                    at: CGPoint(x: x, y: max(8 * layoutScale, bottom - rainHeight - 12 * layoutScale))
+                )
+            }
+
+            if let selectedPoint,
+               let selectedIndex = points.firstIndex(where: { $0.id == selectedPoint.id }) {
+                let x = points.count == 1 ? size.width / 2 : CGFloat(selectedIndex) * step
+                var selection = Path()
+                selection.move(to: CGPoint(x: x, y: top))
+                selection.addLine(to: CGPoint(x: x, y: bottom))
+                context.stroke(
+                    selection,
+                    with: .color(.yellow.opacity(0.82)),
+                    style: StrokeStyle(lineWidth: 2 * layoutScale, dash: [5 * layoutScale, 5 * layoutScale])
+                )
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("24-hour temperature, feels-like, rain probability, and wind chart")
+    }
+
+    private func fillPoint(
+        _ context: inout GraphicsContext,
+        at point: CGPoint,
+        radius: CGFloat,
+        color: Color
+    ) {
+        context.fill(Path(ellipseIn: CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2)), with: .color(color))
+    }
+}
+
+private struct WindSpeedBarsCanvas: View {
     let points: [HourlyForecastPoint]
     let system: MeasurementSystem
     @Environment(\.raynLayoutScale) private var layoutScale
@@ -232,25 +306,30 @@ private struct WindSpeedChart: View {
                 .foregroundStyle(.mint.opacity(0.86))
                 .frame(width: 90 * layoutScale, alignment: .leading)
 
-            Chart {
-                ForEach(Array(points.enumerated()), id: \.offset) { index, point in
-                    BarMark(
-                        x: .value(String(localized: "Time"), point.time),
-                        y: .value(String(localized: "Wind Speed"), displayedSpeed(point.windSpeed))
+            Canvas(rendersAsynchronously: true) { context, size in
+                guard !points.isEmpty else { return }
+                let maximum = maximumSpeed
+                let step = size.width / CGFloat(max(points.count, 1))
+                let barWidth = max(3 * layoutScale, step * 0.58)
+                for (index, point) in points.enumerated() {
+                    let value = displayedSpeed(point.windSpeed)
+                    let height = max(2 * layoutScale, size.height * CGFloat(value / maximum))
+                    let x = step * (CGFloat(index) + 0.5) - barWidth / 2
+                    let rect = CGRect(x: x, y: size.height - height, width: barWidth, height: height)
+                    context.fill(
+                        Path(roundedRect: rect, cornerRadius: 2 * layoutScale),
+                        with: .color(.mint.opacity(index.isMultiple(of: 3) ? 0.95 : 0.68))
                     )
-                    .foregroundStyle(.mint.opacity(index.isMultiple(of: 3) ? 0.95 : 0.68))
-                    .annotation(position: .top, spacing: 2) {
-                        if index.isMultiple(of: 3) {
-                            Text(displayedSpeed(point.windSpeed).formattedNumber(decimals: 0))
-                                .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.mint.opacity(0.9))
-                        }
+                    if index.isMultiple(of: 3) {
+                        context.draw(
+                            Text(value.formattedNumber(decimals: 0))
+                                .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.mint.opacity(0.90)),
+                            at: CGPoint(x: x + barWidth / 2, y: max(7 * layoutScale, size.height - height - 8 * layoutScale))
+                        )
                     }
                 }
             }
-            .chartLegend(.hidden)
-            .chartXAxis(.hidden)
-            .chartYScale(domain: 0...maximumSpeed)
             .frame(height: 58 * layoutScale)
 
             Text(system == .metric ? "km/h" : "mph")

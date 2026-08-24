@@ -40,6 +40,7 @@ final class AppState: ObservableObject {
     private var refreshMonitorTask: Task<Void, Never>?
     private var controlsTask: Task<Void, Never>?
     private var controlsHideDeadline: Date?
+    private var pendingRefreshSources: Set<RefreshSource> = []
     private var searchTask: Task<Void, Never>?
     #if DEBUG
     private var captureTourTask: Task<Void, Never>?
@@ -153,7 +154,7 @@ final class AppState: ObservableObject {
             dataState = .unavailable
             failedSources = [AppFailureSource.locationSearch]
         } else {
-            refresh(force: true)
+            refresh(force: true, sources: RefreshPlan.initial)
         }
         restartRotationTask()
         restartRefreshMonitor()
@@ -162,8 +163,12 @@ final class AppState: ObservableObject {
         #endif
     }
 
-    func refresh(force: Bool = false) {
-        guard !isRefreshing else { return }
+    func refresh(force: Bool = false, sources: Set<RefreshSource> = RefreshPlan.initial) {
+        guard !sources.isEmpty else { return }
+        guard !isRefreshing else {
+            pendingRefreshSources.formUnion(sources)
+            return
+        }
         if selectedLocation.id == SavedLocation.currentPlaceholder.id {
             if settings.useCurrentLocation {
                 dataState = .locating
@@ -181,23 +186,40 @@ final class AppState: ObservableObject {
         let location = selectedLocation
         Task { @MainActor [weak self] in
             guard let self else { return }
-            let result = await refreshCoordinator.refresh(location: location, fallback: snapshot, force: force)
+            let result = await refreshCoordinator.refresh(
+                location: location,
+                fallback: snapshot,
+                force: force,
+                sources: sources
+            )
             // A city may be changed while the previous request is in flight.
             // Never publish the old city's response under the new title; start
             // one fresh request for the latest selection instead.
             guard selectedLocation.id == location.id else {
                 isRefreshing = false
-                refresh(force: true)
+                let pending = pendingRefreshSources
+                pendingRefreshSources.removeAll()
+                refresh(force: true, sources: sources.union(pending))
                 return
             }
             if result.forecastAttempted {
                 snapshot = result.snapshot
                 dataState = result.snapshot == nil ? .unavailable : .live
-            } else if result.snapshot != nil {
+            } else if let supplementarySnapshot = result.snapshot {
+                // Radar and marine refreshes return the existing forecast
+                // plus one updated submodel. Publish that merged snapshot or
+                // the page can fetch real data successfully without showing it.
+                snapshot = supplementarySnapshot
                 dataState = .live
             }
             failedSources = result.failedSources
             isRefreshing = false
+
+            let pending = pendingRefreshSources
+            pendingRefreshSources.removeAll()
+            if !pending.isEmpty {
+                refresh(sources: pending)
+            }
         }
     }
 
@@ -213,7 +235,7 @@ final class AppState: ObservableObject {
                     dataState = .unavailable
                     failedSources = [AppFailureSource.locationSearch]
                 } else {
-                    refresh()
+                    refresh(sources: RefreshPlan.initial)
                 }
             }
             restartRefreshMonitor()
@@ -231,6 +253,7 @@ final class AppState: ObservableObject {
         let currentIndex = scenes.firstIndex(of: currentScene) ?? 0
         currentScene = scenes[(currentIndex + 1) % scenes.count]
         revealControls()
+        requestSupplementaryData(for: currentScene)
     }
 
     func previousScene() {
@@ -239,6 +262,7 @@ final class AppState: ObservableObject {
         let currentIndex = scenes.firstIndex(of: currentScene) ?? 0
         currentScene = scenes[(currentIndex - 1 + scenes.count) % scenes.count]
         revealControls()
+        requestSupplementaryData(for: currentScene)
     }
 
     func select(scene: BroadcastScene) {
@@ -248,6 +272,7 @@ final class AppState: ObservableObject {
         guard scene == .airQuality || !settings.hiddenScenes.contains(scene) else { return }
         currentScene = scene
         revealControls()
+        requestSupplementaryData(for: scene)
     }
 
     func togglePause() {
@@ -332,7 +357,7 @@ final class AppState: ObservableObject {
             dataState = .waiting
             if let savedLocation = savedLocations.first {
                 selectedLocation = savedLocation
-                refresh(force: true)
+                refresh(force: true, sources: RefreshPlan.initial)
             } else {
                 selectedLocation = .currentPlaceholder
                 dataState = .unavailable
@@ -368,7 +393,7 @@ final class AppState: ObservableObject {
         persistLocations()
         snapshot = nil
         dataState = .waiting
-        refresh(force: true)
+        refresh(force: true, sources: RefreshPlan.initial)
         showSettings = false
     }
 
@@ -450,6 +475,7 @@ final class AppState: ObservableObject {
                 let index = scenes.firstIndex(of: currentScene) ?? 0
                 currentScene = scenes[(index + 1) % scenes.count]
                 nextRotationAt = Date().addingTimeInterval(rotationInterval)
+                requestSupplementaryData(for: currentScene)
             }
         }
     }
@@ -510,7 +536,7 @@ final class AppState: ObservableObject {
                     return
                 }
                 guard let self, isAppActive, !isRefreshing else { continue }
-                refresh()
+                refresh(sources: RefreshPlan.initial)
             }
         }
     }
@@ -529,6 +555,18 @@ final class AppState: ObservableObject {
         #if os(tvOS)
         UIApplication.shared.isIdleTimerDisabled = settings.keepScreenAwake
         #endif
+    }
+
+    private func requestSupplementaryData(for scene: BroadcastScene) {
+        guard snapshot != nil else { return }
+        switch scene {
+        case .radar where snapshot?.radar.isAvailable != true:
+            refresh(sources: [.radar])
+        case .astronomy where snapshot?.marine == nil:
+            refresh(sources: [.marine])
+        default:
+            break
+        }
     }
 
     private func updateCurrentLocation() {
@@ -562,7 +600,7 @@ final class AppState: ObservableObject {
                     selectedLocation = savedLocation
                     snapshot = nil
                     dataState = .loading
-                    refresh(force: true)
+                    refresh(force: true, sources: RefreshPlan.initial)
                 } else {
                     dataState = .unavailable
                 }

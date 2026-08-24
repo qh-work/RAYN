@@ -1,4 +1,3 @@
-import Charts
 import SwiftUI
 
 struct AirQualityScene: View {
@@ -257,50 +256,7 @@ private struct AQIHourlyTrend: View {
                         .foregroundStyle(.white.opacity(0.55))
                         .frame(maxWidth: .infinity, minHeight: 112 * layoutScale)
                 } else {
-                    Chart {
-                        ForEach(Array(values.enumerated()), id: \.offset) { index, value in
-                            BarMark(x: .value(String(localized: "Hour"), index), y: .value("AQI", value))
-                                .foregroundStyle(aqiColor(value).gradient)
-                                .cornerRadius(5 * layoutScale)
-                                .annotation(position: .top, spacing: 3 * layoutScale) {
-                                    if index.isMultiple(of: 3) {
-                                        Text(value.formattedNumber(decimals: 0))
-                                            .font(.system(size: 14 * layoutScale, weight: .semibold, design: .rounded))
-                                            .monospacedDigit()
-                                            .foregroundStyle(.white.opacity(0.64))
-                                    }
-                                }
-                        }
-                    }
-                    .chartLegend(.hidden)
-                    .chartYAxis {
-                        AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
-                            AxisGridLine(stroke: StrokeStyle(lineWidth: 1, dash: [3, 5]))
-                                .foregroundStyle(.white.opacity(0.10))
-                            AxisValueLabel {
-                                if let aqi = value.as(Double.self) {
-                                    Text(aqi.formattedNumber(decimals: 0))
-                                        .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
-                                        .monospacedDigit()
-                                        .foregroundStyle(.white.opacity(0.42))
-                                }
-                            }
-                        }
-                    }
-                    .chartXAxis {
-                        AxisMarks(values: .stride(by: 6)) { value in
-                            AxisGridLine(stroke: StrokeStyle(lineWidth: 1, dash: [3, 5]))
-                                .foregroundStyle(.white.opacity(0.10))
-                            AxisValueLabel {
-                                if let index = value.as(Int.self) {
-                                    Text(hourLabel(index))
-                                        .font(.system(size: 16 * layoutScale, weight: .medium, design: .rounded))
-                                        .foregroundStyle(.white.opacity(0.48))
-                                }
-                            }
-                        }
-                    }
-                    .chartYScale(domain: 0...max(values.max() ?? 80, 80))
+                    AQITrendCanvas(values: values, timezone: timezone)
                     .frame(height: 142 * layoutScale)
                 }
                 AQIGradientScale(value: nil, showsLabels: true)
@@ -308,7 +264,75 @@ private struct AQIHourlyTrend: View {
         }
     }
 
-    private func hourLabel(_ index: Int) -> String {
+}
+
+private struct AQITrendCanvas: View {
+    let values: [Double]
+    let timezone: String
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        Canvas(rendersAsynchronously: true) { context, size in
+            guard !values.isEmpty else { return }
+            let left = 38 * layoutScale
+            let top = 8 * layoutScale
+            let bottom = size.height - 24 * layoutScale
+            let plotWidth = max(1, size.width - left)
+            let maximum = max(values.max() ?? 80, 80)
+            let step = plotWidth / CGFloat(max(values.count, 1))
+            let barWidth = max(4 * layoutScale, step * 0.64)
+
+            for fraction in stride(from: 0.0, through: 1.0, by: 0.5) {
+                let y = bottom - (bottom - top) * CGFloat(fraction)
+                var grid = Path()
+                grid.move(to: CGPoint(x: left, y: y))
+                grid.addLine(to: CGPoint(x: size.width, y: y))
+                context.stroke(
+                    grid,
+                    with: .color(.white.opacity(0.10)),
+                    style: StrokeStyle(lineWidth: 1, dash: [3 * layoutScale, 5 * layoutScale])
+                )
+                context.draw(
+                    Text((maximum * fraction).formattedNumber(decimals: 0))
+                        .font(.system(size: 12 * layoutScale, weight: .medium, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(.white.opacity(0.42)),
+                    at: CGPoint(x: left * 0.42, y: y)
+                )
+            }
+
+            for (index, value) in values.enumerated() {
+                let x = left + step * (CGFloat(index) + 0.5)
+                let height = max(2 * layoutScale, (bottom - top) * CGFloat(min(max(value / maximum, 0), 1)))
+                let rect = CGRect(x: x - barWidth / 2, y: bottom - height, width: barWidth, height: height)
+                context.fill(
+                    Path(roundedRect: rect, cornerRadius: 5 * layoutScale),
+                    with: .color(aqiColor(value).opacity(0.88))
+                )
+                if index.isMultiple(of: 3) {
+                    context.draw(
+                        Text(value.formattedNumber(decimals: 0))
+                            .font(.system(size: 12 * layoutScale, weight: .semibold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(.white.opacity(0.64)),
+                        at: CGPoint(x: x, y: max(top, bottom - height - 8 * layoutScale))
+                    )
+                }
+                if index.isMultiple(of: 6) {
+                    context.draw(
+                        Text(hourLabel(index, timezone: timezone))
+                            .font(.system(size: 13 * layoutScale, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.48)),
+                        at: CGPoint(x: x, y: size.height - 8 * layoutScale)
+                    )
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("24-hour air-quality index chart")
+    }
+
+    private func hourLabel(_ index: Int, timezone: String) -> String {
         let calendar = Calendar(identifier: .gregorian)
         let date = calendar.date(bySettingHour: index % 24, minute: 0, second: 0, of: Date()) ?? Date()
         return date.formatted(.time, timezoneIdentifier: timezone)
@@ -338,7 +362,6 @@ private struct AQIGradientScale: View {
                             .fill(.white)
                             .frame(width: 18 * layoutScale, height: 18 * layoutScale)
                             .overlay(Circle().stroke(.black.opacity(0.25), lineWidth: 2 * layoutScale))
-                            .shadow(color: .black.opacity(0.35), radius: 5 * layoutScale, y: 2 * layoutScale)
                             .offset(x: markerOffset(for: value, width: geometry.size.width))
                     }
                 }

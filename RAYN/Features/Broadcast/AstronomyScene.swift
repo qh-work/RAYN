@@ -278,7 +278,7 @@ private struct SunDaylightForecast: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        GlassCard(cornerRadius: 24, shadowRadius: 7, shadowOffset: 3) {
+        GlassCard(cornerRadius: 24) {
             VStack(alignment: .leading, spacing: 10 * layoutScale) {
                 Text("10-Day Daylight Trend")
                     .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
@@ -442,7 +442,7 @@ private struct MoonPhaseCalendar: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        GlassCard(cornerRadius: 24, shadowRadius: 7, shadowOffset: 3) {
+        GlassCard(cornerRadius: 24) {
             VStack(alignment: .leading, spacing: 10 * layoutScale) {
                 Text("Next 14 Days")
                     .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
@@ -849,7 +849,6 @@ private struct MoonDiskView: View {
                     .scaledToFit()
                     .colorMultiply(Color(hex: 0xD8DAD5))
                     .opacity(info.illumination > 0.01 ? 0.92 : 0)
-                    .blur(radius: diameter * 0.002)
                     .mask(MoonIlluminationShape(age: info.age).fill(.white))
 
                 MoonIlluminationShape(age: info.age)
@@ -877,8 +876,10 @@ private struct MoonDiskView: View {
                     )
 
                 MoonIlluminationShape(age: info.age)
-                    .fill(.white.opacity(0.14))
-                    .blur(radius: diameter * 0.022)
+                    // The radial light layer above already softens the
+                    // terminator. Avoiding a blur here keeps the small phase
+                    // calendar out of an offscreen render pass.
+                    .fill(.white.opacity(0.16))
 
                 Circle()
                     .stroke(
@@ -891,7 +892,6 @@ private struct MoonDiskView: View {
                     )
             }
             .frame(width: diameter, height: diameter)
-            .shadow(color: .black.opacity(0.32), radius: diameter * 0.09, y: diameter * 0.045)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .accessibilityElement(children: .ignore)
@@ -943,7 +943,7 @@ private struct MarineConditionCard: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        GlassCard(cornerRadius: 24, shadowRadius: 8, shadowOffset: 3) {
+        GlassCard(cornerRadius: 24) {
             HStack(spacing: 20 * layoutScale) {
                 HStack(spacing: 13 * layoutScale) {
                     Image(systemName: "water.waves")
@@ -1268,8 +1268,10 @@ private struct SunArcGraph: View {
                         )
 
                     line
-                        .stroke(.white.opacity(0.30), style: StrokeStyle(lineWidth: 9 * layoutScale, lineCap: .round, lineJoin: .round))
-                        .blur(radius: 6 * layoutScale)
+                        // A translucent wide stroke gives the trajectory a
+                        // soft halo without forcing SwiftUI to blur the full
+                        // graph offscreen on every minute tick.
+                        .stroke(.white.opacity(0.18), style: StrokeStyle(lineWidth: 9 * layoutScale, lineCap: .round, lineJoin: .round))
                     line
                         .stroke(
                             LinearGradient(
@@ -1323,14 +1325,19 @@ private struct SunArcGraph: View {
                         .position(metrics.sunsetPoint)
 
                     Circle()
-                        .fill(.white.opacity(0.28))
+                        .fill(
+                            RadialGradient(
+                                colors: [.white.opacity(0.38), .white.opacity(0.12), .clear],
+                                center: .center,
+                                startRadius: 1,
+                                endRadius: 23 * layoutScale
+                            )
+                        )
                         .frame(width: 42 * layoutScale, height: 42 * layoutScale)
-                        .blur(radius: 12 * layoutScale)
                         .position(metrics.currentPoint)
                     Circle()
                         .fill(.white)
-                        .frame(width: 20 * layoutScale, height: 20 * layoutScale)
-                        .shadow(color: .white.opacity(0.55), radius: 9 * layoutScale)
+                        .frame(width: 18 * layoutScale, height: 18 * layoutScale)
                         .position(metrics.currentPoint)
 
                     HStack {

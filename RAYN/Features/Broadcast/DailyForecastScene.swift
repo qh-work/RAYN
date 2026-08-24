@@ -65,7 +65,7 @@ private struct DailyForecastList: View {
                 detail: String(localized: "Swipe up or down to choose a date · Press Select for details")
             )
 
-            GlassCard(cornerRadius: 28, shadowRadius: 8, shadowOffset: 4) {
+            GlassCard(cornerRadius: 28) {
                 ScrollView(.vertical, showsIndicators: false) {
                     // Ten rows are deliberately kept alive. A LazyVStack can
                     // recycle the next focus target while tvOS is scrolling,

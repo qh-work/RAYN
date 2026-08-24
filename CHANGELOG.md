@@ -6,6 +6,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-08-24
+
+### Changed
+
+- Replaced hot-path 4K material cards with static glass fills and made card shadows opt-in, removing repeated offscreen blur and shadow composition during focus changes.
+- Split the weather background into a static atmosphere pass and a display-linked particle pass; animated weather keeps its normal cadence while static clouds, fog, haze, and stars are not redrawn every frame.
+- Deferred real radar and marine requests until their scenes are opened; startup now requests only the forecast and homepage air-quality summary, with queued supplementary requests handled after an active refresh.
+- Bounded radar prefetch to the nearest 13 tiles with four concurrent downloads and kept the existing 32 MB in-memory cache and real-data-only behavior.
+- Replaced Swift Charts on the hourly and air-quality pages with asynchronous Canvas renderers that preserve discrete values, rain probability, wind bars, and accessible chart summaries.
+- Removed remaining astronomy, location-title, and radar-container blur/shadow passes and shortened scene handoff delays without reducing animation cadence.
+
+### Verification
+
+- Built the tvOS 27 generic test target with Xcode 27 beta and code signing disabled; ran localization validation and whitespace checks.
+- No physical Apple TV installation or simulator boot was performed in this pass, per the requested test scope.
+- Instruments attachment disconnected after approximately 1.9 seconds, so no unsupported frame-rate or A12 FPS claim is made.
+
 ## [1.2.3] - 2026-08-24
 
 ### Added
@@ -140,7 +157,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.3...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/qh-work/RAYN/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/qh-work/RAYN/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/qh-work/RAYN/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/qh-work/RAYN/compare/v1.2.0...v1.2.1

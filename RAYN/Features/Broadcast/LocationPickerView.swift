@@ -55,7 +55,7 @@ struct LocationPickerView: View {
                         .focusAdaptiveGlassForeground()
                 }
 
-                GlassCard(cornerRadius: 34, shadowRadius: 18, shadowOffset: 8) {
+                GlassCard(cornerRadius: 34) {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 22) {
                             Text("Current Location")

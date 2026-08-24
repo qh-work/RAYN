@@ -18,7 +18,7 @@ Core type roles live in `RAYNDesign.Typography`. Every size is multiplied by the
 
 ## Materials and focus
 
-- Cards use native SwiftUI materials with continuous corners, restrained borders, and soft shadows.
+- Cards use a native-style static glass surface with continuous corners and restrained borders. Backdrop materials and shadows are reserved for deliberately detached surfaces because a full-screen 4K material pass is expensive during tvOS focus changes.
 - Interactive controls use the native tvOS glass button style and adapt their foreground color when focused.
 - Reduce Transparency and Increased Contrast remain authoritative accessibility settings.
 - Extra stacked blur layers and decorative effects are avoided to preserve smooth focus and scene transitions on Apple TV 4K (2nd generation).
