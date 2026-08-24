@@ -446,6 +446,17 @@ final class RAYNTests: XCTestCase {
     )
   }
 
+  func testNightDimmingAppliesOnlyWhenEnabledAtNight() {
+    XCTAssertEqual(RAYNNightDimming.opacity(isDay: true, enabled: true), 0)
+    XCTAssertEqual(RAYNNightDimming.opacity(isDay: false, enabled: false), 0)
+    XCTAssertEqual(
+      RAYNNightDimming.opacity(isDay: false, enabled: true),
+      RAYNNightDimming.maxOpacity
+    )
+    XCTAssertGreaterThan(RAYNNightDimming.maxOpacity, 0)
+    XCTAssertLessThanOrEqual(RAYNNightDimming.maxOpacity, 0.5)
+  }
+
   func testClothingAdviceIsCompactAndWeatherAware() {
     var current = WeatherSnapshot.testFixture.current
     current.feelsLike = 27

@@ -16,8 +16,8 @@ enum WeatherDateParser {
   static func date(from string: String?, timezone: TimeZone? = nil) -> Date? {
     guard let string, !string.isEmpty else { return nil }
     isoLock.lock()
+    defer { isoLock.unlock() }
     let isoValue = fractionalISOFormatter.date(from: string) ?? standardISOFormatter.date(from: string)
-    isoLock.unlock()
     if let isoValue { return isoValue }
 
     return WeatherDateFormatterCache.date(

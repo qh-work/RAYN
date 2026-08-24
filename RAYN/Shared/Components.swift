@@ -20,6 +20,17 @@ enum RAYNLayout {
     }
 }
 
+/// Night dimming is an intentional whole-screen overlay because tvOS exposes
+/// no app-controlled backlight API. The value is kept small enough to preserve
+/// text contrast while taking the edge off a bright broadcast at night.
+enum RAYNNightDimming {
+    static let maxOpacity = 0.32
+
+    static func opacity(isDay: Bool, enabled: Bool) -> Double {
+        enabled && !isDay ? maxOpacity : 0
+    }
+}
+
 /// Shared visual roles for the broadcast interface. Page identity receives
 /// its own prominent space; weather status and other single-purpose
 /// information are centered; leading alignment is otherwise reserved for

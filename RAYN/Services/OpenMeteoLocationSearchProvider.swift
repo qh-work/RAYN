@@ -31,7 +31,7 @@ struct OpenMeteoLocationSearchProvider: LocationSearchProvider {
       SavedLocation(
         name: $0.name ?? query, administrativeArea: $0.admin1 ?? "", country: $0.country ?? "",
         latitude: $0.latitude ?? 0, longitude: $0.longitude ?? 0,
-        timezoneIdentifier: $0.timezone ?? "Asia/Shanghai", isFavorite: false)
+        timezoneIdentifier: $0.timezone ?? TimeZone.current.identifier, isFavorite: false)
     }
   }
 

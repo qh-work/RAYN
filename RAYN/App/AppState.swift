@@ -39,6 +39,7 @@ final class AppState: ObservableObject {
     private var rotationTask: Task<Void, Never>?
     private var refreshMonitorTask: Task<Void, Never>?
     private var controlsTask: Task<Void, Never>?
+    private var searchTask: Task<Void, Never>?
     #if DEBUG
     private var captureTourTask: Task<Void, Never>?
     #endif
@@ -118,6 +119,7 @@ final class AppState: ObservableObject {
         rotationTask?.cancel()
         refreshMonitorTask?.cancel()
         controlsTask?.cancel()
+        searchTask?.cancel()
         #if DEBUG
         captureTourTask?.cancel()
         #endif
@@ -331,16 +333,26 @@ final class AppState: ObservableObject {
     }
 
     func searchLocations(query: String) {
+        searchTask?.cancel()
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             searchResults = []
+            isSearching = false
             return
         }
         isSearching = true
-        Task { @MainActor [weak self] in
+        searchTask = Task { @MainActor [weak self] in
             guard let self else { return }
-            searchResults = (try? await locationSearchProvider.search(query: trimmed)) ?? []
-            isSearching = false
+            do {
+                let results = try await locationSearchProvider.search(query: trimmed)
+                guard !Task.isCancelled else { return }
+                searchResults = results
+                isSearching = false
+            } catch {
+                guard !Task.isCancelled else { return }
+                searchResults = []
+                isSearching = false
+            }
         }
     }
 

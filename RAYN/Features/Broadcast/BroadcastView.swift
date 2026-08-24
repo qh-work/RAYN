@@ -21,6 +21,7 @@ enum ScenePerformancePolicy {
 struct BroadcastView: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.resetFocus) private var resetFocus
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @State private var presentedScene: BroadcastScene = .current
     @State private var sceneOpacity = 1.0
     @State private var sceneTransitionTask: Task<Void, Never>?
@@ -29,6 +30,17 @@ struct BroadcastView: View {
     @State private var showLocationPicker = shouldOpenLocationPickerForCapture
     @State private var openSettingsAfterLocationPicker = false
     @Namespace private var broadcastFocusScope
+
+    private var effectiveReduceMotion: Bool {
+        appState.settings.reduceMotion || systemReduceMotion
+    }
+
+    private var nightDimOpacity: Double {
+        RAYNNightDimming.opacity(
+            isDay: appState.snapshot?.current.isDay ?? true,
+            enabled: appState.settings.nightDimMode
+        )
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -39,7 +51,7 @@ struct BroadcastView: View {
                     theme: appState.snapshot?.theme ?? .clearNight,
                     isDay: appState.snapshot?.current.isDay ?? false,
                     intensity: appState.settings.dynamicIntensity,
-                    reduceMotion: appState.settings.reduceMotion,
+                    reduceMotion: effectiveReduceMotion,
                     lightningEnabled: appState.settings.lightningEnabled
                 )
 
@@ -57,6 +69,18 @@ struct BroadcastView: View {
                     .padding(.bottom, max(60, 30 * layoutScale))
                 } else {
                     liveDataPlaceholder(layoutScale: layoutScale)
+                }
+
+                if nightDimOpacity > 0 {
+                    Color.black
+                        .opacity(nightDimOpacity)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                        .animation(
+                            effectiveReduceMotion ? nil : .easeInOut(duration: 0.6),
+                            value: nightDimOpacity
+                        )
                 }
             }
             .environment(\.raynLayoutScale, layoutScale)
@@ -201,7 +225,10 @@ struct BroadcastView: View {
                 // focused. Keep a small horizontal focus gutter at both ends.
                 .padding(.horizontal, 10 * layoutScale)
                 .opacity(appState.controlsVisible ? 1 : 0)
-                .animation(.easeOut(duration: 0.25), value: appState.controlsVisible)
+                .animation(
+                    effectiveReduceMotion ? nil : .easeOut(duration: 0.25),
+                    value: appState.controlsVisible
+                )
             }
             // Scroll views clip to their bounds by default, which visibly cut
             // the native tvOS focus halo above and below the navigation row.
@@ -245,7 +272,23 @@ struct BroadcastView: View {
         }
 
         guard nextScene != presentedScene else {
-            withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeInDuration)) {
+            if effectiveReduceMotion {
+                sceneOpacity = 1
+            } else {
+                withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeInDuration)) {
+                    sceneOpacity = 1
+                }
+            }
+            return
+        }
+
+        if effectiveReduceMotion {
+            // Honor the system's Reduce Motion setting: switch content in a
+            // single non-animated transaction instead of fading and delaying.
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                presentedScene = nextScene
                 sceneOpacity = 1
             }
             return

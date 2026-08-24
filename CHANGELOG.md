@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-08-24
+
+### Added
+
+- Implemented the previously inactive Low-Brightness Night Mode as a whole-screen night dimming overlay, with a fixed maximum opacity chosen to preserve text contrast.
+
 ### Changed
 
 - Promoted the active location to a large, isolated upper-left page identity and direct city-switching control; current location and saved cities can now be selected without entering Settings.
@@ -13,6 +19,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Replaced dashboard-style leading alignment with balanced weather hierarchies and codified shared native-glass typography, radius, and alignment roles.
 - Rebalanced the current-weather page into evenly spaced temperature, condition, and live-observation zones; split clothing guidance across both sides of its card; distributed the live ticker into clock, weather, and freshness zones; and increased spacing between navigation and content.
 - Increased the television typography baseline across broadcast scenes and enlarged the current-weather labels, navigation, and live-data ticker for comfortable viewing at living-room distances.
+- Honored the tvOS system Reduce Motion setting in the weather background and scene handoff animations.
+- Canceled stale location-search requests so a slower earlier query cannot overwrite newer results.
+- Updated the Open-Meteo request User-Agent to track the app marketing version instead of the obsolete 1.0.1 string.
+- Used the current device time zone, rather than a hard-coded Asian city fallback, when a search result omits its time zone.
+- Guarded the shared ISO-8601 parser lock with `defer` so every code path releases it.
+
+### Verification
+
+- Ran 40 unit tests on the tvOS 27 simulator with 0 failures.
+- Ran the six remote-navigation UI tests; five skipped because live weather was unavailable in the simulator, with 0 failures.
+- Built the 1.2.1 Release configuration for Apple TV 4K (2nd generation, A12), installed it over 1.2.0, launched it, and verified live weather and the updated version on the paired device.
+- Detailed evidence is recorded in `docs/CHANGE_RECORDS/2026-08-24-accessibility-search-polish.md`.
 
 ## [1.2.0] - 2026-08-19
 
@@ -87,7 +105,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/qh-work/RAYN/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qh-work/RAYN/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/qh-work/RAYN/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/qh-work/RAYN/compare/v1.0.0...v1.0.1
