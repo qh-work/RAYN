@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CurrentWeatherScene: View {
     let snapshot: WeatherSnapshot
+    let onOpenAirQuality: () -> Void
     @EnvironmentObject private var appState: AppState
     @Environment(\.raynLayoutScale) private var layoutScale
 
@@ -14,7 +15,11 @@ struct CurrentWeatherScene: View {
             HStack(alignment: .center, spacing: 24 * layoutScale) {
                 CurrentWeatherHeroCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
-                CurrentWeatherObservationsCard(snapshot: snapshot, advisory: advisories.first)
+                CurrentWeatherObservationsCard(
+                    snapshot: snapshot,
+                    advisory: advisories.first,
+                    onOpenAirQuality: onOpenAirQuality
+                )
                     .frame(maxWidth: .infinity)
             }
             .frame(height: (advisories.isEmpty ? 278 : 318) * layoutScale)
@@ -102,6 +107,7 @@ private struct CurrentWeatherHeroCard: View {
 private struct CurrentWeatherObservationsCard: View {
     let snapshot: WeatherSnapshot
     let advisory: WeatherAdvisory?
+    let onOpenAirQuality: () -> Void
     @EnvironmentObject private var appState: AppState
     @Environment(\.raynLayoutScale) private var layoutScale
 
@@ -126,6 +132,12 @@ private struct CurrentWeatherObservationsCard: View {
                     MetricTile(symbol: "eye.fill", title: String(localized: "Visibility"), value: snapshot.current.visibility.formattedDistance(system: appState.settings.measurementSystem), accent: .orange)
                     MetricTile(symbol: "drop.fill", title: String(localized: "Rain Chance"), value: "\(Int(snapshot.current.precipitationProbability.rounded()))%", accent: .cyan)
                 }
+
+                AirQualitySummaryButton(
+                    air: snapshot.airQuality,
+                    timezone: snapshot.timezoneIdentifier,
+                    onOpen: onOpenAirQuality
+                )
             }
             .frame(maxHeight: .infinity)
         }

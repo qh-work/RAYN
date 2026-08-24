@@ -168,7 +168,7 @@ struct BroadcastView: View {
                             .font(.system(size: 27 * layoutScale, weight: .bold))
                             .opacity(0.62)
                     }
-                    .shadow(color: .black.opacity(0.16), radius: 10 * layoutScale, y: 4 * layoutScale)
+                    .shadow(color: .black.opacity(0.12), radius: 5 * layoutScale, y: 2 * layoutScale)
                 }
                 .buttonStyle(FocusButtonStyle())
                 .foregroundStyle(.white)
@@ -251,7 +251,9 @@ struct BroadcastView: View {
     private func sceneContent(scene: BroadcastScene, snapshot: WeatherSnapshot) -> some View {
         switch scene {
         case .current:
-            CurrentWeatherScene(snapshot: snapshot)
+            CurrentWeatherScene(snapshot: snapshot) {
+                appState.select(scene: .airQuality)
+            }
         case .hourly:
             HourlyForecastScene(snapshot: snapshot)
         case .daily:

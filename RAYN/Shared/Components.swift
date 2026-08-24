@@ -54,8 +54,8 @@ enum RAYNDesign {
 struct GlassCard<Content: View>: View {
     var cornerRadius: CGFloat = RAYNDesign.Radius.card
     var tint: Color = .white
-    var shadowRadius: CGFloat = 12
-    var shadowOffset: CGFloat = 5
+    var shadowRadius: CGFloat = 8
+    var shadowOffset: CGFloat = 3
     @ViewBuilder var content: Content
     @Environment(\.raynLayoutScale) private var layoutScale
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -204,12 +204,12 @@ struct FocusButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(isFocused ? 1.04 : 1)
-            .brightness(isFocused ? 0.08 : 0)
+            .scaleEffect(isFocused ? 1.018 : 1)
+            .brightness(isFocused ? 0.03 : 0)
             // Native tvOS focus and glass effects already provide the halo.
             // A second animated shadow forces an offscreen render on every
             // focus step, which is disproportionately expensive on A12.
-            .animation(.easeOut(duration: 0.12), value: isFocused)
+            .animation(.easeOut(duration: 0.10), value: isFocused)
             .opacity(configuration.isPressed ? 0.72 : 1)
     }
 }

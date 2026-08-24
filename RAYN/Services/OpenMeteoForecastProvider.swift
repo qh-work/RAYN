@@ -28,7 +28,7 @@ struct OpenMeteoForecastProvider: ForecastProvider {
       URLQueryItem(
         name: "daily",
         value:
-          "temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset,uv_index_max,daylight_duration"
+          "temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max,sunrise,sunset,moonrise,moonset,moon_phase,uv_index_max,daylight_duration"
       ),
     ]
     guard let url = components?.url else { throw WeatherProviderError.invalidURL }
@@ -119,7 +119,13 @@ struct OpenMeteoForecastProvider: ForecastProvider {
       cloudCoverLow: currentPayload?.cloudCoverLow,
       cloudCoverMid: currentPayload?.cloudCoverMid,
       cloudCoverHigh: currentPayload?.cloudCoverHigh,
-      daylightDuration: dailyPayload?.daylightDuration?.first
+      daylightDuration: dailyPayload?.daylightDuration?.first,
+      moonrise: dailyPayload?.moonrise?.first.flatMap {
+        WeatherDateParser.date(from: $0, timezone: timezone)
+      },
+      moonset: dailyPayload?.moonset?.first.flatMap {
+        WeatherDateParser.date(from: $0, timezone: timezone)
+      }
     )
 
     let hourlyTimes = payload.hourly?.time ?? []
@@ -306,6 +312,9 @@ struct OpenMeteoForecastPayload: Decodable {
     var windGustMax: [Double]?
     var sunrise: [String]?
     var sunset: [String]?
+    var moonrise: [String]?
+    var moonset: [String]?
+    var moonPhase: [Double]?
     var uvIndexMax: [Double]?
     var daylightDuration: [Double]?
 
@@ -320,6 +329,9 @@ struct OpenMeteoForecastPayload: Decodable {
       case windGustMax = "wind_gusts_10m_max"
       case sunrise
       case sunset
+      case moonrise
+      case moonset
+      case moonPhase = "moon_phase"
       case uvIndexMax = "uv_index_max"
       case daylightDuration = "daylight_duration"
     }

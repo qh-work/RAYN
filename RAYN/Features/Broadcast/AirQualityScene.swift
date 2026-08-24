@@ -43,6 +43,82 @@ struct AirQualityScene: View {
 
 }
 
+/// The home screen shows air quality as an environmental sub-panel. Selecting
+/// it opens this scene's full pollutant and hourly trend view without keeping
+/// a separate top-level navigation tab on the broadcast header.
+struct AirQualitySummaryButton: View {
+    let air: AirQualitySnapshot?
+    let timezone: String
+    let onOpen: () -> Void
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    var body: some View {
+        if let air {
+            Button(action: onOpen) {
+                HStack(spacing: 12 * layoutScale) {
+                    Image(systemName: "aqi.medium")
+                        .font(.system(size: 25 * layoutScale, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(aqiColor(air.europeanAQI))
+
+                    VStack(alignment: .leading, spacing: 2 * layoutScale) {
+                        Text("Air Quality")
+                            .font(.system(size: 18 * layoutScale, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.58))
+                        Text(air.level)
+                            .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
+                            .foregroundStyle(aqiColor(air.europeanAQI))
+                    }
+
+                    Spacer(minLength: 8 * layoutScale)
+
+                    VStack(alignment: .trailing, spacing: 2 * layoutScale) {
+                        Text(verbatim: "AQI \(Int(air.europeanAQI.rounded()))")
+                            .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                        Text("Updated \(air.updatedAt.formatted(.time, timezoneIdentifier: timezone))")
+                            .font(.system(size: 14 * layoutScale, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.46))
+                            .monospacedDigit()
+                    }
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 16 * layoutScale, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.42))
+                }
+                .padding(.horizontal, 16 * layoutScale)
+                .padding(.vertical, 10 * layoutScale)
+                .background(
+                    aqiColor(air.europeanAQI).opacity(0.14),
+                    in: RoundedRectangle(cornerRadius: 17 * layoutScale, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 17 * layoutScale, style: .continuous)
+                        .stroke(aqiColor(air.europeanAQI).opacity(0.28), lineWidth: 1)
+                }
+            }
+            .buttonStyle(FocusButtonStyle())
+            .foregroundStyle(.white)
+            .accessibilityLabel(
+                Text(verbatim: "Air quality, AQI \(Int(air.europeanAQI.rounded())), \(air.level)")
+            )
+        } else {
+            HStack(spacing: 12 * layoutScale) {
+                Image(systemName: "aqi.medium")
+                    .font(.system(size: 25 * layoutScale, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.48))
+                Text("Air-quality data is currently unavailable.")
+                    .font(.system(size: 18 * layoutScale, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.54))
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 16 * layoutScale)
+            .padding(.vertical, 12 * layoutScale)
+            .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 17 * layoutScale, style: .continuous))
+        }
+    }
+}
+
 private func aqiColor(_ value: Double) -> Color {
     switch value {
     case ..<20: return .green

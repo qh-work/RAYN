@@ -127,7 +127,12 @@ final class AppState: ObservableObject {
     }
 
     var visibleScenes: [BroadcastScene] {
-        settings.orderedScenes.filter { !settings.hiddenScenes.contains($0) }
+        // Air quality is a home-screen environment sub-panel. Its detailed
+        // view remains reachable from the home summary, but it should not
+        // consume a primary broadcast tab or an automatic-rotation slot.
+        settings.orderedScenes.filter {
+            $0 != .airQuality && !settings.hiddenScenes.contains($0)
+        }
     }
 
     var localTimeZone: TimeZone {
@@ -237,7 +242,10 @@ final class AppState: ObservableObject {
     }
 
     func select(scene: BroadcastScene) {
-        guard !settings.hiddenScenes.contains(scene) else { return }
+        // The home air-quality summary is the intentional entry point for its
+        // detail scene even when the user hid the old standalone tab in a
+        // previous release.
+        guard scene == .airQuality || !settings.hiddenScenes.contains(scene) else { return }
         currentScene = scene
         revealControls()
     }

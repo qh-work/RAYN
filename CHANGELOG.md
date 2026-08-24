@@ -6,6 +6,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-08-24
+
+### Added
+
+- Requested Open-Meteo daily moonrise and moonset fields and mapped them into the live astronomy cards.
+- Added an air-quality summary sub-panel to the home screen with a focusable path to pollutant and hourly-detail views.
+
+### Changed
+
+- Removed Air Quality from the primary broadcast tab and automatic-rotation sequence; it remains available from the home summary.
+- Consolidated the animated weather atmosphere into one asynchronous Canvas and removed unnecessary per-layer blur subtrees.
+- Reduced generic focus scaling and card-shadow composition to keep A12 focus transitions responsive without reducing radar display cadence.
+
+### Verification
+
+- Built the simulator test target and signed the Release configuration with Xcode 27 beta and the tvOS 27 SDK.
+- Installed and launched RAYN Weather 1.2.3 (7) on the paired physical Apple TV 4K (2nd generation, A12).
+- Queried the live Open-Meteo forecast contract for a public Beijing coordinate and confirmed daily moonrise and moonset values are returned and decoded.
+
 ## [1.2.2] - 2026-08-24
 
 ### Fixed
@@ -121,7 +140,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/qh-work/RAYN/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/qh-work/RAYN/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/qh-work/RAYN/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qh-work/RAYN/compare/v1.1.0...v1.2.0

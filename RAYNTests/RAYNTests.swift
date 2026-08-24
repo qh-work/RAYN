@@ -255,11 +255,14 @@ final class RAYNTests: XCTestCase {
           "uv_index":[5.2],
           "weather_code":[61]
         },
-        "daily":{
+          "daily":{
           "time":["2026-08-16"],
           "temperature_2m_max":[31.0],
           "temperature_2m_min":[24.0],
-          "daylight_duration":[45000]
+          "daylight_duration":[45000],
+          "moonrise":["2026-08-16T19:42"],
+          "moonset":["2026-08-17T05:11"],
+          "moon_phase":[0.62]
         }
       }
       """#
@@ -271,6 +274,20 @@ final class RAYNTests: XCTestCase {
     XCTAssertEqual(snapshot.current.cloudCoverHigh, 80)
     XCTAssertEqual(snapshot.current.precipitationProbability, 82)
     XCTAssertEqual(snapshot.current.daylightDuration, 45000)
+    XCTAssertEqual(
+      snapshot.current.moonrise,
+      WeatherDateParser.date(
+        from: "2026-08-16T19:42",
+        timezone: TimeZone(identifier: "Asia/Shanghai")!
+      )
+    )
+    XCTAssertEqual(
+      snapshot.current.moonset,
+      WeatherDateParser.date(
+        from: "2026-08-17T05:11",
+        timezone: TimeZone(identifier: "Asia/Shanghai")!
+      )
+    )
     XCTAssertEqual(snapshot.hourly.first?.windGust, 35)
     XCTAssertEqual(snapshot.hourly.first?.visibility, 12)
     XCTAssertEqual(snapshot.hourly.first?.uvIndex, 5.2)
@@ -478,6 +495,18 @@ final class RAYNTests: XCTestCase {
     state.nextScene()
     XCTAssertEqual(state.currentScene, .daily)
     state.applySettings(AppConfiguration.defaultSettings)
+  }
+
+  @MainActor
+  func testAirQualityIsReachedFromHomeInsteadOfPrimaryRotationTabs() {
+    let state = AppState()
+
+    XCTAssertFalse(state.visibleScenes.contains(.airQuality))
+    state.select(scene: .airQuality)
+    XCTAssertEqual(state.currentScene, .airQuality)
+
+    state.select(scene: .current)
+    XCTAssertEqual(state.currentScene, .current)
   }
 
   @MainActor
