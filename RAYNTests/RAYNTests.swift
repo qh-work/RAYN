@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 
 @testable import RAYN
 
@@ -497,6 +498,19 @@ final class RAYNTests: XCTestCase {
     state.togglePause()
     XCTAssertFalse(state.isPaused)
     state.applySettings(AppConfiguration.defaultSettings)
+  }
+
+  @MainActor
+  func testFocusInteractionDoesNotPublishAWholeSceneUpdate() {
+    let state = AppState()
+    var publications = 0
+    let subscription = state.objectWillChange.sink { _ in publications += 1 }
+
+    state.noteFocusInteraction()
+    state.noteFocusInteraction()
+
+    XCTAssertEqual(publications, 0)
+    withExtendedLifetime(subscription) {}
   }
 
   func testBeijingUsesItsOwnTimezoneAndAllThemesExist() {

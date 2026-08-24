@@ -5,10 +5,7 @@ struct DailyForecastScene: View {
     @Binding var selectedDayID: Date?
     @EnvironmentObject private var appState: AppState
     @Environment(\.raynLayoutScale) private var layoutScale
-    @Environment(\.resetFocus) private var resetFocus
     @State private var lastFocusedDayID: Date?
-    @FocusState private var focusedDayID: Date?
-    @Namespace private var dayFocusScope
 
     var body: some View {
         Group {
@@ -30,12 +27,37 @@ struct DailyForecastScene: View {
                 .padding(.top, 28 * layoutScale)
                 .padding(.bottom, 18 * layoutScale)
             } else {
-                forecastList
+                DailyForecastList(
+                    snapshot: snapshot,
+                    selectedDayID: $selectedDayID,
+                    lastFocusedDayID: $lastFocusedDayID
+                )
             }
         }
     }
 
-    private var forecastList: some View {
+    private var days: [DailyForecastPoint] {
+        Array(snapshot.daily.prefix(10))
+    }
+
+    private func closeDetail() {
+        guard let selectedDayID else { return }
+        lastFocusedDayID = selectedDayID
+        self.selectedDayID = nil
+    }
+}
+
+private struct DailyForecastList: View {
+    let snapshot: WeatherSnapshot
+    @Binding var selectedDayID: Date?
+    @Binding var lastFocusedDayID: Date?
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.raynLayoutScale) private var layoutScale
+    @Environment(\.resetFocus) private var resetFocus
+    @FocusState private var focusedDayID: Date?
+    @Namespace private var dayFocusScope
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 20 * layoutScale) {
             PageHeader(
                 eyebrow: String(localized: "Extended Forecast"),
@@ -94,11 +116,6 @@ struct DailyForecastScene: View {
             // fully navigable with the remote, so a shorter viewport is a
             // better tradeoff than shrinking the forecast text.
             .frame(height: 426 * layoutScale)
-                .onChange(of: focusedDayID) { _, nextID in
-                    guard let nextID else { return }
-                    lastFocusedDayID = nextID
-                    appState.revealControls()
-                }
             }
             .focusSection()
 
@@ -141,11 +158,6 @@ struct DailyForecastScene: View {
         }
     }
 
-    private func closeDetail() {
-        guard let selectedDayID else { return }
-        lastFocusedDayID = selectedDayID
-        self.selectedDayID = nil
-    }
 }
 private struct DailyForecastRow: View {
     let point: DailyForecastPoint
@@ -255,11 +267,6 @@ private struct DailyForecastRowButtonStyle: ButtonStyle {
             }
             .scaleEffect(isFocused ? 1.018 : 1)
             .brightness(isFocused ? 0.05 : 0)
-            .shadow(
-                color: .white.opacity(isFocused ? 0.18 : 0),
-                radius: 13 * layoutScale,
-                y: 2 * layoutScale
-            )
             .zIndex(isFocused ? 1 : 0)
             .opacity(configuration.isPressed ? 0.72 : 1)
             .animation(.easeOut(duration: 0.14), value: isFocused)

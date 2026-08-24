@@ -5,8 +5,8 @@ enum AppConfiguration {
     // internal name keeps targets, modules, paths, and icon artwork stable.
     static let displayName = "RAYN Weather"
     static let productName = "RAYN"
-    static let marketingVersion = "1.2.1"
-    static let buildNumber = "5"
+    static let marketingVersion = "1.2.2"
+    static let buildNumber = "6"
     static let weatherRefreshInterval: TimeInterval = 15 * 60
     static let airQualityRefreshInterval: TimeInterval = 45 * 60
     static let radarRefreshInterval: TimeInterval = 10 * 60

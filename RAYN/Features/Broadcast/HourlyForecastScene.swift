@@ -6,7 +6,7 @@ struct HourlyForecastScene: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.raynLayoutScale) private var layoutScale
     @State private var selectedHourID: Date?
-    @FocusState private var focusedHourID: Date?
+    @Namespace private var hourlyFocusScope
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18 * layoutScale) {
@@ -80,12 +80,15 @@ struct HourlyForecastScene: View {
                                 timezone: snapshot.timezoneIdentifier,
                                 unit: appState.settings.temperatureUnit,
                                 measurementSystem: appState.settings.measurementSystem,
-                                isSelected: selectedHourID == point.id || focusedHourID == point.id
+                                isSelected: selectedHourID == point.id
                             )
                         }
-                        .buttonStyle(FocusButtonStyle())
-                        .focused($focusedHourID, equals: point.id)
+                        .buttonStyle(HourlyForecastCardButtonStyle())
                         .foregroundStyle(.white)
+                        .prefersDefaultFocus(
+                            point.id == snapshot.hourly.first?.id,
+                            in: hourlyFocusScope
+                        )
                         .accessibilityLabel(hourAccessibilityLabel(point))
                         .accessibilityHint("Press Select to keep this hour highlighted")
                     }
@@ -97,11 +100,7 @@ struct HourlyForecastScene: View {
             .clipShape(Rectangle().inset(by: -20 * layoutScale))
             .frame(height: 190 * layoutScale)
             .focusSection()
-            .onChange(of: focusedHourID) { _, hourID in
-                guard let hourID else { return }
-                selectedHourID = hourID
-                appState.revealControls()
-            }
+            .focusScope(hourlyFocusScope)
             if let selectedHour {
                 Text("Selected \(selectedHour.time.formatted(.monthDayTime, timezoneIdentifier: snapshot.timezoneIdentifier)) · Feels like \(selectedHour.apparentTemperature.formattedTemperature(unit: appState.settings.temperatureUnit))° · Rain \(Int(selectedHour.precipitationProbability.rounded()))% · Wind Direction \(Int(selectedHour.windDirection.rounded()))°")
                     .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
@@ -161,6 +160,26 @@ private struct HourlyCard: View {
         .frame(width: 166 * layoutScale)
         .padding(.vertical, 15 * layoutScale)
         .background((isSelected ? Color.cyan.opacity(0.24) : Color.white.opacity(0.09)), in: RoundedRectangle(cornerRadius: 18 * layoutScale, style: .continuous))
+    }
+}
+
+private struct HourlyForecastCardButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+    @Environment(\.raynLayoutScale) private var layoutScale
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .overlay {
+                RoundedRectangle(cornerRadius: 18 * layoutScale, style: .continuous)
+                    .stroke(
+                        isFocused ? Color.white.opacity(0.42) : .clear,
+                        lineWidth: 1.5 * layoutScale
+                    )
+            }
+            .scaleEffect(isFocused ? 1.025 : 1)
+            .brightness(isFocused ? 0.05 : 0)
+            .opacity(configuration.isPressed ? 0.72 : 1)
+            .animation(.easeOut(duration: 0.12), value: isFocused)
     }
 }
 

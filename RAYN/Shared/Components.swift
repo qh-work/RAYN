@@ -206,8 +206,10 @@ struct FocusButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(isFocused ? 1.04 : 1)
             .brightness(isFocused ? 0.08 : 0)
-            .shadow(color: .white.opacity(isFocused ? 0.24 : 0), radius: 18)
-            .animation(.easeOut(duration: 0.18), value: isFocused)
+            // Native tvOS focus and glass effects already provide the halo.
+            // A second animated shadow forces an offscreen render on every
+            // focus step, which is disproportionately expensive on A12.
+            .animation(.easeOut(duration: 0.12), value: isFocused)
             .opacity(configuration.isPressed ? 0.72 : 1)
     }
 }
@@ -225,7 +227,6 @@ private struct FocusAdaptiveGlassForeground: ViewModifier {
             // does not reliably publish a glass button's focus state to an
             // exterior modifier on tvOS.
             .focused($isFocused)
-            .animation(.easeOut(duration: 0.12), value: isFocused)
     }
 }
 

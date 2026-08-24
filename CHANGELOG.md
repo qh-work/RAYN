@@ -6,6 +6,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-08-24
+
+### Fixed
+
+- Removed whole-scene publication and task churn from remote focus movement; focus steps now update the local control state without rebuilding the broadcast hierarchy.
+- Isolated hourly-card focus styling from the 24-hour Charts view so moving across values does not recalculate the chart or all 24 cards.
+- Isolated the 10-day list focus state from its detail scene so vertical navigation does not rebuild the detail branch on every row change.
+- Removed redundant animated focus shadows and shortened the remaining local focus transition while retaining native tvOS focus and glass behavior.
+- Changed automatic rotation to reset a deadline instead of cancelling and recreating its async task for every interaction.
+
+### Verification
+
+- Built and signed the Release configuration with Xcode 27 beta and the tvOS 27 SDK for Apple TV 4K (2nd generation, A12).
+- Installed and launched RAYN Weather 1.2.2 (6) on the paired physical Apple TV; captured a 3840×2160 live-data screenshot.
+- The tvOS 27 simulator was shut down after a stale boot/storage-analysis process made its CPU behavior unrepresentative of the app or A12 hardware.
+
 ## [1.2.1] - 2026-08-24
 
 ### Added
@@ -105,7 +121,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Rebranded the application, Xcode project, targets, schemes, modules, and public documentation as RAYN.
 - Isolated radar rendering and constrained transition work for Apple TV 4K (2nd generation, A12).
 
-[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/qh-work/RAYN/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/qh-work/RAYN/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/qh-work/RAYN/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/qh-work/RAYN/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/qh-work/RAYN/compare/v1.0.1...v1.1.0

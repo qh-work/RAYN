@@ -31,14 +31,15 @@ final class AppState: ObservableObject {
     @Published var searchResults: [SavedLocation] = []
     @Published var isSearching = false
     @Published var showSettings = false
-    @Published var lastInteraction = Date()
 
     private let refreshCoordinator: RefreshCoordinator
     private let locationSearchProvider: LocationSearchProvider
     private let locationService = LocationService()
     private var rotationTask: Task<Void, Never>?
+    private var nextRotationAt: Date?
     private var refreshMonitorTask: Task<Void, Never>?
     private var controlsTask: Task<Void, Never>?
+    private var controlsHideDeadline: Date?
     private var searchTask: Task<Void, Never>?
     #if DEBUG
     private var captureTourTask: Task<Void, Never>?
@@ -247,25 +248,56 @@ final class AppState: ObservableObject {
     }
 
     func revealControls() {
-        controlsVisible = true
-        lastInteraction = Date()
-        // A manual interaction starts a fresh dwell period. Without this,
-        // selecting Radar near the old timer deadline immediately advanced to
-        // Air Quality, which looked like an incorrect intermediate scene.
-        restartRotationTask()
-        controlsTask?.cancel()
-        #if DEBUG
+        // Directional input arrives for every focus step. Do not publish a
+        // new AppState value when the controls are already visible: that
+        // invalidated the complete 4K scene hierarchy while the tvOS focus
+        // engine was still animating.
+        if !controlsVisible {
+            controlsVisible = true
+        }
+        controlsHideDeadline = Date().addingTimeInterval(5)
+        resetRotationDeadline()
+        scheduleControlsHideTask()
+    }
+
+    /// Records a focus step without cancelling and recreating the automatic
+    /// rotation task. This path is called for every remote direction, so it
+    /// must remain a private, non-publishing update on the main actor.
+    func noteFocusInteraction() {
+        if !controlsVisible {
+            controlsVisible = true
+        }
+        controlsHideDeadline = Date().addingTimeInterval(5)
+        resetRotationDeadline()
+        scheduleControlsHideTask()
+    }
+
+    private func scheduleControlsHideTask() {
+#if DEBUG
         // Accessibility queries are deliberately slower than a real remote.
         // Keep navigation visible only for deterministic UI automation; the
         // release app still hides it after the normal five-second dwell.
         if ProcessInfo.processInfo.environment["RAYN_KEEP_CONTROLS_VISIBLE"] == "1" {
             return
         }
-        #endif
+#endif
+        guard controlsTask == nil else { return }
         controlsTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
-            guard let self, Date().timeIntervalSince(lastInteraction) >= 4.8 else { return }
-            controlsVisible = false
+            while !Task.isCancelled {
+                guard let self, let deadline = controlsHideDeadline else { return }
+                let remaining = deadline.timeIntervalSinceNow
+                if remaining <= 0 {
+                    controlsVisible = false
+                    controlsHideDeadline = nil
+                    controlsTask = nil
+                    return
+                }
+                do {
+                    try await Task.sleep(nanoseconds: UInt64(max(remaining, 0.05) * 1_000_000_000))
+                } catch {
+                    return
+                }
+            }
         }
     }
 
@@ -379,26 +411,48 @@ final class AppState: ObservableObject {
         switch direction {
         case .left: previousScene()
         case .right: nextScene()
-        case .up, .down: revealControls()
-        @unknown default: revealControls()
+        case .up, .down: noteFocusInteraction()
+        @unknown default: noteFocusInteraction()
         }
     }
 
     private func restartRotationTask() {
         rotationTask?.cancel()
+        nextRotationAt = nil
         guard settings.automaticRotation else { return }
+        nextRotationAt = Date().addingTimeInterval(rotationInterval)
         rotationTask = Task { @MainActor [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
-                let nanos = UInt64(max(8, settings.rotationSeconds) * 1_000_000_000)
-                try? await Task.sleep(nanoseconds: nanos)
-                guard !Task.isCancelled, settings.automaticRotation, !isPaused else { continue }
+                guard settings.automaticRotation else { return }
+                if isPaused {
+                    nextRotationAt = Date().addingTimeInterval(rotationInterval)
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    continue
+                }
+                let deadline = nextRotationAt ?? Date().addingTimeInterval(rotationInterval)
+                nextRotationAt = deadline
+                let remaining = deadline.timeIntervalSinceNow
+                if remaining > 0 {
+                    try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                }
+                guard !Task.isCancelled, settings.automaticRotation else { return }
                 let scenes = visibleScenes
                 guard !scenes.isEmpty else { continue }
                 let index = scenes.firstIndex(of: currentScene) ?? 0
                 currentScene = scenes[(index + 1) % scenes.count]
+                nextRotationAt = Date().addingTimeInterval(rotationInterval)
             }
         }
+    }
+
+    private func resetRotationDeadline() {
+        guard settings.automaticRotation else { return }
+        nextRotationAt = Date().addingTimeInterval(rotationInterval)
+    }
+
+    private var rotationInterval: TimeInterval {
+        max(8, settings.rotationSeconds)
     }
 
     #if DEBUG

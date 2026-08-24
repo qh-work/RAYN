@@ -91,7 +91,7 @@ struct BroadcastView: View {
             // Directional input belongs to the tvOS focus engine. Mutating the
             // scene here made one swipe both move tab focus and change pages,
             // so Radar could briefly or permanently land on Air Quality.
-            appState.revealControls()
+            appState.noteFocusInteraction()
         }
         .onPlayPauseCommand {
             appState.togglePause()
