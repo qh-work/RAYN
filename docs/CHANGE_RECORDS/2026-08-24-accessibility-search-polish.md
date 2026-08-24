@@ -49,16 +49,16 @@ Physical build, install, launch:
 ```text
 DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
 xcodebuild -project RAYN.xcodeproj -scheme RAYN -configuration Release \
--destination 'platform=tvOS,id=6146849D-1D31-5E94-857E-638F0BC5AE79' \
+-destination 'platform=tvOS,id=YOUR_PAIRED_TV_DEVICE_ID' \
 -derivedDataPath /tmp/RAYN-DerivedData DEVELOPMENT_TEAM=3VUKZK4LYF \
 -allowProvisioningUpdates build
 
 xcrun devicectl device install app \
---device 6146849D-1D31-5E94-857E-638F0BC5AE79 \
+--device YOUR_PAIRED_TV_DEVICE_ID \
 /tmp/RAYN-DerivedData/Build/Products/Release-appletvos/RAYN.app
 
 xcrun devicectl device process launch \
---device 6146849D-1D31-5E94-857E-638F0BC5AE79 --terminate-existing \
+--device YOUR_PAIRED_TV_DEVICE_ID --terminate-existing \
 com.rayn.weather.tv
 ```
 
