@@ -1,7 +1,7 @@
 # Change record: moon events, home air quality, and A12 rendering
 
-Date: 2026-08-24  
-Scope: RAYN Weather tvOS 27  
+Date: 2026-08-24
+Scope: RAYN Weather tvOS 27
 Status: Built, installed, and launched on the paired Apple TV 4K (2nd generation, A12).
 
 ## Findings
@@ -25,4 +25,3 @@ Status: Built, installed, and launched on the paired Apple TV 4K (2nd generation
 - A 3840×2160 hardware screenshot showed the home air-quality sub-panel with live AQI data.
 - A public Beijing Open-Meteo request returned daily moonrise and moonset values; provider mapping tests assert both values and their time zone conversion.
 - An Instruments Animation Hitches recording could not be completed because the Xcode tracing service disconnected from the Apple TV. No simulator result was used as a hardware performance claim.
-
