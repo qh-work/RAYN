@@ -3,12 +3,14 @@
 **Weather, alive.**
 
 [![tvOS CI](https://github.com/qh-work/RAYN/actions/workflows/ci.yml/badge.svg)](https://github.com/qh-work/RAYN/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/qh-work/RAYN?display_name=tag&sort=semver)](https://github.com/qh-work/RAYN/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/qh-work/RAYN?style=flat)](https://github.com/qh-work/RAYN/stargazers)
 
 > **Project status:** Public open-source preview. Source builds, tests, hardware validation, and self-install instructions are available; App Store and TestFlight distribution are not currently provided.
 
 [简体中文](README.zh-CN.md) | English
 
-RAYN Weather is a native, open-source weather studio for Apple TV. It turns live weather, air quality, radar, sunlight, moon, and marine conditions into a cinematic interface designed for televisions and projectors.
+RAYN Weather is a native, open-source weather studio for Apple TV. It turns live weather, air quality, radar, sunlight, moon, and marine conditions into a cinematic interface designed for televisions and projectors—not a phone layout stretched onto a big screen.
 
 The production launch path uses real network data only. It does not fall back to demo weather, a hard-coded city, or invented radar imagery when a provider is unavailable.
 
