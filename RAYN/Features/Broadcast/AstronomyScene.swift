@@ -156,9 +156,9 @@ private struct SunDetailView: View {
                         )
                     }
                 }
-                .frame(width: 505 * layoutScale)
+                .frame(maxWidth: .infinity)
             }
-            .frame(height: 374 * layoutScale)
+            .frame(minHeight: 460 * layoutScale)
 
             SunDaylightForecast(
                 days: Array(snapshot.daily.prefix(10)),
@@ -242,7 +242,7 @@ private struct SunPathDetailCard: View {
                         date: context.date,
                         timezone: snapshot.timezoneIdentifier
                     )
-                    .frame(height: 208 * layoutScale)
+                    .frame(height: 340 * layoutScale)
                 }
             }
         }
@@ -280,21 +280,27 @@ private struct SunDaylightForecast: View {
     var body: some View {
         GlassCard(cornerRadius: 24) {
             VStack(alignment: .leading, spacing: 10 * layoutScale) {
-                Text("10-Day Daylight Trend")
-                    .font(.system(size: 20 * layoutScale, weight: .bold, design: .rounded))
+                Text("Daylight (hours)")
+                    .font(.system(size: 24 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.82))
                 HStack(alignment: .bottom, spacing: 10 * layoutScale) {
                     ForEach(Array(days.enumerated()), id: \.element.id) { index, day in
                         VStack(spacing: 5 * layoutScale) {
-                            Text(daylightValue(day).formattedNumber(decimals: 1))
-                                .font(.system(size: 15 * layoutScale, weight: .bold, design: .rounded))
+                            Text(daylightValue(day).map { $0.formattedNumber(decimals: 1) } ?? "—")
+                                .font(.system(size: 22 * layoutScale, weight: .bold, design: .rounded))
                                 .monospacedDigit()
                                 .foregroundStyle(.white.opacity(0.68))
-                            Capsule()
-                                .fill(LinearGradient(colors: [.orange, .yellow], startPoint: .bottom, endPoint: .top))
-                                .frame(height: barHeight(for: day))
+                            ZStack(alignment: .bottom) {
+                                Capsule().fill(.white.opacity(0.05))
+                                if daylightValue(day) != nil {
+                                    Capsule()
+                                        .fill(LinearGradient(colors: [.orange, .yellow], startPoint: .bottom, endPoint: .top))
+                                        .frame(height: barHeight(for: day))
+                                }
+                            }
+                            .frame(height: 64 * layoutScale)
                             Text(index == 0 ? String(localized: "Today") : day.date.formatted(.shortWeekday, timezoneIdentifier: timezone))
-                                .font(.system(size: 15 * layoutScale, weight: .semibold, design: .rounded))
+                                .font(.system(size: 20 * layoutScale, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.54))
                         }
                         .frame(maxWidth: .infinity)
@@ -305,23 +311,17 @@ private struct SunDaylightForecast: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var range: ClosedRange<Double> {
-        let values = days.map(daylightValue)
-        let minimum = values.min() ?? 0
-        let maximum = values.max() ?? minimum + 1
-        return minimum...(maximum == minimum ? minimum + 1 : maximum)
-    }
-
-    private func daylightValue(_ day: DailyForecastPoint) -> Double {
+    private func daylightValue(_ day: DailyForecastPoint) -> Double? {
         if let duration = day.daylightDuration { return duration / 3_600 }
-        guard let sunrise = day.sunrise, let sunset = day.sunset else { return 0 }
+        guard let sunrise = day.sunrise, let sunset = day.sunset else { return nil }
         return max(0, sunset.timeIntervalSince(sunrise) / 3_600)
     }
 
     private func barHeight(for day: DailyForecastPoint) -> CGFloat {
-        let span = max(range.upperBound - range.lowerBound, 0.01)
-        let fraction = (daylightValue(day) - range.lowerBound) / span
-        return (20 + 34 * fraction) * layoutScale
+        // Absolute 0–24 h scale: a two-minute change must not look like a
+        // doubling of daylight. Missing events remain absent, not zero hours.
+        let fraction = min(max((daylightValue(day) ?? 0) / 24, 0), 1)
+        return 64 * fraction * layoutScale
     }
 }
 
@@ -841,7 +841,7 @@ private struct MoonDiskView: View {
                     .resizable()
                     .scaledToFit()
                     .colorMultiply(Color(hex: 0x77838A))
-                    .opacity(0.42)
+                    .opacity(0.14)
                     .mask(Circle().fill(.white))
 
                 Image("MoonSurface")
@@ -855,8 +855,8 @@ private struct MoonDiskView: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                .white.opacity(0.20),
-                                Color(hex: 0xDDE2E0).opacity(0.10),
+                                .white.opacity(0.08),
+                                Color(hex: 0xDDE2E0).opacity(0.04),
                                 .clear
                             ],
                             center: lightCenter,
@@ -879,16 +879,16 @@ private struct MoonDiskView: View {
                     // The radial light layer above already softens the
                     // terminator. Avoiding a blur here keeps the small phase
                     // calendar out of an offscreen render pass.
-                    .fill(.white.opacity(0.16))
+                    .fill(.white.opacity(0.035))
 
                 Circle()
                     .stroke(
                         LinearGradient(
-                            colors: [.white.opacity(0.52), .white.opacity(0.10)],
+                            colors: [.white.opacity(0.15), .clear],
                             startPoint: lightCenter,
                             endPoint: UnitPoint(x: waxing ? 0.05 : 0.95, y: 0.72)
                         ),
-                        lineWidth: max(1, diameter * 0.012)
+                        lineWidth: max(0.5, diameter * 0.003)
                     )
             }
             .frame(width: diameter, height: diameter)
@@ -1397,7 +1397,8 @@ private struct SunArcGraph: View {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: timezone) ?? .current
         let startOfDay = calendar.startOfDay(for: date)
-        let daySeconds = 86_400.0
+        let daySeconds = calendar.date(byAdding: .day, value: 1, to: startOfDay)?
+            .timeIntervalSince(startOfDay) ?? 86_400.0
         let sunriseFraction = CGFloat(min(max(sunrise.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
         let sunsetFraction = CGFloat(min(max(sunset.timeIntervalSince(startOfDay) / daySeconds, sunriseFraction), 1))
         let currentFraction = CGFloat(min(max(date.timeIntervalSince(startOfDay) / daySeconds, 0), 1))
@@ -1432,12 +1433,12 @@ private struct SunArcGraph: View {
         if fraction < sunrise {
             let progress = min(max(fraction / max(sunrise, 0.001), 0), 1)
             let eased = progress * progress * (3 - 2 * progress)
-            return -0.24 * (1 - eased)
+            return -0.48 * (1 - eased)
         }
         if fraction > sunset {
             let progress = min(max((fraction - sunset) / max(1 - sunset, 0.001), 0), 1)
             let eased = progress * progress * (3 - 2 * progress)
-            return -0.24 * eased
+            return -0.48 * eased
         }
         let progress = (fraction - sunrise) / daylightSpan
         return CGFloat(sin(Double.pi * Double(progress)))

@@ -71,8 +71,30 @@ struct OpenMeteoForecastProvider: ForecastProvider {
       let dates = daily.time, dates.count >= 10,
       let highs = daily.temperatureMax, highs.count >= 10,
       let lows = daily.temperatureMin, lows.count >= 10,
-      let codes = daily.weatherCode, codes.count >= 10
+      let codes = daily.weatherCode, codes.count >= 10,
+      let probabilities = daily.precipitationProbabilityMax, probabilities.count >= 10,
+      let precipitation = daily.precipitationSum, precipitation.count >= 10,
+      let wind = daily.windSpeedMax, wind.count >= 10,
+      let gust = daily.windGustMax, gust.count >= 10,
+      let hourly = payload.hourly, let hours = hourly.time, !hours.isEmpty,
+      let temperatures = hourly.temperature, temperatures.count == hours.count,
+      let apparent = hourly.apparentTemperature, apparent.count == hours.count,
+      let hourlyRainChance = hourly.precipitationProbability, hourlyRainChance.count == hours.count,
+      let hourlyRain = hourly.precipitation, hourlyRain.count == hours.count,
+      let hourlySnow = hourly.snowfall, hourlySnow.count == hours.count,
+      let hourlyWind = hourly.windSpeed, hourlyWind.count == hours.count,
+      let hourlyDirection = hourly.windDirection, hourlyDirection.count == hours.count,
+      let hourlyCode = hourly.weatherCode, hourlyCode.count == hours.count,
+      let hourlyDay = hourly.isDay, hourlyDay.count == hours.count
     else {
+      throw WeatherProviderError.invalidResponse
+    }
+    guard let timezoneName = payload.timezone, let timezone = TimeZone(identifier: timezoneName),
+          let currentDate = WeatherDateParser.date(from: time, timezone: timezone),
+          dates.allSatisfy({ WeatherDateParser.date(from: $0, timezone: timezone) != nil }),
+          hours.allSatisfy({ WeatherDateParser.date(from: $0, timezone: timezone) != nil }),
+          hours.compactMap({ WeatherDateParser.date(from: $0, timezone: timezone) })
+            .filter({ $0 >= currentDate.addingTimeInterval(-3600) }).count >= 24 else {
       throw WeatherProviderError.invalidResponse
     }
   }
@@ -129,7 +151,11 @@ struct OpenMeteoForecastProvider: ForecastProvider {
     )
 
     let hourlyTimes = payload.hourly?.time ?? []
-    var hourly = hourlyTimes.indices.prefix(48).map { index in
+    let upcomingIndices = hourlyTimes.indices.filter {
+      guard let date = WeatherDateParser.date(from: hourlyTimes[$0], timezone: timezone) else { return false }
+      return date >= currentTime.addingTimeInterval(-3600)
+    }
+    var hourly = upcomingIndices.prefix(48).map { index in
       let time =
         WeatherDateParser.date(from: hourlyTimes[index], timezone: timezone)
         ?? currentTime.addingTimeInterval(Double(index) * 3600)
@@ -310,10 +336,10 @@ struct OpenMeteoForecastPayload: Decodable {
     var precipitationSum: [Double]?
     var windSpeedMax: [Double]?
     var windGustMax: [Double]?
-    var sunrise: [String]?
-    var sunset: [String]?
-    var moonrise: [String]?
-    var moonset: [String]?
+    var sunrise: [String?]?
+    var sunset: [String?]?
+    var moonrise: [String?]?
+    var moonset: [String?]?
     var moonPhase: [Double]?
     var uvIndexMax: [Double]?
     var daylightDuration: [Double]?

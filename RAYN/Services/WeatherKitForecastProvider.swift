@@ -19,11 +19,20 @@ struct AppleWeatherKitProvider: ForecastProvider {
     func fetchForecast(for location: SavedLocation) async throws -> WeatherSnapshot {
         let coordinate = CLLocation(latitude: location.latitude, longitude: location.longitude)
         do {
-            let weather = try await weatherService.weather(for: coordinate)
+            async let weatherRequest = weatherService.weather(for: coordinate)
+            async let attributionRequest = weatherService.attribution
+            let (weather, attribution) = try await (weatherRequest, attributionRequest)
             guard weather.dailyForecast.count >= 10 else {
                 throw WeatherProviderError.invalidResponse
             }
-            return makeSnapshot(from: weather, location: location)
+            var snapshot = makeSnapshot(from: weather, location: location)
+            snapshot.sourceAttributions = [
+                DataAttribution(id: "apple-weather", title: attribution.serviceName,
+                                detail: attribution.legalAttributionText,
+                                urlString: attribution.legalPageURL.absoluteString,
+                                logoURLString: attribution.combinedMarkDarkURL.absoluteString)
+            ]
+            return snapshot
         } catch {
             if let error = error as? WeatherProviderError {
                 throw error
@@ -159,6 +168,12 @@ struct AppleWeatherKitProvider: ForecastProvider {
                 visibility: current.visibility
             )
         )
+        switch weather.availability.alertAvailability {
+        case .available: snapshot.alertAvailability = .available
+        case .unsupported: snapshot.alertAvailability = .unsupported
+        default: snapshot.alertAvailability = .unavailable
+        }
+        snapshot.alertsCheckedAt = now
         snapshot.summary = WeatherSummaryBuilder.make(from: snapshot)
         return snapshot
     }

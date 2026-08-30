@@ -2,7 +2,7 @@ name: tvOS CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'release/**']
   pull_request:
   workflow_dispatch:
 
@@ -26,6 +26,12 @@ jobs:
         run: |
           xcodebuild -version
           xcodebuild -showsdks
+
+      - name: Validate localization and provider regressions
+        run: |
+          ruby Scripts/validate-localizations.rb
+          bash Scripts/validate-core.sh
+          bash Scripts/validate-core.sh --tvos-typecheck
 
       - name: Build RAYN
         run: |

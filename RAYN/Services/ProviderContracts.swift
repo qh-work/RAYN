@@ -1,10 +1,11 @@
 import Foundation
 
-struct DataAttribution: Identifiable, Hashable {
+struct DataAttribution: Identifiable, Hashable, Codable {
   let id: String
   let title: String
   let detail: String
   let urlString: String
+  var logoURLString: String? = nil
 
   static let openMeteo = DataAttribution(
     id: "open-meteo",
@@ -18,6 +19,12 @@ struct DataAttribution: Identifiable, Hashable {
     title: "RainViewer",
     detail: String(localized: "Precipitation radar maps"),
     urlString: "https://www.rainviewer.com/"
+  )
+
+  static let nws = DataAttribution(
+    id: "nws", title: "NOAA / National Weather Service",
+    detail: String(localized: "Official US alerts and radar"),
+    urlString: "https://www.weather.gov/"
   )
 
   static func unique(_ items: [DataAttribution]) -> [DataAttribution] {
@@ -70,17 +77,20 @@ struct WeatherProviderSuite {
   let airQuality: AirQualityProvider
   let radar: RadarProvider
   let marine: MarineWeatherProvider
+  let alerts: WeatherAlertProvider
 
   init(
     forecast: ForecastProvider,
     airQuality: AirQualityProvider,
     radar: RadarProvider,
-    marine: MarineWeatherProvider
+    marine: MarineWeatherProvider,
+    alerts: WeatherAlertProvider = UnsupportedAlertProvider()
   ) {
     self.forecast = forecast
     self.airQuality = airQuality
     self.radar = radar
     self.marine = marine
+    self.alerts = alerts
   }
 
   var dataAttributions: [DataAttribution] {
@@ -89,6 +99,7 @@ struct WeatherProviderSuite {
         + airQuality.dataAttributions
         + radar.dataAttributions
         + marine.dataAttributions
+        + alerts.dataAttributions
     )
   }
 }

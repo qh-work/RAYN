@@ -27,11 +27,15 @@ struct OpenMeteoLocationSearchProvider: LocationSearchProvider {
     urlRequest.timeoutInterval = 12
     let data = try await httpClient.data(for: urlRequest)
     let payload = try JSONDecoder().decode(GeocodingPayload.self, from: data)
-    return (payload.results ?? []).map {
-      SavedLocation(
-        name: $0.name ?? query, administrativeArea: $0.admin1 ?? "", country: $0.country ?? "",
-        latitude: $0.latitude ?? 0, longitude: $0.longitude ?? 0,
-        timezoneIdentifier: $0.timezone ?? TimeZone.current.identifier, isFavorite: false)
+    return (payload.results ?? []).compactMap {
+      guard let latitude = $0.latitude, latitude.isFinite, (-90...90).contains(latitude),
+            let longitude = $0.longitude, longitude.isFinite, (-180...180).contains(longitude),
+            let timezone = $0.timezone, TimeZone(identifier: timezone) != nil,
+            let name = $0.name, !name.isEmpty else { return nil }
+      return SavedLocation(
+        name: name, administrativeArea: $0.admin1 ?? "", country: $0.country ?? "",
+        latitude: latitude, longitude: longitude,
+        timezoneIdentifier: timezone, isFavorite: false)
     }
   }
 

@@ -22,10 +22,7 @@ struct RainViewerRadarProvider: RadarProvider {
     let pastFrames = (payload.radar?.past ?? []).compactMap {
       makeFrame($0, host: host, isForecast: false)
     }
-    let nowcastFrames = (payload.radar?.nowcast ?? []).compactMap {
-      makeFrame($0, host: host, isForecast: true)
-    }
-    let frames = pastFrames + nowcastFrames
+    let frames = pastFrames.sorted { $0.timestamp < $1.timestamp }
     guard !frames.isEmpty else { return .unavailable }
     return RadarSnapshot(
       frames: frames, selectedIndex: frames.count - 1, isAvailable: true, message: nil)
@@ -37,14 +34,17 @@ struct RainViewerRadarProvider: RadarProvider {
     guard let timestamp = item.time, let path = item.path, !path.isEmpty else { return nil }
     let normalizedHost = host.hasSuffix("/") ? String(host.dropLast()) : host
     let normalizedPath = path.hasPrefix("/") ? path : "/\(path)"
-    let tileURLTemplate = "\(normalizedHost)\(normalizedPath)/256/{z}/{x}/{y}/2/1_1.png"
-    return RadarFrame(
+    let tileURLTemplate = "\(normalizedHost)\(normalizedPath)/256/{z}/{x}/{y}/2/1_0.png"
+    var frame = RadarFrame(
       timestamp: timestamp,
       tilePath: path,
       tileURLTemplate: tileURLTemplate,
       source: "RainViewer",
       isForecast: isForecast
     )
+    frame.tileDescriptor = RadarTileDescriptor(kind: .xyz, urlTemplate: tileURLTemplate,
+                                               maximumZoom: 7, palette: .universalBlue)
+    return frame
   }
 }
 

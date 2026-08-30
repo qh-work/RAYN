@@ -281,6 +281,14 @@ struct SettingsView: View {
                     if let destination = URL(string: attribution.urlString) {
                         Link(destination: destination) {
                             HStack(spacing: 10) {
+                                if let url = attribution.logoURLString.flatMap(URL.init(string:)) {
+                                    AsyncImage(url: url) { image in
+                                        image.resizable().scaledToFit()
+                                    } placeholder: {
+                                        Text(attribution.title)
+                                    }
+                                    .frame(width: 160, height: 34)
+                                }
                                 Text(attribution.title)
                                     .fontWeight(.semibold)
                                 Text(attribution.detail)

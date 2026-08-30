@@ -17,12 +17,11 @@ enum AirQualitySource: String, CaseIterable {
 
 /// Radar backends supported by the app.
 ///
-/// RainViewer is the currently implemented global tile adapter. Regional official
-/// feeds such as NOAA NEXRAD/MRMS and DWD composites are documented in
-/// `docs/DATA_SOURCES.md` and can be added behind the same `RadarProvider` protocol
-/// without changing the views or refresh coordinator.
+/// Regional selects NOAA in the contiguous US and RainViewer elsewhere (or
+/// after a NOAA failure). Views consume provider-neutral tile metadata.
 enum RadarSource: String, CaseIterable {
   case rainViewer
+  case regional
 }
 
 enum MarineSource: String, CaseIterable {
@@ -37,9 +36,13 @@ enum RAYNProviderConfiguration {
   // These lines are the only source-selection switches for a public build.
   // Custom distributions may instead inject a WeatherProviderSuite and a
   // LocationSearchProvider at AppState's composition boundary.
+  #if RAYN_WEATHERKIT
+  static let forecastSource: ForecastSource = .weatherKit
+  #else
   static let forecastSource: ForecastSource = .openMeteo
+  #endif
   static let airQualitySource: AirQualitySource = .openMeteo
-  static let radarSource: RadarSource = .rainViewer
+  static let radarSource: RadarSource = .regional
   static let marineSource: MarineSource = .openMeteo
   static let locationSearchSource: LocationSearchSource = .openMeteo
 
@@ -48,7 +51,8 @@ enum RAYNProviderConfiguration {
       forecast: makeForecastProvider(),
       airQuality: makeAirQualityProvider(),
       radar: makeRadarProvider(),
-      marine: makeMarineProvider()
+      marine: makeMarineProvider(),
+      alerts: NWSAlertProvider()
     )
   }
 
@@ -65,6 +69,8 @@ enum RAYNProviderConfiguration {
     switch radarSource {
     case .rainViewer:
       return RainViewerRadarProvider()
+    case .regional:
+      return RegionalRadarProvider()
     }
   }
 

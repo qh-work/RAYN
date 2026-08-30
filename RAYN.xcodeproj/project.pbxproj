@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+        B00104 /* RadarTileMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00104; };
+        B00101 /* WeatherAlertProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00101; };
+        B00102 /* NOAARadarProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00102; };
+        B00103 /* RadarTileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00103; };
 		B00001 /* RAYNApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00001 /* RAYNApp.swift */; };
 		B00002 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00002 /* AppConfiguration.swift */; };
 		B00003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00003 /* AppState.swift */; };
@@ -66,6 +70,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+        F00104 /* RadarTileMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarTileMapView.swift; sourceTree = "<group>"; };
+        F00101 /* WeatherAlertProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAlertProvider.swift; sourceTree = "<group>"; };
+        F00102 /* NOAARadarProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NOAARadarProvider.swift; sourceTree = "<group>"; };
+        F00103 /* RadarTileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarTileStore.swift; sourceTree = "<group>"; };
 		F00001 /* RAYNApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAYNApp.swift; sourceTree = "<group>"; };
 		F00002 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		F00003 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -167,6 +175,9 @@
 				F00021 /* HTTPClient.swift */,
 				F00022 /* ProviderSupport.swift */,
 				F00028 /* RefreshCoordinator.swift */,
+                F00101 /* WeatherAlertProvider.swift */,
+                F00102 /* NOAARadarProvider.swift */,
+                F00103 /* RadarTileStore.swift */,
 				F00023 /* OpenMeteoForecastProvider.swift */,
 				F00024 /* OpenMeteoAirQualityProvider.swift */,
 				F00026 /* OpenMeteoMarineProvider.swift */,
@@ -246,6 +257,7 @@
 				F00033 /* HourlyForecastScene.swift */,
 				F00034 /* DailyForecastScene.swift */,
 				F00035 /* RadarScene.swift */,
+                F00104 /* RadarTileMapView.swift */,
 				F00036 /* AirQualityScene.swift */,
 				F00037 /* AstronomyScene.swift */,
 			);
@@ -434,6 +446,9 @@
 				B00026 /* OpenMeteoMarineProvider.swift in Sources */,
 				B00027 /* OpenMeteoLocationSearchProvider.swift in Sources */,
 				B00028 /* RefreshCoordinator.swift in Sources */,
+                B00101 /* WeatherAlertProvider.swift in Sources */,
+                B00102 /* NOAARadarProvider.swift in Sources */,
+                B00103 /* RadarTileStore.swift in Sources */,
 				B00018 /* WeatherKitForecastProvider.swift in Sources */,
 				B00019 /* ProviderConfiguration.swift in Sources */,
 				B00017 /* LocationService.swift in Sources */,
@@ -445,6 +460,7 @@
 				B00033 /* HourlyForecastScene.swift in Sources */,
 				B00034 /* DailyForecastScene.swift in Sources */,
 				B00035 /* RadarScene.swift in Sources */,
+                B00104 /* RadarTileMapView.swift in Sources */,
 				B00036 /* AirQualityScene.swift in Sources */,
 				B00037 /* AstronomyScene.swift in Sources */,
 				B00038 /* PerformanceMonitor.swift in Sources */,
@@ -493,7 +509,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 8;
+                CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_TESTABILITY = YES;
@@ -504,7 +520,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-                MARKETING_VERSION = 1.2.4;
+                MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -523,7 +539,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 8;
+                CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -533,7 +549,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-                MARKETING_VERSION = 1.2.4;
+                MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rayn.weather.tv;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;

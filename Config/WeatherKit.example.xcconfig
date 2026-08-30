@@ -1,0 +1,5 @@
+// Optional, bring-your-own Apple Developer configuration. No personal team.
+// Pass with xcodebuild -xcconfig Config/WeatherKit.example.xcconfig ...
+// Enable WeatherKit for your App ID and select your own signing team in Xcode.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) RAYN_WEATHERKIT
+CODE_SIGN_ENTITLEMENTS = $(SRCROOT)/Config/WeatherKit.entitlements

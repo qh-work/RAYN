@@ -8,6 +8,7 @@ enum WeatherDataState: Equatable {
     case locating
     case loading
     case live
+    case stale
     case unavailable
 }
 
@@ -28,6 +29,7 @@ final class AppState: ObservableObject {
     @Published var controlsVisible = true
     @Published var isRefreshing = false
     @Published var failedSources: [String] = []
+    private var refreshTask: Task<Void, Never>?
     @Published var searchResults: [SavedLocation] = []
     @Published var isSearching = false
     @Published var showSettings = false
@@ -118,6 +120,7 @@ final class AppState: ObservableObject {
     }
 
     deinit {
+        refreshTask?.cancel()
         rotationTask?.cancel()
         refreshMonitorTask?.cancel()
         controlsTask?.cancel()
@@ -141,7 +144,7 @@ final class AppState: ObservableObject {
     }
 
     var dataAttributions: [DataAttribution] {
-        DataAttribution.unique(refreshCoordinator.dataAttributions + locationSearchProvider.dataAttributions)
+        DataAttribution.unique((snapshot?.sourceAttributions ?? []) + refreshCoordinator.dataAttributions + locationSearchProvider.dataAttributions)
     }
 
     func start() {
@@ -184,18 +187,28 @@ final class AppState: ObservableObject {
             dataState = .loading
         }
         let location = selectedLocation
-        Task { @MainActor [weak self] in
+        // Forecast owns first paint. Optional AQ/alerts must never hold the
+        // loading screen hostage to another provider's timeout.
+        let fetchSources: Set<RefreshSource>
+        if snapshot == nil && sources.contains(.forecast) {
+            fetchSources = [.forecast]
+            pendingRefreshSources.formUnion(sources.subtracting(fetchSources))
+        } else { fetchSources = sources }
+        refreshTask = Task { @MainActor [weak self] in
             guard let self else { return }
             let result = await refreshCoordinator.refresh(
                 location: location,
                 fallback: snapshot,
                 force: force,
-                sources: sources
+                sources: fetchSources
             )
+            guard !Task.isCancelled else { return }
             // A city may be changed while the previous request is in flight.
             // Never publish the old city's response under the new title; start
             // one fresh request for the latest selection instead.
-            guard selectedLocation.id == location.id else {
+            guard selectedLocation.id == location.id,
+                  selectedLocation.latitude == location.latitude,
+                  selectedLocation.longitude == location.longitude else {
                 isRefreshing = false
                 let pending = pendingRefreshSources
                 pendingRefreshSources.removeAll()
@@ -204,15 +217,15 @@ final class AppState: ObservableObject {
             }
             if result.forecastAttempted {
                 snapshot = result.snapshot
-                dataState = result.snapshot == nil ? .unavailable : .live
+                dataState = result.snapshot == nil ? .unavailable : (result.snapshot?.isOffline == true ? .stale : .live)
             } else if let supplementarySnapshot = result.snapshot {
                 // Radar and marine refreshes return the existing forecast
                 // plus one updated submodel. Publish that merged snapshot or
                 // the page can fetch real data successfully without showing it.
                 snapshot = supplementarySnapshot
-                dataState = .live
+                dataState = supplementarySnapshot.isOffline ? .stale : .live
             }
-            failedSources = result.failedSources
+            failedSources = Array(Set(failedSources).subtracting(fetchSources.map(\.rawValue)).union(result.failedSources)).sorted()
             isRefreshing = false
 
             let pending = pendingRefreshSources
@@ -227,6 +240,7 @@ final class AppState: ObservableObject {
         switch phase {
         case .active:
             isAppActive = true
+            restartRotationTask()
             if snapshot == nil {
                 if settings.useCurrentLocation && selectedLocation.id == SavedLocation.currentPlaceholder.id {
                     dataState = .locating
@@ -237,10 +251,17 @@ final class AppState: ObservableObject {
                 } else {
                     refresh(sources: RefreshPlan.initial)
                 }
+            } else {
+                refresh(sources: RefreshPlan.initial)
+                requestSupplementaryData(for: currentScene)
             }
             restartRefreshMonitor()
         case .inactive, .background:
             isAppActive = false
+            refreshTask?.cancel()
+            refreshTask = nil
+            isRefreshing = false
+            rotationTask?.cancel()
             refreshMonitorTask?.cancel()
         @unknown default:
             break
@@ -337,6 +358,13 @@ final class AppState: ObservableObject {
     func applySettings(_ newSettings: AppSettings) {
         let shouldRequestLocation = newSettings.useCurrentLocation && !settings.useCurrentLocation
         let shouldReturnToSavedLocation = !newSettings.useCurrentLocation && settings.useCurrentLocation
+        if shouldRequestLocation || shouldReturnToSavedLocation {
+            refreshTask?.cancel()
+            refreshTask = nil
+            isRefreshing = false
+            pendingRefreshSources.removeAll()
+            failedSources.removeAll()
+        }
         var normalizedSettings = newSettings
         normalizedSettings.normalizeSceneOrder()
         settings = normalizedSettings
@@ -384,6 +412,11 @@ final class AppState: ObservableObject {
     }
 
     private func setLocation(_ location: SavedLocation, usingCurrentLocation: Bool) {
+        refreshTask?.cancel()
+        refreshTask = nil
+        isRefreshing = false
+        pendingRefreshSources.removeAll()
+        failedSources.removeAll()
         selectedLocation = location
         settings.useCurrentLocation = usingCurrentLocation
         persistSettings()
@@ -537,6 +570,7 @@ final class AppState: ObservableObject {
                 }
                 guard let self, isAppActive, !isRefreshing else { continue }
                 refresh(sources: RefreshPlan.initial)
+                requestSupplementaryData(for: currentScene)
             }
         }
     }
@@ -560,9 +594,9 @@ final class AppState: ObservableObject {
     private func requestSupplementaryData(for scene: BroadcastScene) {
         guard snapshot != nil else { return }
         switch scene {
-        case .radar where snapshot?.radar.isAvailable != true:
+        case .radar:
             refresh(sources: [.radar])
-        case .astronomy where snapshot?.marine == nil:
+        case .astronomy:
             refresh(sources: [.marine])
         default:
             break

@@ -5,6 +5,7 @@ enum RefreshSource: String, CaseIterable {
   case airQuality
   case radar
   case marine
+  case alerts
 
   var refreshInterval: TimeInterval {
     switch self {
@@ -12,6 +13,7 @@ enum RefreshSource: String, CaseIterable {
     case .airQuality: return AppConfiguration.airQualityRefreshInterval
     case .radar: return AppConfiguration.radarRefreshInterval
     case .marine: return AppConfiguration.airQualityRefreshInterval
+    case .alerts: return 5 * 60
     }
   }
 }
@@ -21,7 +23,7 @@ enum RefreshPlan {
   /// summary. Radar tiles and marine observations are loaded when their page
   /// is actually opened, so launch and focus interaction do not compete with
   /// four independent network pipelines.
-  static let initial: Set<RefreshSource> = [.forecast, .airQuality]
+  static let initial: Set<RefreshSource> = [.forecast, .airQuality, .alerts]
   static let all: Set<RefreshSource> = Set(RefreshSource.allCases)
 }
 
@@ -63,15 +65,18 @@ final class RefreshCoordinator {
   private let airQualityProvider: AirQualityProvider
   private let radarProvider: RadarProvider
   private let marineProvider: MarineWeatherProvider
+  private let alertProvider: WeatherAlertProvider
   let dataAttributions: [DataAttribution]
   private var retrySchedules: [RefreshSource: RetrySchedule] = [:]
   private var nextEligibleAt: [RefreshSource: Date] = [:]
+  private var locationKey: String?
 
   init(providers: WeatherProviderSuite = RAYNProviderConfiguration.makeWeatherProviderSuite()) {
     self.forecastProvider = providers.forecast
     self.airQualityProvider = providers.airQuality
     self.radarProvider = providers.radar
     self.marineProvider = providers.marine
+    self.alertProvider = providers.alerts
     self.dataAttributions = providers.dataAttributions
   }
 
@@ -97,9 +102,19 @@ final class RefreshCoordinator {
   ) async -> RefreshResult {
     let performanceInterval = RAYNPerformance.beginRefresh(force: force)
     defer { RAYNPerformance.endRefresh(performanceInterval) }
-    var snapshot = fallback
-    snapshot?.location = location
-    snapshot?.timezoneIdentifier = location.timezoneIdentifier
+    let key = "\(location.id)|\(location.latitude)|\(location.longitude)"
+    if locationKey != key {
+      retrySchedules.removeAll()
+      nextEligibleAt.removeAll()
+      locationKey = key
+    }
+    // Never relabel another city's snapshot. Coordinates can change even
+    // when the persistent "current location" identity stays the same.
+    var snapshot = fallback.flatMap {
+      $0.location.id == location.id && $0.location.latitude == location.latitude
+        && $0.location.longitude == location.longitude ? $0 : nil
+    }
+    let previous = snapshot
     var failures: [String] = []
     var deferred: [String] = []
 
@@ -111,6 +126,8 @@ final class RefreshCoordinator {
       && shouldAttempt(.radar, force: force, now: now)
     let marineAllowed = sources.contains(.marine)
       && shouldAttempt(.marine, force: force, now: now)
+    let alertsAllowed = sources.contains(.alerts)
+      && shouldAttempt(.alerts, force: force, now: now)
 
     async let forecastTask = fetchResult(shouldFetch: forecastAllowed) {
       try await self.forecastProvider.fetchForecast(for: location)
@@ -124,22 +141,38 @@ final class RefreshCoordinator {
     async let marineTask = fetchResult(shouldFetch: marineAllowed) {
       try await self.marineProvider.fetchMarineWeather(for: location)
     }
+    async let alertsTask = fetchResult(shouldFetch: alertsAllowed) {
+      try await self.alertProvider.fetchAlerts(for: location)
+    }
 
-    if let result = await forecastTask {
+    let results = await (forecastTask, airQualityTask, radarTask, marineTask, alertsTask)
+    guard locationKey == key, !Task.isCancelled else {
+      return RefreshResult(snapshot: nil, failedSources: [], forecastAttempted: false)
+    }
+    if let result = results.0 {
       switch result {
       case .success(let value):
         snapshot = value
+        snapshot?.airQuality = previous?.airQuality
+        snapshot?.radar = previous?.radar ?? .unavailable
+        snapshot?.marine = previous?.marine
+        snapshot?.alertAvailability = value.alertAvailability ?? previous?.alertAvailability
+        snapshot?.alertsCheckedAt = value.alertsCheckedAt ?? previous?.alertsCheckedAt
+        if let oldAlerts = previous?.alerts, !oldAlerts.isEmpty, value.alerts.isEmpty,
+           value.alertAvailability != .available {
+          snapshot?.alerts = oldAlerts.filter { $0.endDate > now }
+        }
         recordSuccess(.forecast, at: now)
       case .failure:
         failures.append(RefreshSource.forecast.rawValue)
         recordFailure(.forecast, at: now)
-        snapshot = nil
+        snapshot?.isOffline = true
       }
     } else {
       deferred.append(RefreshSource.forecast.rawValue)
     }
 
-    if let result = await airQualityTask {
+    if let result = results.1 {
       switch result {
       case .success(let value):
         snapshot?.airQuality = value
@@ -152,7 +185,7 @@ final class RefreshCoordinator {
       deferred.append(RefreshSource.airQuality.rawValue)
     }
 
-    if let result = await radarTask {
+    if let result = results.2 {
       switch result {
       case .success(let value):
         snapshot?.radar = value
@@ -166,7 +199,7 @@ final class RefreshCoordinator {
       deferred.append(RefreshSource.radar.rawValue)
     }
 
-    if let result = await marineTask {
+    if let result = results.3 {
       switch result {
       case .success(let value):
         snapshot?.marine = value
@@ -180,7 +213,27 @@ final class RefreshCoordinator {
       deferred.append(RefreshSource.marine.rawValue)
     }
 
+    if let result = results.4 {
+      switch result {
+      case .success(let value):
+        // Outside NWS coverage, retain any alerts provided by WeatherKit.
+        if value.availability != .unsupported {
+          snapshot?.alerts = value.alerts
+          snapshot?.alertAvailability = value.availability
+        } else if snapshot?.alertAvailability == nil {
+          snapshot?.alertAvailability = .unsupported
+        }
+        snapshot?.alertsCheckedAt = value.checkedAt
+        recordSuccess(.alerts, at: now)
+      case .failure:
+        snapshot?.alertAvailability = .unavailable
+        failures.append(RefreshSource.alerts.rawValue)
+        recordFailure(.alerts, at: now)
+      }
+    } else { deferred.append(RefreshSource.alerts.rawValue) }
+
     if var snapshot {
+      snapshot.alerts.removeAll { $0.endDate <= now }
       snapshot.updatedAt = snapshot.updatedAt > now ? now : snapshot.updatedAt
       snapshot.summary = WeatherSummaryBuilder.make(from: snapshot)
       return RefreshResult(

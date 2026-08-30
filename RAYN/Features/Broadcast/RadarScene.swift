@@ -4,24 +4,19 @@ import SwiftUI
 enum RadarPerformancePolicy {
     static let mapActivationDelayNanoseconds: UInt64 = 280_000_000
     static let initialPlaybackDelayNanoseconds: UInt64 = 900_000_000
-    static let playbackIntervalNanoseconds: UInt64 = 1_100_000_000
-    static let staleOverlayRemovalDelayNanoseconds: UInt64 = 80_000_000
-    static let mapReadyFallbackDelayNanoseconds: UInt64 = 1_200_000_000
-    static let tileMemoryLimit = 32 * 1_024 * 1_024
-    /// The map requests its visible tiles itself. Prefetch only the nearest
-    /// center tiles for the next frame; fetching the full 34-tile ring at
-    /// once made radar entry compete with MapKit and focus animation.
-    static let tilePrefetchLimit = 13
-    static let tilePrefetchConcurrency = 4
+    static let loadTimeoutNanoseconds: UInt64 = 20_000_000_000
 }
 
 struct RadarScene: View {
     let snapshot: WeatherSnapshot
+    @Environment(\.scenePhase) private var scenePhase
     @State private var isPlaying = true
     @State private var requestedIndex = 0
     @State private var presentedIndex = 0
     @State private var shouldLoadMap = false
     @State private var isMapVisible = false
+    @State private var loadFailed = false
+    @State private var mapReloadGeneration = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -40,7 +35,7 @@ struct RadarScene: View {
         }
         .padding(.top, 30)
         .padding(.bottom, 16)
-        .task {
+        .task(id: snapshot.radar.frames.map(\.tileURLTemplate)) {
             guard snapshot.radar.isAvailable, !snapshot.radar.frames.isEmpty else { return }
             let initialIndex = min(
                 max(snapshot.radar.selectedIndex, 0),
@@ -54,6 +49,8 @@ struct RadarScene: View {
         }
         .task(id: playbackTaskID) {
             guard isPlaying,
+                  !loadFailed,
+                  scenePhase == .active,
                   isMapVisible,
                   requestedIndex == presentedIndex,
                   snapshot.radar.frames.count > 1 else { return }
@@ -63,9 +60,21 @@ struct RadarScene: View {
                   requestedIndex == presentedIndex else { return }
             requestedIndex = (presentedIndex + 1) % snapshot.radar.frames.count
         }
+        .task(id: "\(requestedFrame?.tileURLTemplate ?? "")-\(mapReloadGeneration)-\(isMapVisible)-\(presentedIndex)") {
+            guard shouldLoadMap || snapshot.radar.isAvailable else { return }
+            loadFailed = false
+            guard !isMapVisible || requestedIndex != presentedIndex else { return }
+            try? await Task.sleep(nanoseconds: RadarPerformancePolicy.loadTimeoutNanoseconds)
+            guard !Task.isCancelled else { return }
+            loadFailed = true
+            isPlaying = false
+        }
         .onDisappear {
             shouldLoadMap = false
             isMapVisible = false
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { isPlaying = false }
         }
     }
 
@@ -89,8 +98,10 @@ struct RadarScene: View {
                             guard let index = snapshot.radar.frames.firstIndex(where: { $0.id == frameID }) else { return }
                             RAYNPerformance.radarFramePresented()
                             presentedIndex = index
+                            loadFailed = false
                         }
                     )
+                    .id(mapReloadGeneration)
                     .opacity(isMapVisible ? 1 : 0)
                 }
                 VStack(alignment: .leading, spacing: 9) {
@@ -124,6 +135,15 @@ struct RadarScene: View {
 
             VStack(alignment: .leading, spacing: 18) {
                 Text("Animation Controls").font(.system(size: 26, weight: .bold, design: .rounded))
+                if loadFailed {
+                    Text("Radar loading failed").font(.system(size: 22, weight: .medium))
+                    Button("Retry") {
+                        loadFailed = false
+                        isMapVisible = false
+                        mapReloadGeneration += 1
+                    }
+                    .buttonStyle(FocusButtonStyle())
+                }
                 Button {
                     isPlaying.toggle()
                 } label: {
@@ -169,7 +189,11 @@ struct RadarScene: View {
                     Text("Later").foregroundStyle(.white.opacity(0.55))
                 }
                 .font(.system(size: 19, weight: .medium, design: .rounded))
-                RadarLegend()
+                RadarLegend(palette: displayedFrame?.tileDescriptor?.palette ?? .universalBlue,
+                            legendURLString: displayedFrame?.tileDescriptor?.legendURLString)
+                Text(displayedFrame?.source ?? "")
+                    .font(.system(size: 19, weight: .medium))
+                    .foregroundStyle(.secondary)
                 Text("Coverage reflects available radar data")
                     .font(.system(size: 17, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.45))
@@ -188,7 +212,7 @@ struct RadarScene: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("No live radar echoes are available")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                    Text(snapshot.radar.message ?? String(localized: "Radar coverage is temporarily unavailable for this location. Demo imagery will not be substituted."))
+                    Text(snapshot.radar.message ?? String(localized: "No radar imagery is available for this area."))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.62))
                 }
@@ -244,6 +268,7 @@ private struct RadarMap: View {
                     location: location,
                     frameID: frame?.id ?? 0,
                     tileURLTemplate: tileURLTemplate,
+                    maximumZoom: frame?.tileDescriptor?.maximumZoom ?? 7,
                     onMapReady: onMapReady,
                     onFramePresented: onFramePresented
                 )
@@ -259,6 +284,7 @@ private struct RadarMap: View {
                     location: location,
                     frameID: frame?.id ?? 0,
                     tileURLTemplate: tileURLTemplate,
+                    maximumZoom: frame?.tileDescriptor?.maximumZoom ?? 7,
                     onMapReady: onMapReady,
                     onFramePresented: onFramePresented
                 )
@@ -351,506 +377,48 @@ private struct RadarTileUnavailableView: View {
                     .foregroundStyle(.cyan)
                 Text("No map tiles are available for this radar frame")
                     .font(.system(size: 23, weight: .bold, design: .rounded))
-                Text("The real timestamp is preserved without substitute echoes")
-                    .font(.system(size: 19, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.58))
             }
             .multilineTextAlignment(.center)
         }
     }
 }
 
-private struct RadarTileMapView: UIViewRepresentable {
-    let location: SavedLocation
-    let frameID: Int
-    let tileURLTemplate: String
-    let onMapReady: () -> Void
-    let onFramePresented: (Int) -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onMapReady: onMapReady, onFramePresented: onFramePresented)
-    }
-
-    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView(frame: .zero)
-        mapView.delegate = context.coordinator
-        mapView.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat, emphasisStyle: .muted)
-        mapView.isScrollEnabled = false
-        mapView.isZoomEnabled = false
-        mapView.pointOfInterestFilter = MKPointOfInterestFilter(including: [])
-        mapView.showsBuildings = false
-        mapView.showsScale = false
-        mapView.showsTraffic = false
-        context.coordinator.install(
-            mapView: mapView,
-            location: location,
-            frameID: frameID,
-            tileURLTemplate: tileURLTemplate
-        )
-        return mapView
-    }
-
-    func updateUIView(_ mapView: MKMapView, context: Context) {
-        context.coordinator.updateCallbacks(
-            onMapReady: onMapReady,
-            onFramePresented: onFramePresented
-        )
-        context.coordinator.update(
-            mapView: mapView,
-            location: location,
-            frameID: frameID,
-            tileURLTemplate: tileURLTemplate
-        )
-    }
-
-    static func dismantleUIView(_ mapView: MKMapView, coordinator: Coordinator) {
-        coordinator.prepareForRemoval(from: mapView)
-        mapView.delegate = nil
-    }
-
-    final class Coordinator: NSObject, MKMapViewDelegate {
-        private var currentLocation: SavedLocation?
-        private var currentFrameID: Int?
-        private var desiredFrameID: Int?
-        private var currentTileURLTemplate: String?
-        private var radarOverlay: RadarTileOverlay?
-        private var locationAnnotation: MKPointAnnotation?
-        private var frameLoadTask: Task<Void, Never>?
-        private var mapReadyFallbackTask: Task<Void, Never>?
-        private var baseMapRendered = false
-        private var initialRadarTileRendered = false
-        private var didReportMapReady = false
-        private var onMapReady: () -> Void
-        private var onFramePresented: (Int) -> Void
-
-        init(onMapReady: @escaping () -> Void, onFramePresented: @escaping (Int) -> Void) {
-            self.onMapReady = onMapReady
-            self.onFramePresented = onFramePresented
-        }
-
-        func updateCallbacks(
-            onMapReady: @escaping () -> Void,
-            onFramePresented: @escaping (Int) -> Void
-        ) {
-            self.onMapReady = onMapReady
-            self.onFramePresented = onFramePresented
-        }
-
-        func install(
-            mapView: MKMapView,
-            location: SavedLocation,
-            frameID: Int,
-            tileURLTemplate: String
-        ) {
-            updateLocation(location, on: mapView)
-            currentLocation = location
-            desiredFrameID = frameID
-            installInitialRadarFrame(
-                frameID: frameID,
-                tileURLTemplate: tileURLTemplate,
-                on: mapView
-            )
-        }
-
-        func update(
-            mapView: MKMapView,
-            location: SavedLocation,
-            frameID: Int,
-            tileURLTemplate: String
-        ) {
-            if currentLocation != location {
-                updateLocation(location, on: mapView)
-                currentLocation = location
-            }
-
-            guard desiredFrameID != frameID || currentTileURLTemplate != tileURLTemplate else { return }
-            desiredFrameID = frameID
-            prepareRadarFrame(
-                frameID: frameID,
-                tileURLTemplate: tileURLTemplate,
-                location: location,
-                on: mapView
-            )
-        }
-
-        func prepareForRemoval(from mapView: MKMapView) {
-            frameLoadTask?.cancel()
-            mapReadyFallbackTask?.cancel()
-            let radarOverlays = mapView.overlays.compactMap { $0 as? RadarTileOverlay }
-            radarOverlays.forEach { $0.cancelPendingRequests() }
-            if !radarOverlays.isEmpty {
-                mapView.removeOverlays(radarOverlays)
-            }
-            if let locationAnnotation {
-                mapView.removeAnnotation(locationAnnotation)
-            }
-            radarOverlay = nil
-            locationAnnotation = nil
-            currentLocation = nil
-            currentFrameID = nil
-            desiredFrameID = nil
-            currentTileURLTemplate = nil
-        }
-
-        private func updateLocation(_ location: SavedLocation, on mapView: MKMapView) {
-            let coordinate = CLLocationCoordinate2D(
-                latitude: location.latitude,
-                longitude: location.longitude
-            )
-            let region = MKCoordinateRegion(
-                center: coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 8.0)
-            )
-            mapView.setRegion(region, animated: false)
-
-            if let locationAnnotation {
-                locationAnnotation.coordinate = coordinate
-                locationAnnotation.title = location.name
-            } else {
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = coordinate
-                annotation.title = location.name
-                locationAnnotation = annotation
-                mapView.addAnnotation(annotation)
-            }
-        }
-
-        private func installInitialRadarFrame(
-            frameID: Int,
-            tileURLTemplate: String,
-            on mapView: MKMapView
-        ) {
-            let overlay = RadarTileOverlay(urlTemplate: tileURLTemplate)
-            overlay.onFirstTileLoaded = { [weak self] in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    initialRadarTileRendered = true
-                    onFramePresented(frameID)
-                    reportMapReadyIfPossible()
-                }
-            }
-            radarOverlay = overlay
-            currentFrameID = frameID
-            currentTileURLTemplate = tileURLTemplate
-            mapView.addOverlay(overlay, level: .aboveLabels)
-
-            mapReadyFallbackTask?.cancel()
-            mapReadyFallbackTask = Task { @MainActor [weak self] in
-                try? await Task.sleep(nanoseconds: RadarPerformancePolicy.mapReadyFallbackDelayNanoseconds)
-                guard let self, !Task.isCancelled, !didReportMapReady else { return }
-                didReportMapReady = true
-                onMapReady()
-            }
-        }
-
-        private func prepareRadarFrame(
-            frameID: Int,
-            tileURLTemplate: String,
-            location: SavedLocation,
-            on mapView: MKMapView
-        ) {
-            frameLoadTask?.cancel()
-            frameLoadTask = Task { @MainActor [weak self, weak mapView] in
-                let loadedTileCount = await RadarTileOverlay.prefetch(
-                    urlTemplate: tileURLTemplate,
-                    around: location
-                )
-                guard let self,
-                      let mapView,
-                      !Task.isCancelled,
-                      desiredFrameID == frameID,
-                      loadedTileCount > 0 else { return }
-                commitRadarFrame(
-                    frameID: frameID,
-                    tileURLTemplate: tileURLTemplate,
-                    on: mapView
-                )
-            }
-        }
-
-        private func commitRadarFrame(
-            frameID: Int,
-            tileURLTemplate: String,
-            on mapView: MKMapView
-        ) {
-            let staleOverlay = radarOverlay
-            let nextOverlay = RadarTileOverlay(urlTemplate: tileURLTemplate)
-            radarOverlay = nextOverlay
-            currentFrameID = frameID
-            currentTileURLTemplate = tileURLTemplate
-            mapView.addOverlay(nextOverlay, level: .aboveLabels)
-
-            // Core visible tiles are already in the bounded memory cache. Keep
-            // the old overlay underneath for a few display frames so MapKit can
-            // draw the new renderer without ever exposing an empty frame.
-            Task { @MainActor [weak self, weak mapView] in
-                try? await Task.sleep(nanoseconds: RadarPerformancePolicy.staleOverlayRemovalDelayNanoseconds)
-                guard let self, let mapView, let staleOverlay, staleOverlay !== radarOverlay else { return }
-                staleOverlay.cancelPendingRequests()
-                mapView.removeOverlay(staleOverlay)
-            }
-            onFramePresented(frameID)
-        }
-
-        private func reportMapReadyIfPossible() {
-            guard !didReportMapReady, baseMapRendered, initialRadarTileRendered else { return }
-            didReportMapReady = true
-            mapReadyFallbackTask?.cancel()
-            onMapReady()
-        }
-
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if let tileOverlay = overlay as? RadarTileOverlay {
-                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
-            }
-            return MKOverlayRenderer(overlay: overlay)
-        }
-
-        func mapViewDidFinishRenderingMap(_ mapView: MKMapView, fullyRendered: Bool) {
-            guard fullyRendered else { return }
-            baseMapRendered = true
-            reportMapReadyIfPossible()
-        }
-
-        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            let identifier = "RAYNLocationPin"
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-            view.annotation = annotation
-            view.displayPriority = .required
-            return view
-        }
-    }
-}
-
-private final class RadarTileOverlay: MKTileOverlay {
-    private static let tileCache: NSCache<NSString, NSData> = {
-        let cache = NSCache<NSString, NSData>()
-        cache.countLimit = 160
-        cache.totalCostLimit = RadarPerformancePolicy.tileMemoryLimit
-        return cache
-    }()
-
-    private static let tileSession: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.urlCache = nil
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.httpMaximumConnectionsPerHost = 4
-        configuration.timeoutIntervalForRequest = 8
-        return URLSession(configuration: configuration)
-    }()
-
-    private let resolvedTileURLTemplate: String
-    private let taskLock = NSLock()
-    private var pendingTasks: [UUID: URLSessionDataTask] = [:]
-    private var didReportFirstTile = false
-    var onFirstTileLoaded: (() -> Void)?
-
-    init(urlTemplate: String) {
-        resolvedTileURLTemplate = urlTemplate
-        super.init(urlTemplate: urlTemplate)
-        tileSize = CGSize(width: 256, height: 256)
-        minimumZ = 1
-        maximumZ = 7
-        canReplaceMapContent = false
-    }
-
-    override func loadTile(at path: MKTileOverlayPath, result: @escaping (Data?, Error?) -> Void) {
-        guard let url = Self.tileURL(
-            from: resolvedTileURLTemplate,
-            z: path.z,
-            x: path.x,
-            y: path.y,
-            scale: path.contentScaleFactor > 1 ? 2 : 1
-        ) else {
-            result(nil, WeatherProviderError.invalidURL)
-            return
-        }
-
-        // Every provider frame has its timestamp in the URL. A small in-memory
-        // cache therefore reuses only identical tiles during playback loops and
-        // can never surface a previous-launch or different-frame image.
-        let cacheKey = url.absoluteString as NSString
-        if let cachedData = Self.tileCache.object(forKey: cacheKey) {
-            reportFirstTileLoaded()
-            result(cachedData as Data, nil)
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        let taskID = UUID()
-        let task = Self.tileSession.dataTask(with: request) { [weak self] data, response, error in
-            self?.removePendingTask(taskID)
-            if let error {
-                result(nil, error)
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode), let data else {
-                result(nil, WeatherProviderError.invalidResponse)
-                return
-            }
-            Self.tileCache.setObject(data as NSData, forKey: cacheKey, cost: data.count)
-            self?.reportFirstTileLoaded()
-            result(data, nil)
-        }
-        taskLock.lock()
-        pendingTasks[taskID] = task
-        taskLock.unlock()
-        task.resume()
-    }
-
-    static func prefetch(urlTemplate: String, around location: SavedLocation) async -> Int {
-        let urls = prefetchURLs(urlTemplate: urlTemplate, around: location)
-        var loadedCount = 0
-        var batchStart = 0
-
-        // Keep peak URLSession, TLS, and image-cache pressure bounded. A
-        // cancelled frame stops before the next batch, so rapid focus/remote
-        // input cannot leave a fan-out of stale requests behind.
-        while batchStart < urls.count && !Task.isCancelled {
-            let batchEnd = min(batchStart + RadarPerformancePolicy.tilePrefetchConcurrency, urls.count)
-            let batch = urls[batchStart..<batchEnd]
-            loadedCount += await withTaskGroup(of: Bool.self, returning: Int.self) { group in
-                for url in batch {
-                    group.addTask {
-                        await fetchAndCache(url)
-                    }
-                }
-
-                var batchLoadedCount = 0
-                for await didLoad in group where didLoad {
-                    batchLoadedCount += 1
-                }
-                return batchLoadedCount
-            }
-            batchStart = batchEnd
-        }
-        return loadedCount
-    }
-
-    func cancelPendingRequests() {
-        taskLock.lock()
-        let tasks = Array(pendingTasks.values)
-        pendingTasks.removeAll(keepingCapacity: false)
-        taskLock.unlock()
-        tasks.forEach { $0.cancel() }
-    }
-
-    private func removePendingTask(_ taskID: UUID) {
-        taskLock.lock()
-        pendingTasks[taskID] = nil
-        taskLock.unlock()
-    }
-
-    private func reportFirstTileLoaded() {
-        taskLock.lock()
-        guard !didReportFirstTile else {
-            taskLock.unlock()
-            return
-        }
-        didReportFirstTile = true
-        let callback = onFirstTileLoaded
-        taskLock.unlock()
-        if let callback {
-            DispatchQueue.main.async(execute: callback)
-        }
-    }
-
-    private static func fetchAndCache(_ url: URL) async -> Bool {
-        guard !Task.isCancelled else { return false }
-        let cacheKey = url.absoluteString as NSString
-        if tileCache.object(forKey: cacheKey) != nil {
-            return true
-        }
-
-        var request = URLRequest(url: url)
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        do {
-            let (data, response) = try await tileSession.data(for: request)
-            guard !Task.isCancelled,
-                  let httpResponse = response as? HTTPURLResponse,
-                  (200..<300).contains(httpResponse.statusCode) else { return false }
-            tileCache.setObject(data as NSData, forKey: cacheKey, cost: data.count)
-            return true
-        } catch {
-            return false
-        }
-    }
-
-    private static func prefetchURLs(urlTemplate: String, around location: SavedLocation) -> [URL] {
-        var urls: [URL] = []
-        var seen = Set<URL>()
-
-        for (zoom, radius) in [(6, 1), (7, 2)] {
-            let center = tileCoordinate(
-                latitude: location.latitude,
-                longitude: location.longitude,
-                zoom: zoom
-            )
-            let tileCount = 1 << zoom
-            let offsets = (-radius...radius).flatMap { x in
-                (-radius...radius).map { y in (x: x, y: y) }
-            }
-            .sorted {
-                (abs($0.x) + abs($0.y)) < (abs($1.x) + abs($1.y))
-            }
-
-            for offset in offsets {
-                let x = ((center.x + offset.x) % tileCount + tileCount) % tileCount
-                let y = min(max(center.y + offset.y, 0), tileCount - 1)
-                guard let url = tileURL(from: urlTemplate, z: zoom, x: x, y: y, scale: 1),
-                      seen.insert(url).inserted else { continue }
-                urls.append(url)
-            }
-        }
-
-        return Array(urls.prefix(RadarPerformancePolicy.tilePrefetchLimit))
-    }
-
-    private static func tileCoordinate(latitude: Double, longitude: Double, zoom: Int) -> (x: Int, y: Int) {
-        let clampedLatitude = min(max(latitude, -85.051_128_78), 85.051_128_78)
-        let latitudeRadians = clampedLatitude * .pi / 180
-        let scale = pow(2, Double(zoom))
-        let x = Int(floor((longitude + 180) / 360 * scale))
-        let y = Int(floor((1 - log(tan(latitudeRadians) + 1 / cos(latitudeRadians)) / .pi) / 2 * scale))
-        return (x, y)
-    }
-
-    private static func tileURL(
-        from template: String,
-        z: Int,
-        x: Int,
-        y: Int,
-        scale: Int
-    ) -> URL? {
-        let urlString = template
-            .replacingOccurrences(of: "{z}", with: String(z))
-            .replacingOccurrences(of: "{x}", with: String(x))
-            .replacingOccurrences(of: "{y}", with: String(y))
-            .replacingOccurrences(of: "{scale}", with: String(scale))
-        return URL(string: urlString)
-    }
-
-    deinit {
-        cancelPendingRequests()
-    }
-}
 
 private struct RadarLegend: View {
+    var palette: RadarPalette
+    var legendURLString: String?
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Precipitation Intensity").font(.system(size: 20, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.68))
-            HStack(spacing: 0) {
-                ForEach([Color.blue, Color.cyan, Color.green, Color.yellow, Color.orange, Color.red], id: \.self) { color in
-                    Rectangle().fill(color).frame(maxWidth: .infinity).frame(height: 10)
+            Text("Reflectivity (dBZ)").font(.system(size: 22, weight: .semibold, design: .rounded)).foregroundStyle(.white.opacity(0.78))
+            if palette == .reflectivity {
+                AsyncImage(url: legendURLString.flatMap(URL.init(string:))) { image in
+                    image.resizable().scaledToFit()
+                } placeholder: {
+                    Text("Legend unavailable").foregroundStyle(.secondary)
+                }
+                .frame(maxHeight: 180)
+            } else {
+                HStack(spacing: 0) {
+                    ForEach(Array(colors.enumerated()), id: \.offset) { index, color in
+                        VStack(spacing: 8) {
+                            Rectangle().fill(color).frame(height: 14)
+                            Text(verbatim: "\(15 + index * 10)")
+                                .font(.system(size: 19, weight: .medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
                 }
             }
-            HStack {
-                Text("Light").foregroundStyle(.white.opacity(0.55))
-                Spacer()
-                Text("Heavy").foregroundStyle(.white.opacity(0.55))
-            }
-            .font(.system(size: 17, weight: .medium, design: .rounded))
+        }
+    }
+
+    private var colors: [Color] {
+        switch palette {
+        case .universalBlue:
+            // 15,25,35,45,55,65 dBZ from RainViewer's published Universal Blue CSV.
+            return [0x88DDEE, 0x0077AA, 0xFFEE00, 0xFF4400, 0xFFAAFF, 0xFFFFFF].map { Color(hex: $0) }
+        case .reflectivity:
+            return []
         }
     }
 }

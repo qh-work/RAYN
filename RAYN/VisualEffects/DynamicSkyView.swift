@@ -11,6 +11,13 @@ struct DynamicSkyView: View, Equatable {
     let intensity: DynamicIntensity
     let reduceMotion: Bool
     let lightningEnabled: Bool
+    @Environment(\.scenePhase) private var scenePhase
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.theme == rhs.theme && lhs.isDay == rhs.isDay &&
+        lhs.intensity == rhs.intensity && lhs.reduceMotion == rhs.reduceMotion &&
+        lhs.lightningEnabled == rhs.lightningEnabled
+    }
 
     private var hasAnimatedAtmosphere: Bool {
         theme.hasRain ||
@@ -55,7 +62,7 @@ struct DynamicSkyView: View, Equatable {
                 }
 
                 if animatesParticles {
-                    TimelineView(.animation) { context in
+                    TimelineView(.animation(paused: scenePhase != .active)) { context in
                         WeatherAtmosphereCanvas(
                             theme: theme,
                             intensity: intensity,

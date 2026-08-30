@@ -311,7 +311,7 @@ struct TickerClock: View {
     @Environment(\.raynLayoutScale) private var layoutScale
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
+        TimelineView(.periodic(from: Calendar.current.nextDate(after: .now, matching: DateComponents(second: 0), matchingPolicy: .nextTime) ?? .now, by: 60)) { context in
             Text(timeString(context.date))
                 .font(.system(size: 24 * layoutScale, weight: .semibold, design: .rounded))
                 .monospacedDigit()
@@ -373,63 +373,5 @@ struct LiveIndicator: View {
                 .tracking(1.1 * layoutScale)
         }
         .foregroundStyle(.white.opacity(0.85))
-    }
-}
-
-extension Double {
-    func formattedTemperature(unit: TemperatureUnit, decimals: Int = 0) -> String {
-        let converted = unit == .celsius ? self : (self * 9 / 5) + 32
-        return converted.formatted(.number.precision(.fractionLength(decimals)))
-    }
-
-    func formattedNumber(decimals: Int = 0) -> String {
-        formatted(.number.precision(.fractionLength(decimals)))
-    }
-
-    func formattedSpeed(system: MeasurementSystem) -> String {
-        let value = system == .metric ? self : self * 0.621371
-        return "\(value.formattedNumber()) \(system == .metric ? "km/h" : "mph")"
-    }
-
-    func formattedDistance(system: MeasurementSystem, decimals: Int = 1) -> String {
-        let value = system == .metric ? self : self * 0.621371
-        return "\(value.formattedNumber(decimals: decimals)) \(system == .metric ? "km" : "mi")"
-    }
-}
-
-enum WeatherDateTemplate {
-    case time
-    case monthDayTime
-    case monthDay
-    case weekday
-    case fullDate
-    case shortWeekday
-    case hour
-
-    var formatTemplate: String {
-        switch self {
-        case .time: return "Hm"
-        case .monthDayTime: return "MdHm"
-        case .monthDay: return "Md"
-        case .weekday: return "EEEE"
-        case .fullDate: return "yyyyMdEEEE"
-        case .shortWeekday: return "EEE"
-        case .hour: return "j"
-        }
-    }
-}
-
-extension Date {
-    func formatted(
-        _ template: WeatherDateTemplate,
-        timezoneIdentifier: String,
-        locale: Locale = .autoupdatingCurrent
-    ) -> String {
-        WeatherDateFormatterCache.string(
-            from: self,
-            template: template.formatTemplate,
-            timezone: TimeZone(identifier: timezoneIdentifier) ?? .autoupdatingCurrent,
-            locale: locale
-        )
     }
 }

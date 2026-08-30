@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 private var shouldOpenLocationPickerForCapture: Bool {
     #if DEBUG
@@ -13,8 +14,6 @@ enum ScenePerformancePolicy {
     // fully faded before the next hierarchy is inserted, while the shorter
     // handoff leaves less dead time between a remote press and new content.
     static let fadeOutDuration = 0.06
-    static let sceneHandoffDelayNanoseconds: UInt64 = 70_000_000
-    static let sceneLayoutDelayNanoseconds: UInt64 = 24_000_000
     static let fadeInDuration = 0.11
 }
 
@@ -25,6 +24,8 @@ struct BroadcastView: View {
     @State private var presentedScene: BroadcastScene = .current
     @State private var sceneOpacity = 1.0
     @State private var sceneTransitionTask: Task<Void, Never>?
+    @State private var transitionGeneration = 0
+    @State private var transitionInterval: OSSignpostIntervalState?
     @State private var selectedDailyDayID: Date?
     @State private var hasAssignedInitialFocus = false
     @State private var showLocationPicker = shouldOpenLocationPickerForCapture
@@ -62,6 +63,7 @@ struct BroadcastView: View {
                         sceneContent(scene: presentedScene, snapshot: snapshot)
                             .opacity(sceneOpacity)
                             .allowsHitTesting(sceneOpacity > 0.99)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                         bottomTicker(snapshot: snapshot, layoutScale: layoutScale)
                     }
                     .focusScope(broadcastFocusScope)
@@ -121,7 +123,9 @@ struct BroadcastView: View {
             present(nextScene)
         }
         .onDisappear {
+            transitionGeneration += 1
             sceneTransitionTask?.cancel()
+            finishTransitionMeasurement()
         }
         .fullScreenCover(isPresented: $appState.showSettings) {
             SettingsView()
@@ -251,9 +255,13 @@ struct BroadcastView: View {
     private func sceneContent(scene: BroadcastScene, snapshot: WeatherSnapshot) -> some View {
         switch scene {
         case .current:
-            CurrentWeatherScene(snapshot: snapshot) {
-                appState.select(scene: .airQuality)
+            ScrollView(.vertical) {
+                CurrentWeatherScene(snapshot: snapshot) {
+                    appState.select(scene: .airQuality)
+                }
+                .padding(18)
             }
+            .scrollClipDisabled()
         case .hourly:
             HourlyForecastScene(snapshot: snapshot)
         case .daily:
@@ -263,12 +271,18 @@ struct BroadcastView: View {
         case .airQuality:
             AirQualityScene(snapshot: snapshot)
         case .astronomy:
-            AstronomyScene(snapshot: snapshot)
+            ScrollView(.vertical) {
+                AstronomyScene(snapshot: snapshot).padding(18)
+            }
+            .scrollClipDisabled()
         }
     }
 
     private func present(_ nextScene: BroadcastScene) {
         sceneTransitionTask?.cancel()
+        transitionGeneration += 1
+        let generation = transitionGeneration
+        finishTransitionMeasurement()
         if nextScene != .daily {
             selectedDailyDayID = nil
         }
@@ -296,49 +310,54 @@ struct BroadcastView: View {
             return
         }
 
-        let previousScene = presentedScene
-        sceneTransitionTask = Task { @MainActor in
-            let performanceInterval = RAYNPerformance.beginSceneTransition(
-                from: previousScene,
-                to: nextScene
-            )
-            defer { RAYNPerformance.endSceneTransition(performanceInterval) }
-            withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeOutDuration)) {
-                sceneOpacity = 0
-            }
-            try? await Task.sleep(nanoseconds: ScenePerformancePolicy.sceneHandoffDelayNanoseconds)
-            guard !Task.isCancelled else { return }
-
+        transitionInterval = RAYNPerformance.beginSceneTransition(from: presentedScene, to: nextScene)
+        withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeOutDuration), completionCriteria: .logicallyComplete) {
+            sceneOpacity = 0
+        } completion: {
+            guard generation == transitionGeneration else { return }
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) {
                 presentedScene = nextScene
             }
-
-            // Give the new hierarchy one render pass to lay itself out while
-            // transparent. This prevents the first visible frame from paying
-            // the construction cost of a large Canvas hierarchy or MapKit.
-            try? await Task.sleep(nanoseconds: ScenePerformancePolicy.sceneLayoutDelayNanoseconds)
-            guard !Task.isCancelled else { return }
-            withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeInDuration)) {
-                sceneOpacity = 1
+            sceneTransitionTask = Task { @MainActor in
+                // Allow SwiftUI to schedule the replacement. No timed guess
+                // decides when the preceding animation has completed.
+                await Task.yield()
+                guard !Task.isCancelled, generation == transitionGeneration else { return }
+                withAnimation(.easeOut(duration: ScenePerformancePolicy.fadeInDuration), completionCriteria: .logicallyComplete) {
+                    sceneOpacity = 1
+                } completion: {
+                    guard generation == transitionGeneration else { return }
+                    finishTransitionMeasurement()
+                }
             }
+        }
+    }
+
+    private func finishTransitionMeasurement() {
+        if let interval = transitionInterval {
+            RAYNPerformance.endSceneTransition(interval)
+            transitionInterval = nil
         }
     }
 
     private func bottomTicker(snapshot: WeatherSnapshot, layoutScale: CGFloat) -> some View {
         HStack(spacing: 0) {
             HStack(spacing: 18 * layoutScale) {
-                LiveIndicator()
+                if snapshot.isOffline {
+                    Label("Update Failed", systemImage: "wifi.exclamationmark")
+                        .font(.system(size: 24 * layoutScale, weight: .semibold))
+                        .foregroundStyle(.yellow)
+                } else {
+                    LiveIndicator()
+                }
                 Rectangle()
                     .fill(.white.opacity(0.20))
                     .frame(width: 1, height: 30 * layoutScale)
                 TickerClock()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            TickerWeatherSummary(snapshot: snapshot)
-                .frame(maxWidth: .infinity, alignment: .center)
 
             HStack(spacing: 18 * layoutScale) {
                 if appState.isPaused {
@@ -350,7 +369,7 @@ struct BroadcastView: View {
                     updatedAt: snapshot.updatedAt,
                     fetchedAt: snapshot.fetchedAt,
                     timezoneIdentifier: snapshot.timezoneIdentifier,
-                    fontSize: 19
+                    fontSize: 24
                 )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -415,7 +434,7 @@ struct BroadcastView: View {
             return appState.failedSources.contains(AppFailureSource.currentLocation)
                 ? String(localized: "Location was unavailable, so the saved location was used.")
                 : String(localized: "Check the Apple TV's network connection.")
-        case .waiting, .live:
+        case .waiting, .live, .stale:
             return String(localized: "Preparing…")
         }
     }

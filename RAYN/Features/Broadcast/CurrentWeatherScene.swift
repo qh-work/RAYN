@@ -22,7 +22,7 @@ struct CurrentWeatherScene: View {
                 )
                     .frame(maxWidth: .infinity)
             }
-            .frame(height: (advisories.isEmpty ? 278 : 318) * layoutScale)
+            .frame(minHeight: (advisories.isEmpty ? 310 : 360) * layoutScale)
             .accessibilityElement(children: .contain)
 
             HStack(alignment: .center, spacing: 24 * layoutScale) {
@@ -31,7 +31,7 @@ struct CurrentWeatherScene: View {
                 CurrentWeatherFactsCard(snapshot: snapshot)
                     .frame(maxWidth: .infinity)
             }
-            .frame(height: 164 * layoutScale)
+            .frame(minHeight: 176 * layoutScale)
         }
         .padding(.top, 18 * layoutScale)
         .padding(.bottom, 16)
@@ -110,11 +110,12 @@ private struct CurrentWeatherObservationsCard: View {
     let onOpenAirQuality: () -> Void
     @EnvironmentObject private var appState: AppState
     @Environment(\.raynLayoutScale) private var layoutScale
+    @State private var showsAlerts = false
 
     var body: some View {
         GlassCard(cornerRadius: RAYNDesign.Radius.heroCard) {
             VStack(spacing: advisory == nil ? 20 * layoutScale : 12 * layoutScale) {
-                Text("Live Observations")
+                Text("Current Conditions")
                     .font(.system(size: 26 * layoutScale, weight: .bold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.86))
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -138,9 +139,73 @@ private struct CurrentWeatherObservationsCard: View {
                     timezone: snapshot.timezoneIdentifier,
                     onOpen: onOpenAirQuality
                 )
+                if (snapshot.alertAvailability != nil && snapshot.alertAvailability != .unsupported) || !snapshot.alerts.isEmpty {
+                    Button {
+                        showsAlerts = true
+                    } label: {
+                        Label("Official Alerts", systemImage: "exclamationmark.shield")
+                            .font(.system(size: 23 * layoutScale, weight: .semibold))
+                    }
+                    .buttonStyle(.glass)
+                    .focusAdaptiveGlassForeground()
+                    .accessibilityIdentifier("official-alerts")
+                }
             }
             .frame(maxHeight: .infinity)
         }
+        .fullScreenCover(isPresented: $showsAlerts) {
+            OfficialAlertsView(snapshot: snapshot)
+        }
+    }
+}
+
+private struct OfficialAlertsView: View {
+    let snapshot: WeatherSnapshot
+    @Environment(\.dismiss) private var dismiss
+    private var activeAlerts: [WeatherAlertItem] {
+        snapshot.alerts.filter { $0.startDate <= Date() && $0.endDate > Date() }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 28) {
+            HStack {
+                Text("Official Alerts").font(.largeTitle.bold())
+                Spacer()
+                Button("Close") { dismiss() }.buttonStyle(.glass)
+            }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    if snapshot.alertAvailability == .unavailable {
+                        Text("Alert updates unavailable").foregroundStyle(.yellow)
+                    } else if snapshot.alertAvailability == .unsupported && snapshot.alerts.isEmpty {
+                        Text("Official alerts are not supported for this location.")
+                    } else if activeAlerts.isEmpty {
+                        Text("No active official alerts.")
+                    }
+                    ForEach(activeAlerts) { alert in
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 18) {
+                                Text(alert.title).font(.title2.bold())
+                                Text(alert.issuer).foregroundStyle(.secondary)
+                                Text(alert.endDate.formatted(.monthDayTime, timezoneIdentifier: snapshot.timezoneIdentifier))
+                                    .monospacedDigit()
+                                if let body = alert.body, !body.isEmpty { Text(body) }
+                                if let url = alert.detailURL.flatMap(URL.init(string:)), url.scheme == "https" {
+                                    Link("Source Details", destination: url)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                }
+                .font(.system(size: 28))
+                .padding(20)
+            }
+            .scrollClipDisabled()
+        }
+        .padding(70)
+        .background(Color(hex: 0x102136))
+        .onExitCommand { dismiss() }
     }
 }
 
@@ -196,7 +261,7 @@ private struct ClothingAdviceCard: View {
 
     var body: some View {
         GlassCard(cornerRadius: 24, tint: tint) {
-            HStack(spacing: 44 * layoutScale) {
+            HStack(spacing: 28 * layoutScale) {
                 VStack(alignment: .center, spacing: 6 * layoutScale) {
                     Image(systemName: advice.index.symbolName)
                         .font(.system(size: 37 * layoutScale, weight: .semibold))
@@ -217,21 +282,15 @@ private struct ClothingAdviceCard: View {
                 .frame(maxWidth: .infinity, alignment: .center)
 
                 VStack(alignment: .center, spacing: 6 * layoutScale) {
-                    Text("Today")
-                        .font(.system(size: 19 * layoutScale, weight: .bold, design: .rounded))
-                        .tracking(1.2 * layoutScale)
-                        .textCase(.uppercase)
-                        .foregroundStyle(.white.opacity(0.52))
                     Text(advice.outfit)
-                        .font(.system(size: 26 * layoutScale, weight: .semibold, design: .rounded))
+                        .font(.system(size: 29 * layoutScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
                     Text(advice.detail)
-                        .font(.system(size: 19 * layoutScale, weight: .medium, design: .rounded))
+                        .font(.system(size: 23 * layoutScale, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.60))
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, alignment: .center)

@@ -161,7 +161,7 @@ final class RAYNTests: XCTestCase {
       )
     ]
 
-    let advisories = WeatherAdvisoryBuilder.make(from: snapshot)
+    let advisories = WeatherAdvisoryBuilder.make(from: snapshot, at: snapshot.updatedAt)
     XCTAssertTrue(advisories.contains { $0.isOfficial && $0.id.hasPrefix("official-") })
   }
 
@@ -372,27 +372,20 @@ final class RAYNTests: XCTestCase {
     XCTAssertEqual(Set(result.failedSources), Set(["forecast", "airQuality", "radar", "marine"]))
   }
 
-  func testWeatherKitProviderExplicitlyFallsBack() async {
-    do {
-      _ = try await AppleWeatherKitProvider().fetchForecast(for: .beijing)
-      XCTFail("WeatherKit capability is intentionally absent in this unsigned build")
-    } catch {
-      XCTAssertTrue(
-        error.localizedDescription.contains("Open-Meteo")
-          || error.localizedDescription.contains("WeatherKit"))
-    }
-  }
-
   func testProviderSelectionHasOneReadableSwitchPoint() {
+    #if RAYN_WEATHERKIT
+    XCTAssertEqual(RAYNProviderConfiguration.forecastSource, .weatherKit)
+    #else
     XCTAssertEqual(RAYNProviderConfiguration.forecastSource, .openMeteo)
+    #endif
     XCTAssertEqual(RAYNProviderConfiguration.airQualitySource, .openMeteo)
-    XCTAssertEqual(RAYNProviderConfiguration.radarSource, .rainViewer)
+    XCTAssertEqual(RAYNProviderConfiguration.radarSource, .regional)
     XCTAssertEqual(RAYNProviderConfiguration.marineSource, .openMeteo)
     XCTAssertEqual(RAYNProviderConfiguration.locationSearchSource, .openMeteo)
   }
 
   func testInitialRefreshPlanDefersHeavySupplementarySources() {
-    XCTAssertEqual(RefreshPlan.initial, Set([RefreshSource.forecast, .airQuality]))
+    XCTAssertEqual(RefreshPlan.initial, Set([RefreshSource.forecast, .airQuality, .alerts]))
     XCTAssertEqual(RefreshPlan.all, Set(RefreshSource.allCases))
     XCTAssertFalse(RefreshPlan.initial.contains(.radar))
     XCTAssertFalse(RefreshPlan.initial.contains(.marine))
@@ -409,7 +402,7 @@ final class RAYNTests: XCTestCase {
     )
 
     let result = await coordinator.refresh(
-      location: .beijing,
+      location: fallback.location,
       fallback: fallback,
       force: true,
       sources: [.radar]
@@ -458,19 +451,11 @@ final class RAYNTests: XCTestCase {
   }
 
   func testHeavySceneHandoffAndRadarWarmupAreSerialized() {
-    let sceneHandoffDelay =
-      Double(ScenePerformancePolicy.sceneHandoffDelayNanoseconds) / 1_000_000_000
     let mapActivationDelay =
       Double(RadarPerformancePolicy.mapActivationDelayNanoseconds) / 1_000_000_000
-    XCTAssertGreaterThan(mapActivationDelay, sceneHandoffDelay)
+    XCTAssertGreaterThan(mapActivationDelay, ScenePerformancePolicy.fadeInDuration)
     XCTAssertLessThan(ScenePerformancePolicy.fadeOutDuration, ScenePerformancePolicy.fadeInDuration)
-    XCTAssertLessThanOrEqual(RadarPerformancePolicy.tileMemoryLimit, 32 * 1_024 * 1_024)
-    XCTAssertEqual(RadarPerformancePolicy.tilePrefetchLimit, 13)
-    XCTAssertEqual(RadarPerformancePolicy.tilePrefetchConcurrency, 4)
-    XCTAssertLessThan(
-      RadarPerformancePolicy.staleOverlayRemovalDelayNanoseconds,
-      RadarPerformancePolicy.playbackIntervalNanoseconds
-    )
+    XCTAssertGreaterThan(RadarPerformancePolicy.loadTimeoutNanoseconds, 12_000_000_000)
   }
 
   func testSceneOrderMatchesRemoteDirectionOrder() {

@@ -363,6 +363,7 @@ struct RadarFrame: Codable, Identifiable, Equatable {
     /// Full `{z}/{x}/{y}` tile template when a provider supplies one.
     /// Keeping this optional preserves compatibility with older snapshots.
     var tileURLTemplate: String?
+    var tileDescriptor: RadarTileDescriptor? = nil
     var source: String
     var isForecast: Bool
 
@@ -386,6 +387,7 @@ struct RadarFrame: Codable, Identifiable, Equatable {
         case timestamp
         case tilePath
         case tileURLTemplate
+        case tileDescriptor
         case source
         case isForecast
     }
@@ -395,6 +397,7 @@ struct RadarFrame: Codable, Identifiable, Equatable {
         timestamp = try container.decode(Int.self, forKey: .timestamp)
         tilePath = try container.decodeIfPresent(String.self, forKey: .tilePath)
         tileURLTemplate = try container.decodeIfPresent(String.self, forKey: .tileURLTemplate)
+        tileDescriptor = try container.decodeIfPresent(RadarTileDescriptor.self, forKey: .tileDescriptor)
         source = try container.decode(String.self, forKey: .source)
         isForecast = try container.decodeIfPresent(Bool.self, forKey: .isForecast) ?? false
     }
@@ -449,6 +452,9 @@ struct WeatherAlertItem: Codable, Identifiable, Equatable {
     var startDate: Date
     var endDate: Date
     var detailURL: String?
+    var providerIdentifier: String? = nil
+    var severity: String? = nil
+    var body: String? = nil
 
     init(id: UUID = UUID(), title: String, issuer: String, startDate: Date, endDate: Date, detailURL: String? = nil) {
         self.id = id
@@ -754,8 +760,8 @@ struct WeatherAdvisory: Identifiable, Codable, Equatable {
 }
 
 enum WeatherAdvisoryBuilder {
-    static func make(from snapshot: WeatherSnapshot) -> [WeatherAdvisory] {
-        var advisories = snapshot.alerts.map { alert in
+    static func make(from snapshot: WeatherSnapshot, at now: Date = Date()) -> [WeatherAdvisory] {
+        var advisories = snapshot.alerts.filter { $0.startDate <= now && $0.endDate > now }.map { alert in
             WeatherAdvisory(
                 id: "official-\(alert.id.uuidString)",
                 title: alert.title,
@@ -887,6 +893,9 @@ struct WeatherSnapshot: Codable, Equatable {
     var radar: RadarSnapshot
     var marine: MarineSnapshot?
     var alerts: [WeatherAlertItem]
+    var alertAvailability: AlertAvailability? = nil
+    var alertsCheckedAt: Date? = nil
+    var sourceAttributions: [DataAttribution]? = nil
     var summary: WeatherSummary
     var updatedAt: Date
     /// Time at which this provider response was received by the app.
