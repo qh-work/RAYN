@@ -9,7 +9,9 @@ RAYN Weather is distributed as source code. There is currently no universal sign
 - Any personal Apple Account added to Xcode. Paid Apple Developer Program membership is not required for installation on your own device.
 - Internet access for the live weather and radar providers.
 
-The default provider configuration uses Open-Meteo and RainViewer. It does not require WeatherKit or a WeatherKit entitlement.
+The default provider configuration uses Open-Meteo, regional NOAA/NWS services and RainViewer. It does not require WeatherKit or a WeatherKit entitlement. The 1.3 regional service additions still need live release acceptance.
+
+For an optional WeatherKit build, enable WeatherKit on your own App ID and use `-xcconfig Config/WeatherKit.example.xcconfig` with your usual `xcodebuild` invocation. This defines `RAYN_WEATHERKIT` and applies the included capability entitlement. Supply your own signing team locally; do not commit it or any signing material. Without this flag, the app continues to use Open-Meteo. Capability-enabled device testing and Apple attribution review are required before distributing that variant.
 
 ## Install with a free Apple Account
 

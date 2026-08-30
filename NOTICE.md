@@ -11,6 +11,7 @@ The MIT License does not grant rights to third-party weather data, radar tiles, 
 - Open-Meteo forecast, air-quality, marine, and geocoding data are subject to Open-Meteo's current terms and CC BY 4.0 attribution requirements. Its free API is restricted to non-commercial use and published usage limits.
 - RainViewer radar access is subject to RainViewer's current API terms. The public service targets personal, educational, and small-scale community use, requires visible attribution, and provides no service-level guarantee.
 - Apple WeatherKit is optional. A distributor enabling it must supply an authorized App ID and comply with Apple's attribution, trademark, and service requirements.
+- The candidate includes NOAA/NWS official alerts and a regional radar adapter. These are independent runtime services, not a promise of universal coverage, timeliness or endorsement; preserve agency attribution and review their service guidance.
 - Apple MapKit content and SF Symbols are supplied by the operating system and are governed by Apple's applicable agreements. They are not redistributed under the MIT License.
 
 Provider terms can change independently of this repository. Distributors are responsible for checking the current terms before shipping a build.

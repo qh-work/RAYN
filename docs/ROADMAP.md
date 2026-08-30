@@ -4,6 +4,8 @@ RAYN Weather aims to become a dependable, provider-neutral weather experience fo
 
 ## What is available now
 
+The list below describes the existing product, not certification of every environment. Version 1.3 remains a candidate; its [change record](CHANGE_RECORDS/2026-08-30-1.3-candidate.md) is the authority for completed checks and release blockers.
+
 - Native SwiftUI application built for tvOS 27.
 - Current, hourly, and 10-day forecasts backed by live provider responses.
 - Selectable 10-day rows with a dedicated detail view for every available day.
@@ -43,6 +45,20 @@ The 1.2 visual and maintainability pass delivered several items ahead of their o
 See [`docs/CHANGE_RECORDS/2026-08-19-macos-weather-polish.md`](CHANGE_RECORDS/2026-08-19-macos-weather-polish.md) for verification evidence and remaining limits.
 
 ## Near term — solidify the 1.x foundation
+
+### 1.3 candidate implementation — 2026-08-30
+
+- [x] Code: shared cancellable radar pipeline, visible-tile-only requests, draw-driven pending-layer handoff and a timeout/retry UI.
+- [x] Code: per-location refresh isolation, honest stale state and stricter live-response validation.
+- [x] Code: US official-alert adapter, regional NOAA WMS adapter and provider-owned legends; optional WeatherKit build template.
+- [x] Checks: 31 deterministic core regressions, tvOS provider/MapKit type checking and nine-language catalog validation.
+- [ ] Full SwiftUI application build and remote-navigation tests on the current Xcode beta.
+- [ ] Real NOAA/NWS/WeatherKit endpoint and attribution acceptance for enabled variants.
+- [ ] A12 cold/warm traces, repeated focus navigation, long-running radar, and 1080p/4K accessibility/visual review.
+- [ ] Updated public-city screenshots and demonstration video; asset-provenance review.
+- [ ] Signed release tag, green remote CI, physical installation of that same version, and public announcement.
+
+Do not convert code-complete checkboxes into a performance guarantee or announce 1.3 as stable until the remaining gates pass.
 
 ### Performance and reliability
 

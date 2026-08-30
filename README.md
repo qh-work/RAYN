@@ -74,12 +74,15 @@ The project intentionally stores no personal Development Team. For a physical Ap
 
 ## Live data and licensing
 
+The `release/1.3` work includes a **not-yet-released candidate**, not a validated stable update. See its [implementation and verification record](docs/CHANGE_RECORDS/2026-08-30-1.3-candidate.md). Existing gallery images are from earlier builds, not evidence of the candidate's appearance or performance.
+
 | Capability | Default provider | Public-build constraint |
 | --- | --- | --- |
 | Forecast and location search | [Open-Meteo](https://open-meteo.com/) | Free API is non-commercial, CC BY 4.0, and rate-limited. |
 | Air quality | [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api) | Model data is not a local sensor reading. |
 | Marine weather | [Open-Meteo Marine](https://open-meteo.com/en/docs/marine-weather-api) | Inland and uncovered coordinates may return no marine values. |
-| Radar | [RainViewer](https://www.rainviewer.com/api.html) | Personal, educational, and small-community use; attribution required; no SLA. |
+| Radar | NOAA WMS in the contiguous US, [RainViewer](https://www.rainviewer.com/api/transition-faq.html) elsewhere or on NOAA failure | Coverage varies; historical frames only; source attribution required; new NOAA path awaits live acceptance. |
+| Official alerts | [US National Weather Service](https://www.weather.gov/documentation/services-web-api) | US coverage; unsupported and failed checks are distinct from no active alerts. |
 | Optional forecast adapter | [Apple WeatherKit](https://developer.apple.com/weatherkit/) | Requires your own capability, signing configuration, and Apple attribution. |
 
 Provider terms are not relicensed by this repository. Review [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md) and [`NOTICE.md`](NOTICE.md) before distributing a fork, especially for commercial use.

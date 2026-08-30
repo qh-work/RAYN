@@ -9,7 +9,8 @@ RAYN Weather 不把“精度高”理解成永远正确。天气预测、雷达�
 | 天气预报 | Open-Meteo Forecast API | 当前、逐小时、10 天、日出日落、风、UV | 预报模型并非气象站实况；定位坐标会影响网格结果；免费接口限非商业用途并采用 CC BY 4.0 |
 | 空气质量 | Open-Meteo Air Quality API | AQI、PM2.5、PM10、O₃、NO₂、SO₂、CO | 空气质量是模型/监测融合结果，不能当作本地传感器读数；沿用同一服务许可 |
 | 海况 | Open-Meteo Marine API | 波高、波向、周期、风浪、涌浪 | 近岸或陆地点可能没有海浪模型网格；无值时保留“未覆盖”，不借用远海坐标；沿用同一服务许可 |
-| 雷达 | RainViewer Weather Maps API | 历史雷达帧，若接口提供则附带临近趋势帧 | 仅在实际雷达覆盖区域显示有效回波；免费公共服务没有 SLA |
+| 雷达（1.3 候选） | 美国本土 NOAA WMS；其他区域或失败时使用 RainViewer | 服务实际公布的历史帧、坐标投影和图例 | NOAA 新接入尚待真实网络与实机验收；不混合两家服务的时间序列 |
+| 官方预警（1.3 候选） | NWS Alerts API | 美国官方生效预警原文、发布单位、有效期 | 不支持地区、请求失败、无有效预警分开表示；不把条件推导提醒冒充官方警报 |
 
 ## 公共展示城市验证
 
@@ -21,26 +22,34 @@ RAYN Weather 不把“精度高”理解成永远正确。天气预测、雷达�
 
 `AppleWeatherKitProvider` 已经实现了 `ForecastProvider` 转换边界。启用步骤：
 
-1. 在 `ProviderConfiguration.swift` 将 `forecastSource` 改为 `.weatherKit`。
+1. 使用 `Config/WeatherKit.example.xcconfig` 构建，定义 `RAYN_WEATHERKIT`；不传此配置仍使用免费默认预报源。
 2. 在自己的 Apple Developer App ID 中启用 WeatherKit capability，并用对应签名构建 tvOS 应用。
 3. 保留 `WeatherKitForecastProvider.swift` 到 `WeatherSnapshot` 的转换；不要让 View 直接读取 WeatherKit 的 `Weather`、`HourWeather` 或 `DayWeather`。
-4. 根据 WeatherKit 的归因要求在正式发行版本补充 Apple Weather 和相关气象机构归因。
+4. 适配器请求 WeatherKit 归因元数据并传到 Settings；发布前实测法务链接、Apple Weather 标记和各机构说明，不把静态假标记当成满足归因要求。
 
 WeatherKit 原生 Swift API 提供当前、分钟级降水、逐小时、逐日预报和天气警报；它需要 capability 和有效开发者配置。仓库只包含适配器，不包含任何开发者密钥。
 
 ## 雷达候选方案
 
-### RainViewer（当前默认）
+### RainViewer（全球备用适配器）
 
-RainViewer 的公开 Weather Maps API 返回最近约两小时、十分钟间隔的雷达元数据和瓦片路径；接口也可能返回临近趋势帧。RAYN Weather 将服务返回的瓦片模板放进 `RadarFrame.tileURLTemplate`，地图视图不依赖 RainViewer 的 JSON 结构。
+RainViewer 的公开 Weather Maps API 返回最近约两小时、十分钟间隔的历史雷达元数据和瓦片路径。按其 [2026 API 迁移说明](https://www.rainviewer.com/api/transition-faq.html)，未来 nowcast 已停止，调色板仅保留 Universal Blue，最高缩放为 7，每 IP 每分钟 100 次请求。1.3 只消费历史帧，按应用约每 0.68 秒启动一个瓦片请求，并遵守 Retry-After；共享出口的其他设备仍可能触发服务端限流。时间戳是服务帧的时间，不代表当前位置传感器恰在该秒观测。
+
+`RadarTileStore` 负责全部可见瓦片请求、去重、取消及 32 MB 压缩数据内存缓存；MapKit 仍有自己的渲染资源，32 MB 不是整个应用的内存上限。缓存仅优化同一真实帧的重绘，不用于启动天气回填。图例颜色来自服务公布的 Universal Blue 表，标注反射率 dBZ，不错误换算成毫米降雨量。
 
 RainViewer 免费公共 API 适用于个人、教育和小型社区项目，要求在应用中显示可见归因，并且不保证服务可用性。若项目未来商业化、流量增大或需要 SLA，应联系 RainViewer 或更换为自有/商业雷达服务。
 
 Open-Meteo 免费接口当前要求非商业用途、CC BY 4.0 归因，并限制为每天 10,000 次、每小时 5,000 次和每分钟 600 次调用。项目若加入广告、订阅或用于商业产品，不能继续默认依赖免费接口，应改用其商业套餐或替换 Provider。
 
-### NOAA NEXRAD / MRMS（区域适配候选）
+### NOAA 官方雷达（1.3 候选实现，待实时验收）
 
-NOAA 的 NEXRAD 和 MRMS 适合美国区域，数据质量和官方来源更适合美国用户。它们的服务协议、时间维度和地图格式与 RainViewer 不同，因此不能把 NOAA URL 直接塞进当前 RainViewer 瓦片类；应新增 `NOAARadarProvider`，输出同一个 `RadarSnapshot` 和 `RadarFrame.tileURLTemplate`，并根据经纬度只在美国覆盖范围内启用。
+`NOAARadarProvider` 使用 [NOAA OpenGeo 官方目录](https://opengeo.ncep.noaa.gov/geoserver/www/index.html) 下 `conus/conus_bref_qcd/ows` 服务。解析 WMS capabilities 的真实时间维度，只保留过去两小时内至多 13 帧；GetMap 固定该帧的 TIME，采用 EPSG:3857 边界框。图例地址随 `RadarTileDescriptor` 提供，View 不拼 NOAA 地址。
+
+区域选择同时检查国家和经纬度，不能仅凭矩形范围把加拿大城市归为美国。美国本土的 NOAA 请求失败或没有帧时，整体使用 RainViewer 的序列；不把“latest”图像附上编造的历史时间。当前已通过样例解析和 tvOS 类型检查，不代表该服务在真实网络、全部坐标和电视上已经验证可用。
+
+### NWS 官方预警（1.3 候选实现）
+
+使用 `/alerts/active?point=latitude,longitude&status=actual`，携带可联系到公开仓库的 User-Agent。过滤过期、未来生效、测试及取消消息，以服务 ID 生成稳定列表标识；实际警报关键字段损坏时请求失败，而非显示无预警。预警原文不机器翻译，周围操作文案支持九种语言。默认约每五分钟刷新；不是推送式紧急警报工具，不能替代官方应急通知。
 
 ### DWD Open Data（区域适配候选）
 

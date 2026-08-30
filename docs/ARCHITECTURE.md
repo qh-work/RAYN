@@ -7,11 +7,11 @@
 按下面顺序阅读：
 
 1. `Models/WeatherModels.swift`：跨服务统一的数据模型和业务枚举。
-2. `Services/ProviderContracts.swift`：五类数据源协议、归因模型和 `WeatherProviderSuite`。
+2. `Services/ProviderContracts.swift` 与 `WeatherAlertProvider.swift`：六类数据源协议、归因模型和 `WeatherProviderSuite`（地点搜索独立注入）。
 3. `Services/HTTPClient.swift`：可注入的网络传输边界。
 4. `Services/RefreshCoordinator.swift`：按刷新计划并行调度、失败隔离和退避调度；启动只取主页必需数据，雷达与海况按页面懒加载。
 5. `Services/*Provider.swift`：每个供应商、每类数据各自独立的请求、DTO 和映射。
-6. `Services/ProviderConfiguration.swift`：五类数据服务的唯一切换点。
+6. `Services/ProviderConfiguration.swift`：数据服务的组装与切换点。
 7. `App/AppState.swift`：启动、当前位置优先级、设置持久化、刷新和遥控器场景切换。
 8. `Features/Broadcast/BroadcastView.swift`：大屏壳层、动态背景、场景导航和底部状态条。
 9. `Features/Broadcast/*Scene.swift`：当前、逐小时、10 日、雷达、空气质量、日照月相各自独立；只阅读正在修改的场景。
@@ -77,6 +77,14 @@ View 不直接访问 URL、JSON 字段或某个供应商的类型。更换服务
 WeatherKit 适配器已经独立在 `WeatherKitForecastProvider.swift`。启用它需要开发者账号中的 WeatherKit capability 和自己的签名配置；任何私钥、JWT、Service ID 或用户位置历史都不能提交到仓库。
 
 ## 7. 给其他 AI 的修改协议
+
+1.3 候选新增边界：
+
+- `RadarScene` 管控制和加载状态；`RadarTileMapView` 管 MapKit 层及绘制交接；`RadarTileStore` 管网络、取消、限流和压缩数据缓存。不要重新添加一套预取 URLSession 或等待整圈瓦片。
+- `RadarTileDescriptor` 携带瓦片格式、图例、缩放和调色板信息。新服务不应要求 View 知道其 API 地址或 JSON。
+- `RefreshCoordinator` 以地点 ID 和坐标隔离节流与结果；`AppState` 取消过时任务。主页预报先到即可展示，随后请求 AQ/官方警报，雷达和海况在进入页面后请求。
+- `alertAvailability` 区分已查询、不支持和失败；当前进程的旧天气必须显式标记过期，不能持久化成启动回填。
+- `Scripts/validate-core.sh` 检查真实生产模型/服务，fixture 只在脚本内。`--tvos-typecheck` 使用真实 tvOS SDK 检查数据层和独立 MapKit 组件，不代表 SwiftUI 整个应用已构建。
 
 接手任务时先做四件事：
 
