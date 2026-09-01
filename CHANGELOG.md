@@ -9,11 +9,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### 1.3 candidate — not yet released
 
 - Added provider-neutral official-alert availability, NWS US alert parsing and a home-screen detail sheet; malformed messages cannot silently become an all-clear.
-- Added a regional NOAA WMS radar adapter with advertised frame times and source-provided legend metadata, falling back to RainViewer without blending sources. Live endpoint acceptance is still pending.
+- Added a regional NOAA WMS radar adapter with advertised frame times and source-provided legend metadata, falling back to RainViewer without blending sources.
 - Updated RainViewer to the documented 2026 historical-only, Universal Blue, zoom-7 API contract.
 - Consolidated radar networking into a bounded, cancellable in-memory pipeline. Removed blocking ring prefetch; pending overlays no longer replace the last drawn frame prematurely. Added load-timeout retry controls.
 - Replaced timed scene handoff guesses with animation completion and generation guards; suspended weather animation and refresh work while inactive. Foreground animation cadence is unchanged.
-- Fixed per-city refresh throttling, rejection of another city's previous data, and forecast-only refresh losing supplementary data. Startup remains live-data-only; an in-session failed refresh is explicitly marked stale.
+- Fixed per-city refresh throttling, rejection of another city's previous data, and forecast-only refresh losing supplementary data. Startup and failed forecast refreshes remain live-data-only instead of republishing stale or fixture weather.
+- Accepted Open-Meteo's date-only daily timestamps and legitimate null lunar/UV/daylight points without discarding an otherwise complete live forecast.
 - Improved home spacing, clothing readability, solar-curve proportions and lunar shading. Daylight bars now use a truthful 0–24 hour scale and preserve missing values.
 - Added an optional WeatherKit build configuration and runtime legal attribution. Kept QHWORK authorship and nine-language parity.
 
@@ -21,7 +22,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - 31 deterministic core checks pass, including tile coalescing, cancellation, concurrency, response validation and official-alert boundaries.
 - Production provider and extracted MapKit code pass type checking against the tvOS 27 SDK. Nine-language catalogs and whitespace checks pass.
-- Full SwiftUI application compilation remains blocked by the local Xcode beta macro-plugin error, also observed on the unmodified baseline. No UI, live new-provider, physical A12 or FPS acceptance is claimed.
+- The full unsigned Release application builds with Xcode 27 beta 5 and the tvOS 27 SDK.
+- A reproducible live acceptance script passes Open-Meteo forecast, NWS alerts, NOAA WMS metadata and a real New York radar tile, plus RainViewer history for London. No physical A12 or FPS acceptance is claimed.
 - No 1.3 release tag, public release or new-version promotional media has been published. See the [change record](docs/CHANGE_RECORDS/2026-08-30-1.3-candidate.md).
 
 ## [1.2.4] - 2026-08-24

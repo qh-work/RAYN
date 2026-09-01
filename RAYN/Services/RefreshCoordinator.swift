@@ -166,7 +166,10 @@ final class RefreshCoordinator {
       case .failure:
         failures.append(RefreshSource.forecast.rawValue)
         recordFailure(.forecast, at: now)
-        snapshot?.isOffline = true
+        // A forecast failure must not republish a previous or fixture snapshot
+        // as though it were current. Supplementary-only refreshes still retain
+        // the active live forecast because they never enter this branch.
+        snapshot = nil
       }
     } else {
       deferred.append(RefreshSource.forecast.rawValue)

@@ -227,6 +227,18 @@ final class RAYNTests: XCTestCase {
     XCTAssertNotNil(snapshot.fetchedAt)
   }
 
+  func testWeatherDateParserAcceptsOpenMeteoDailyDate() {
+    let timezone = TimeZone(identifier: "America/New_York")!
+    let date = WeatherDateParser.date(from: "2026-09-01", timezone: timezone)
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = timezone
+
+    XCTAssertNotNil(date)
+    XCTAssertEqual(date.map { calendar.component(.year, from: $0) }, 2026)
+    XCTAssertEqual(date.map { calendar.component(.month, from: $0) }, 9)
+    XCTAssertEqual(date.map { calendar.component(.day, from: $0) }, 1)
+  }
+
   func testOpenMeteoFieldsAndCurrentProbabilityAreMapped() throws {
     let json = #"""
       {

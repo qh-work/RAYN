@@ -20,9 +20,17 @@ enum WeatherDateParser {
     let isoValue = fractionalISOFormatter.date(from: string) ?? standardISOFormatter.date(from: string)
     if let isoValue { return isoValue }
 
-    return WeatherDateFormatterCache.date(
+    if let localDateTime = WeatherDateFormatterCache.date(
       from: string,
       format: "yyyy-MM-dd'T'HH:mm",
+      timezone: timezone ?? TimeZone(secondsFromGMT: 0)!
+    ) {
+      return localDateTime
+    }
+
+    return WeatherDateFormatterCache.date(
+      from: string,
+      format: "yyyy-MM-dd",
       timezone: timezone ?? TimeZone(secondsFromGMT: 0)!
     )
   }

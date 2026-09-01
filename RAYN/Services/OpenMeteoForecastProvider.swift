@@ -141,7 +141,7 @@ struct OpenMeteoForecastProvider: ForecastProvider {
       cloudCoverLow: currentPayload?.cloudCoverLow,
       cloudCoverMid: currentPayload?.cloudCoverMid,
       cloudCoverHigh: currentPayload?.cloudCoverHigh,
-      daylightDuration: dailyPayload?.daylightDuration?.first,
+      daylightDuration: dailyPayload?.daylightDuration?.first ?? nil,
       moonrise: dailyPayload?.moonrise?.first.flatMap {
         WeatherDateParser.date(from: $0, timezone: timezone)
       },
@@ -210,8 +210,8 @@ struct OpenMeteoForecastProvider: ForecastProvider {
         sunset: dailyPayload?.sunset?[safe: index].flatMap {
           WeatherDateParser.date(from: $0, timezone: timezone)
         },
-        uvIndex: dailyPayload?.uvIndexMax?[safe: index],
-        daylightDuration: dailyPayload?.daylightDuration?[safe: index]
+        uvIndex: dailyPayload?.uvIndexMax?[safe: index] ?? nil,
+        daylightDuration: dailyPayload?.daylightDuration?[safe: index] ?? nil
       )
     }
 
@@ -340,9 +340,12 @@ struct OpenMeteoForecastPayload: Decodable {
     var sunset: [String?]?
     var moonrise: [String?]?
     var moonset: [String?]?
-    var moonPhase: [Double]?
-    var uvIndexMax: [Double]?
-    var daylightDuration: [Double]?
+    // Polar regions and lunar edge cases legitimately return null entries.
+    // Decode points independently so one absent event cannot discard the
+    // complete live forecast response.
+    var moonPhase: [Double?]?
+    var uvIndexMax: [Double?]?
+    var daylightDuration: [Double?]?
 
     enum CodingKeys: String, CodingKey {
       case time
