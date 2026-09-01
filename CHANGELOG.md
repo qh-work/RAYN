@@ -24,6 +24,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Production provider and extracted MapKit code pass type checking against the tvOS 27 SDK. Nine-language catalogs and whitespace checks pass.
 - The full unsigned Release application builds with Xcode 27 beta 5 and the tvOS 27 SDK.
 - A reproducible live acceptance script passes Open-Meteo forecast, NWS alerts, NOAA WMS metadata and a real New York radar tile, plus RainViewer history for London. No physical A12 or FPS acceptance is claimed.
+- GitHub's Xcode 27 runner passes the full build and all 44 deterministic unit tests.
 - No 1.3 release tag, public release or new-version promotional media has been published. See the [change record](docs/CHANGE_RECORDS/2026-08-30-1.3-candidate.md).
 
 ## [1.2.4] - 2026-08-24
