@@ -86,8 +86,8 @@ struct CoreChecks {
         let coordinator = RefreshCoordinator(forecastProvider: FailingForecast(),
                                             airQualityProvider: FailingAir(), radarProvider: FailingRadar(),
                                             marineProvider: FailingMarine())
-        let stale = await coordinator.refresh(location: location, fallback: fixture, sources: [.forecast])
-        try expect(stale.snapshot?.isOffline == true, "same-city session retains explicitly stale values")
+        let failedRefresh = await coordinator.refresh(location: location, fallback: fixture, sources: [.forecast])
+        try expect(failedRefresh.snapshot == nil, "same-city forecast failure does not republish stale values")
         var other = location
         other.id = UUID()
         other.latitude = 34
